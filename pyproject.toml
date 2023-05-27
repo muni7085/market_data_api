@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "nse-api"
+version = "0.1.0"
+description = "get stocks and options related information"
+authors = ["munikumar <munikumar7085@gmail.com>"]
+license = "N/A"
+readme = "README.md"
+packages = [{include = "nse_api"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.95.2"
+uvicorn = "^0.22.0"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
