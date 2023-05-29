@@ -2,7 +2,7 @@ import json
 from typing import List, Any
 
 
-def get_PE_CE_data(option_type:str, data:dict, is_data:bool)->dict[str, list]:
+def get_PE_CE_data(option_type: str, data: dict, is_data: bool) -> dict[str, list]:
     """
     if CE or PE data is present then returns the data in dict format else returns dict with `0` values
 
@@ -17,11 +17,11 @@ def get_PE_CE_data(option_type:str, data:dict, is_data:bool)->dict[str, list]:
 
     Returns
     -------
-        filtered_data: ``dict[str, list]`` 
+        filtered_data: ``dict[str, list]``
             cleaned data for given option type
     """
     if is_data:
-        filtered_data={
+        filtered_data = {
             "strikePrice": data[option_type]["strikePrice"],
             "lastPrice": data[option_type]["lastPrice"],
             "change": data[option_type]["change"],
@@ -31,7 +31,7 @@ def get_PE_CE_data(option_type:str, data:dict, is_data:bool)->dict[str, list]:
             "pchangeinOpenInterest": data[option_type]["pchangeinOpenInterest"],
         }
     else:
-        filtered_data= {
+        filtered_data = {
             "strikePrice": None,
             "lastPrice": None,
             "change": None,
@@ -41,6 +41,7 @@ def get_PE_CE_data(option_type:str, data:dict, is_data:bool)->dict[str, list]:
             "pchangeinOpenInterest": None,
         }
     return filtered_data
+
 
 def get_expiry_based_ce_pe(
     expiry_list: List[str], all_data: List[dict]
@@ -58,10 +59,10 @@ def get_expiry_based_ce_pe(
 
     Returns
     -------
-        option_data: ``dict[str, dict[str, list]]`` 
+        option_data: ``dict[str, dict[str, list]]``
             cleaned data for given expiry dates
     """
-    option_data:dict = {expiry: {"ce": [], "pe": []} for expiry in expiry_list}
+    option_data: dict = {expiry: {"ce": [], "pe": []} for expiry in expiry_list}
     for data in all_data:
         if data["expiryDate"] in expiry_list:
             if "CE" in data.keys():
@@ -85,7 +86,7 @@ def get_expiry_based_ce_pe(
 
 def clean_options_data(response: str, month: str) -> dict[str, dict[str, list]]:
     """
-    clean the api response from NSE, to get given month expiry (weekly) contracts and 
+    clean the api response from NSE, to get given month expiry (weekly) contracts and
     response contains dictionary of expiry data as key and values as ce and pe list of dicts
     with `strikePrice`, `lastPrice`, `change`, `pChange`, `openInterest`, `changeinOpenInterest`, `pchangeinOpenInterest`
 
@@ -98,10 +99,10 @@ def clean_options_data(response: str, month: str) -> dict[str, dict[str, list]]:
 
     Returns
     -------
-        cleaned: ``dict[str, dict[str, list]]`` 
+        cleaned: ``dict[str, dict[str, list]]``
             dictionary of expiry and their ce, pe data
     """
-    response_dict:dict = json.loads(response_dict)
+    response_dict: dict = json.loads(response_dict)
     current_month_expires = [
         expiry
         for expiry in response_dict["records"]["expiryDates"]
