@@ -1,9 +1,10 @@
 import requests
-import json
 from .data_cleaner import clean_options_data
+from typing import Union
+from requests import Response
 
 
-def get_api_data(url: str, month: str):
+def get_api_data(url: str, month: str)->Union[dict , Response]:
     header = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36",
         "authority": "www.nseindia.com",
