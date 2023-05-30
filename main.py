@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fetch_data.options.indices import get_banknifty_data
+from fetch_data.options.indices import get_option_chain_data
 
 app = FastAPI()
 
@@ -9,6 +9,6 @@ def index():
     return "This is main page"
 
 
-@app.get("/option")
-def option_chain():
-    return get_banknifty_data()
+@app.get("/option/{symbol}")
+def option_chain(symbol):
+    return get_option_chain_data(symbol=symbol)

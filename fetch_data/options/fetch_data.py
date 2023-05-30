@@ -13,6 +13,6 @@ def get_api_data(url: str, month: str):
     response = requests.get(url, headers=header)
     if response.status_code == 200:
         response = response.text
-        return clean_options_data(response_dict=response, month=month)
+        return clean_options_data(response=response, month=month)
     else:
         return response.headers

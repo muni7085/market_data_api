@@ -102,7 +102,7 @@ def clean_options_data(response: str, month: str) -> dict[str, dict[str, list]]:
         cleaned: ``dict[str, dict[str, list]]``
             dictionary of expiry and their ce, pe data
     """
-    response_dict: dict = json.loads(response_dict)
+    response_dict: dict = json.loads(response)
     current_month_expires = [
         expiry
         for expiry in response_dict["records"]["expiryDates"]
