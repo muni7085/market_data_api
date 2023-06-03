@@ -12,9 +12,9 @@ def index():
     return "This is main page"
 
 
-@app.get("/option/{symbol}")
-def option_chain(symbol):
-    return get_option_chain_data(symbol=symbol)
+@app.post("/option/{symbol}")
+def option_chain(symbol:str, expiry_month:ExpiryMonth):
+    return get_option_chain_data(symbol=symbol,expiry_month=expiry_month.month)
 
 @app.get('/index/{index_name}')
 def index_stocks(index_name: str,specific_stock: Optional[str] = None):
