@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fetch_data.options.indices import get_option_chain_data
 from stocks.indices import get_index_stocks_data
 
+from body_classes.option_chain_body import ExpiryMonth
 app = FastAPI()
 
 

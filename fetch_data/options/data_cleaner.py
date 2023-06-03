@@ -106,7 +106,7 @@ def clean_options_data(response: str, month: str) -> dict[str, dict[str, list]]:
     current_month_expires = [
         expiry
         for expiry in response_dict["records"]["expiryDates"]
-        if month in expiry.lower()
+        if month.lower() in expiry.lower()
     ]
     if len(current_month_expires) == 0:
         return {"error": "No contracts available for give month"}
