@@ -1,7 +1,7 @@
 # option_chain_api
 
 create conda enviroment with the following command:  
-`conda create --name option-chain python=3.11`
+`conda create --name option-chain python=3.10`
 
 If poetry not available install poetry:  
 `sudo apt install poetry`
