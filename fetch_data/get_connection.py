@@ -1,5 +1,5 @@
 from fetch_data.constants import API_KEY, CLIENT_ID, PWD, TOKEN
-from smartapi import SmartConnect
+from SmartApi import SmartConnect
 import pyotp
 
 
@@ -24,3 +24,18 @@ class SmartApiConnection(metaclass=Singleton):
             if "jwtToken" in client_data:
                 return client_data["jwtToken"]
         return None
+
+    def get_headers(self):
+        auth_token = self.get_auth_token()
+        headers = {
+            "Authorization": auth_token,
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "X-UserType": "USER",
+            "X-SourceID": "WEB",
+            "X-ClientLocalIP": "CLIENT_LOCAL_IP",
+            "X-ClientPublicIP": "CLIENT_PUBLIC_IP",
+            "X-MACAddress": "MAC_ADDRESS",
+            "X-PrivateKey": API_KEY,
+        }
+        return headers
