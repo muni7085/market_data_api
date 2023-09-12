@@ -1,4 +1,4 @@
-from .constants import BASE_URL
+from ..constants import BASE_URL
 from .fetch_data import get_api_data
 from typing import Union
 from requests import Response
