@@ -7,6 +7,7 @@ license = "N/A"
 readme = "README.md"
 packages = [{include = "nse_api"}]
 
+
 [tool.poetry.dependencies]
 python = "^3.10"
 fastapi = "^0.95.2"
@@ -17,11 +18,13 @@ websocket-client = "^1.5.2"
 sqlalchemy = "^2.0.15"
 pyotp = "^2.9.0"
 
-
-[tool.poetry.group.dev.dependencies]
+[tool.poetry.dev-dependencies]
 black = "^23.3.0"
 mypy = "^1.3.0"
+
+
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
