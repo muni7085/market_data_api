@@ -1,1 +1,0 @@
-BASE_URL = 'https://www.nseindia.com/api/equity-stockIndices?index='

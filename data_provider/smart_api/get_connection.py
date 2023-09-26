@@ -1,4 +1,4 @@
-from fetch_data.constants import API_KEY, CLIENT_ID, PWD, TOKEN
+from data_provider.smart_api.constants import API_KEY, CLIENT_ID, PWD, TOKEN
 from SmartApi import SmartConnect
 import pyotp
 

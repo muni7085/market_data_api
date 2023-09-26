@@ -1,5 +1,5 @@
-from fetch_data.get_connection import SmartApiConnection
-from fetch_data.constants import API_KEY, SYMBOLS_PATH
+from data_provider.smart_api.get_connection import SmartApiConnection
+from data_provider.smart_api.constants import SYMBOLS_PATH
 import http.client
 import json
 
