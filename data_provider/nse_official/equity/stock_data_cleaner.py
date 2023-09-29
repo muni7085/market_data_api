@@ -1,4 +1,4 @@
-from data_provider.nse_official.models.stock_model import StockData
+from data_provider.models.stock_model import StockData
 
 
 def filter_nifty_stocks(raw_stocks_data):

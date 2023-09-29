@@ -1,5 +1,5 @@
-from data_provider.smart_api.constants import API_KEY, CLIENT_ID, PWD, TOKEN
-from SmartApi import SmartConnect
+from data_provider.smart_api.utils.constants import API_KEY, CLIENT_ID, PWD, TOKEN
+from SmartApi import SmartConnect, smartWebSocketV2
 import pyotp
 
 
@@ -39,3 +39,14 @@ class SmartApiConnection(metaclass=Singleton):
             "X-PrivateKey": API_KEY,
         }
         return headers
+    @staticmethod
+    def get_connection():
+        connection=SmartApiConnection()
+        return connection
+    
+
+def get_smart_websocket_connection():
+    smart_api_connection=SmartApiConnection.get_connection()
+    auth_token=smart_api_connection.get_auth_token()
+    feed_token=smart_api_connection.data.getfeedToken()
+    return smartWebSocketV2(auth_token, API_KEY, CLIENT_ID, feed_token)

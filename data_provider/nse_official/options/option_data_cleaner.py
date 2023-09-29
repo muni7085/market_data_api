@@ -1,4 +1,4 @@
-from data_provider.nse_official.models.option_model import (
+from data_provider.models.option_model import (
     StrikePriceData,
     ExpiryOptionData,
     Option,

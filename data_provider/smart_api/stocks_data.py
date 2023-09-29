@@ -1,49 +1,36 @@
 from data_provider.smart_api.get_connection import SmartApiConnection
-from data_provider.smart_api.constants import SYMBOLS_PATH
 import http.client
 import json
 
 
-def get_token(symbol: str) -> str:
-    """
-    Retrieve the token value for the given symbol
-    Parameters
-    ----------
-    symbol: ``str``
-        Stock symbol `eg:` LT-EQ
-
-    Returns
-    -------
-    RetName: ``str``
-        Token value corresponding to the symbol from the angle one API
-    """
-    with open(SYMBOLS_PATH, "r") as fp:
-        data = json.load(fp)
-    symbol_data = data.get(symbol)
-    token = None
-
-    if symbol_data is not None:
-        token = symbol_data["token"]
-
-    return token
-
-
-def get_stock_data(stock_symbol: str):
+def get_endpoint_connection(payload: str | dict, method_type: str, url: str):
     api_connection = SmartApiConnection()
-    conn = http.client.HTTPSConnection("apiconnect.angelbroking.com")
-    stock_token = get_token(stock_symbol)
-    payload = f"""{{   
-        \"exchange\": \"NSE\",    
-        \"tradingsymbol\": \"{stock_symbol}\",  
-        \"symboltoken\":\"{stock_token}\"
-    }}"""
+    connection = http.client.HTTPSConnection("apiconnect.angelbroking.com")
     headers = api_connection.get_headers()
-    conn.request(
-        "POST",
-        "/rest/secure/angelbroking/order/v1/getLtpData",
-        body=payload,
-        headers=headers,
+    connection.request(method_type, url, body=payload, headers=headers)
+    return connection
+
+
+async def partial_price_quote(stock_symbol: str, stock_token: str):
+    payload = {
+        "exchange": "NSE",
+        "tradingsymbol": stock_symbol,
+        "symboltoken": stock_token,
+    }
+    json_payload = json.dumps(payload)
+    url = "/rest/secure/angelbroking/order/v1/getLtpData"
+    connection = get_endpoint_connection(
+        payload=json_payload, method_type="POST", url=url
     )
-    res = conn.getresponse()
+    res = connection.getresponse()
+    data = res.read()
+    return json.loads(data.decode("utf-8"))
+
+
+async def full_price_quote(exchange: str, stock_token: str):
+    payload = {"mode": "FULL", "exchangeTokens": {exchange.upper(): [stock_token]}}
+    url = "rest/secure/angelbroking/market/v1/quote/"
+    connection = get_endpoint_connection(payload=payload, method_type="POST", url=url)
+    res = connection.getresponse()
     data = res.read()
     return json.loads(data.decode("utf-8"))
