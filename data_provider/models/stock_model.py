@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-class StockData(BaseModel):
+class StockPriceInfo(BaseModel):
     symbol:str
-    last_price:float
+    last_traded_price:float
     day_open:float
     day_low:float
     day_high:float
     change:float
-    pchange:float
+    percent_change:float
     
     

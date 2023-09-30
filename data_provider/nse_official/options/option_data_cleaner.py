@@ -5,7 +5,24 @@ from data_provider.models.option_model import (
 )
 
 
-def filter_strike_prices_with_expiry_date(records, expiry_date):
+def filter_strike_prices_with_expiry_date(records: list, expiry_date: str) -> list:
+    """
+    Filter the strike prices with given expiry date.
+        eg: if expiry date is 28-Sep-2023 then filtered data contain strike prices information for that particular expiry
+
+    Parameters:
+    -----------
+    records: `list`
+        List contain the strike prices information.
+    expiry_date: `str`
+        Expiry date in "dd-MM-yyyy".
+
+    Return:
+    -------
+    list
+        list of stock prices data for the given expiry.
+    """
+
     def filterer(record):
         if record["expiryDate"] == expiry_date:
             return record
@@ -15,7 +32,20 @@ def filter_strike_prices_with_expiry_date(records, expiry_date):
     return filter_data
 
 
-def get_option(option):
+def get_option(option: dict) -> dict:
+    """
+    Filter the option data required to initialize `Option` model class, from the given "CE" or "PE" data.
+
+    Parameters:
+    -----------
+    option: `dict`
+        dictionary of either "PE" or "CE" data
+
+    Return:
+    -------
+    dict
+        dictionary contain the option data that is required to initialize `Option` model class.
+    """
     return {
         "ltp": option["lastPrice"],
         "change": option["change"],
@@ -25,7 +55,24 @@ def get_option(option):
     }
 
 
-def filter_index_option(strike_prices: list[dict], expiry_date: str):
+def filter_index_option(
+    strike_prices: list[dict], expiry_date: str
+) -> ExpiryOptionData:
+    """
+    Filter the index option chain data based on the expiry and required data.
+
+    Parameters:
+    -----------
+    strike_prices: `list[dict]`
+        List of strike prices data of an derivative.
+    expiry_date: `str`
+        Expiry date in "dd-MM-yyyy".
+
+    Return:
+    -------
+    ExpiryOptionData
+        This object contain all the strike prices data for a given expiry date.
+    """
     all_strike_prices: list[StrikePriceData] = []
     for strike_price in strike_prices:
         ce, pe = None, None

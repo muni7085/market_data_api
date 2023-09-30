@@ -1,9 +1,11 @@
 from data_provider.smart_api.get_connection import SmartApiConnection
+
 import http.client
+from http.client import HTTPConnection
 import json
 
 
-def get_endpoint_connection(payload: str | dict, method_type: str, url: str):
+def get_endpoint_connection(payload: str | dict, method_type: str, url: str)->HTTPConnection:
     api_connection = SmartApiConnection()
     connection = http.client.HTTPSConnection("apiconnect.angelbroking.com")
     headers = api_connection.get_headers()

@@ -3,10 +3,11 @@ from fastapi import FastAPI, Path, Query, Depends, HTTPException
 from data_provider.nse_official.equity.nse_stocks import (
     get_nifty_index_stocks,
     get_stock_trade_info,
+    get_index_data
 )
 
-from data_provider.models.stock_model import StockData
-from data_provider.nse_official.utils.stock_urls import NIFTY_INDEX_BASE
+from data_provider.models.stock_model import StockPriceInfo
+from data_provider.nse_official.utils.urls import NIFTY_INDEX_BASE
 from data_provider.nse_official.options.nse_options import (
     get_index_option_chain,
     validate_expiry_date,
@@ -33,12 +34,18 @@ async def get_stock_data(stock_symbol: Annotated[str, Path()]):
     return get_stock_trade_info(stock_symbol)
 
 
-@app.get("/stocks/{index_symbol}", response_model=list[StockData])
+@app.get("/stocks/{index_symbol}", response_model=list[StockPriceInfo])
 async def nifty_fifty_stocks(
     index_symbol: Annotated[dict[str, str], Depends(validate_index_symbol)]
 ):
     index_url = f"{NIFTY_INDEX_BASE}{index_symbol}"
     return get_nifty_index_stocks(index_url)
+
+
+@app.get("/index/nse/{index_symbol}")
+async def nse_index_data(index_symbol:Annotated[str,Path()]):
+    validate_index_symbol(index_symbol)
+    return get_index_data(index_symbol)
 
 
 @app.get(
