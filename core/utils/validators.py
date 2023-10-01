@@ -1,13 +1,28 @@
-
 from typing import Annotated
 
 from fastapi import HTTPException, Path
-from core.routers.nse.utils.urls import (
+from core.utils.urls import (
     NSE_INDEX_SYMBOLS,
     NSE_STOCK_SYMBOLS,
     NSE_F_AND_O_SYMBOLS,
 )
 from core.utils.file_utls import get_symbols
+
+
+months = {
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+}
 
 
 def validate_stock_symbol(stock_symbol: str):
@@ -36,7 +51,7 @@ def validate_stock_symbol(stock_symbol: str):
         )
 
 
-def validate_index_symbol(index_symbol: Annotated[str, Path()])->str:
+def validate_index_symbol(index_symbol: Annotated[str, Path()]) -> str:
     """
     Validate index symbol with the available index symbols in the Nse official website.
 
@@ -93,3 +108,23 @@ def validate_derivative_symbols(derivative_symbol: str):
                 + "Please refer nse official website to get index symbols"
             },
         )
+
+
+def validate_expiry_date(expiry_data: str) -> bool:
+    """
+    Validate the given expiry date to ensure that the given date is in "dd-MM-yyyy" format.
+
+    Parameters:
+    -----------
+    expiry_data: `str`
+        expiry date to be validated.
+
+    Return:
+    -------
+    bool
+        whether the given date is valid or not.
+    """
+    day, mon, _ = expiry_data.split("-")
+    if mon not in months or day > 31:
+        return False
+    return True

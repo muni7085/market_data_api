@@ -1,3 +1,4 @@
+
 from core.schemas.option_model import (
     StrikePriceData,
     ExpiryOptionData,
@@ -85,3 +86,4 @@ def filter_index_option(
         )
         all_strike_prices.append(strike_price_data)
     return ExpiryOptionData(strike_prices=all_strike_prices, expiry_data=expiry_date)
+

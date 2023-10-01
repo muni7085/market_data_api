@@ -1,10 +1,10 @@
-from core.routers.nse.equity.stock_data_cleaner import (
+from core.routers.nse.equity.data_processor import (
     filter_nifty_stocks,
     filter_single_stock,
     filter_single_index,
 )
-from core.routers.nse.utils.urls import STOCK_URL, ALL_INDICES
-from core.routers.nse.utils.fetch_data import fetch_nse_data
+from core.utils.urls import STOCK_URL, ALL_INDICES
+from core.utils.fetch_data import fetch_nse_data
 from core.schemas.stock_model import StockPriceInfo
 from typing import Optional
 

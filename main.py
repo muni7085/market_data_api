@@ -1,84 +1,23 @@
 from typing import Annotated
 from fastapi import FastAPI, Path, Query, Depends, HTTPException
-from core.routers.nse import equity
-from core.routers.nse.equity.nse_stocks import (
-    get_nifty_index_stocks,
-    get_stock_trade_info,
-    get_index_data
-)
-from core.schemas.stock_model import StockPriceInfo
-from core.routers.nse.utils.urls import NIFTY_INDEX_BASE
-from core.routers.nse.derivatives.derivatives import (
-    get_index_option_chain,
-    validate_expiry_date,
-)
-from core.routers.nse.utils.validators import (
-    validate_derivative_symbols,
-    validate_index_symbol,
-    validate_stock_symbol,
-)
+from core.routers.nse.derivatives import derivatives
+from core.routers.nse.equity import equity
+
+
 from core.routers.smart_api.utils.validator import validate_symbol_and_get_token
 
 from core.routers.smart_api.stocks_data import partial_price_quote, full_price_quote
 
 app = FastAPI()
 
+app.include_router(derivatives.router)
+app.include_router(equity.router)
+
 
 @app.get("/")
 def index():
     return "This is main page"
 
-
-@app.get("/stock/nse/{stock_symbol}", dependencies=[Depends(validate_stock_symbol)])
-async def get_stock_data(stock_symbol: Annotated[str, Path()]):
-    return get_stock_trade_info(stock_symbol)
-
-
-@app.get("/stocks/{index_symbol}", response_model=list[StockPriceInfo])
-async def nifty_fifty_stocks(
-    index_symbol: Annotated[dict[str, str], Depends(validate_index_symbol)]
-):
-    index_url = f"{NIFTY_INDEX_BASE}{index_symbol}"
-    return get_nifty_index_stocks(index_url)
-
-
-@app.get("/index/nse/{index_symbol}")
-async def nse_index_data(index_symbol:Annotated[str,Path()]):
-    validate_index_symbol(index_symbol)
-    return get_index_data(index_symbol)
-
-
-@app.get(
-    "/option/{derivative_symbol}", dependencies=[Depends(validate_derivative_symbols)]
-)
-async def index_option_chain(
-    derivative_symbol: Annotated[str, Path()],
-    expiry_date: Annotated[
-        str,
-        Query(
-            example="28-Sep-2023",
-        ),
-    ],
-    option_chain_type: Annotated[
-        str,
-        Query(
-            examples={
-                "stock": {"value": "stock", "description": "Option chain for stock"},
-                "index": {"value": "index", "description": "option chain for index"},
-            }
-        ),
-    ],
-):
-    is_date_valid = validate_expiry_date
-    if not is_date_valid:
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "Error": f"{expiry_date} is not valid. It should be dd-MM-yyyy. eg, 28-Sep-2023"
-            },
-        )
-
-    return get_index_option_chain(expiry_date, derivative_symbol, option_chain_type)
 
 
 @app.get("/stock/smart_api/{stock_symbol}")

@@ -2,8 +2,8 @@ import requests
 import json
 from fastapi import HTTPException
 from typing import Any
-from core.routers.nse.utils.headers import REQUEST_HEADERS
-from core.routers.nse.utils.urls import NSE_BASE_URL
+from core.utils.headers import REQUEST_HEADERS
+from core.utils.urls import NSE_BASE_URL
 
 
 def fetch_nse_data(url: str, max_tries: int = 1000) -> Any:
