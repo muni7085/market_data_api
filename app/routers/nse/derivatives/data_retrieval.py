@@ -1,12 +1,10 @@
-from core.routers.nse.derivatives.data_processor import filter_index_option, filter_strike_prices_with_expiry_date
-from core.utils.fetch_data import fetch_nse_data
-from core.utils.urls import INDEX_OPTION_CHAIN_URL, STOCK_OPTION_CHAIN_URL
+from app.routers.nse.derivatives.data_processor import (
+    filter_index_option, filter_strike_prices_with_expiry_date)
+from app.schemas.option_model import ExpiryOptionData, Option, StrikePriceData
+from app.utils.fetch_data import fetch_nse_data
+from app.utils.urls import INDEX_OPTION_CHAIN_URL, STOCK_OPTION_CHAIN_URL
 
-from core.schemas.option_model import (
-    StrikePriceData,
-    ExpiryOptionData,
-    Option,
-)
+
 def get_index_option_chain(
     expiry_date: str, derivative_symbol: str, derivative_type: str
 ) -> ExpiryOptionData:
@@ -41,5 +39,3 @@ def get_index_option_chain(
     expiry_option_data = filter_index_option(filtered_strike_price_data, expiry_date)
 
     return expiry_option_data
-
-

@@ -1,9 +1,11 @@
-import requests
 import json
-from fastapi import HTTPException
 from typing import Any
-from core.utils.headers import REQUEST_HEADERS
-from core.utils.urls import NSE_BASE_URL
+
+import requests
+from fastapi import HTTPException
+
+from app.utils.headers import REQUEST_HEADERS
+from app.utils.urls import NSE_BASE_URL
 
 
 def fetch_nse_data(url: str, max_tries: int = 1000) -> Any:
@@ -32,7 +34,6 @@ def fetch_nse_data(url: str, max_tries: int = 1000) -> Any:
     session = requests.Session()
     request = session.get(NSE_BASE_URL, headers=REQUEST_HEADERS, timeout=5)
     for _ in range(max_tries):
-        
         cookies = dict(request.cookies)
         response = session.get(url, headers=REQUEST_HEADERS, timeout=5, cookies=cookies)
         if response.status_code == 200:

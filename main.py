@@ -1,12 +1,13 @@
 from typing import Annotated
-from fastapi import FastAPI, Path, Query, Depends, HTTPException
-from core.routers.nse.derivatives import derivatives
-from core.routers.nse.equity import equity
 
+from fastapi import Depends, FastAPI, HTTPException, Path, Query
 
-from core.routers.smart_api.utils.validator import validate_symbol_and_get_token
-
-from core.routers.smart_api.stocks_data import partial_price_quote, full_price_quote
+from app.routers.nse.derivatives import derivatives
+from app.routers.nse.equity import equity
+from app.routers.smart_api.stocks_data import (full_price_quote,
+                                                partial_price_quote)
+from app.routers.smart_api.utils.validator import \
+    validate_symbol_and_get_token
 
 app = FastAPI()
 
@@ -17,7 +18,6 @@ app.include_router(equity.router)
 @app.get("/")
 def index():
     return "This is main page"
-
 
 
 @app.get("/stock/smart_api/{stock_symbol}")

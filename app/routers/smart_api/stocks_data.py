@@ -1,11 +1,13 @@
-from core.routers.smart_api.get_connection import SmartApiConnection
-
 import http.client
-from http.client import HTTPConnection
 import json
+from http.client import HTTPConnection
+
+from app.routers.smart_api.get_connection import SmartApiConnection
 
 
-def get_endpoint_connection(payload: str | dict, method_type: str, url: str)->HTTPConnection:
+def get_endpoint_connection(
+    payload: str | dict, method_type: str, url: str
+) -> HTTPConnection:
     api_connection = SmartApiConnection()
     connection = http.client.HTTPSConnection("apiconnect.angelbroking.com")
     headers = api_connection.get_headers()

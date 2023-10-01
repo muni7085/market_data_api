@@ -1,5 +1,4 @@
-
-from core.schemas.stock_model import StockPriceInfo
+from app.schemas.stock_model import StockPriceInfo
 
 
 def filter_nifty_stocks(stocks_data: dict) -> list[StockPriceInfo]:
@@ -62,7 +61,7 @@ def filter_single_stock(symbol: str, stock_data: dict) -> StockPriceInfo:
     )
 
 
-def filter_single_index(index_data: dict)->StockPriceInfo:
+def filter_single_index(index_data: dict) -> StockPriceInfo:
     """
     Filter the required data and create a pydantic model from the given api response for single index.
 

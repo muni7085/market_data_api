@@ -1,13 +1,10 @@
 from typing import Annotated
 
 from fastapi import HTTPException, Path
-from core.utils.urls import (
-    NSE_INDEX_SYMBOLS,
-    NSE_STOCK_SYMBOLS,
-    NSE_F_AND_O_SYMBOLS,
-)
-from core.utils.file_utls import get_symbols
 
+from app.utils.file_utls import get_symbols
+from app.utils.urls import (NSE_F_AND_O_SYMBOLS, NSE_INDEX_SYMBOLS,
+                             NSE_STOCK_SYMBOLS)
 
 months = {
     "Jan",

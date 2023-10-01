@@ -1,12 +1,11 @@
-from core.routers.nse.equity.data_processor import (
-    filter_nifty_stocks,
-    filter_single_stock,
-    filter_single_index,
-)
-from core.utils.urls import STOCK_URL, ALL_INDICES
-from core.utils.fetch_data import fetch_nse_data
-from core.schemas.stock_model import StockPriceInfo
 from typing import Optional
+
+from app.routers.nse.equity.data_processor import (filter_nifty_stocks,
+                                                    filter_single_index,
+                                                    filter_single_stock)
+from app.schemas.stock_model import StockPriceInfo
+from app.utils.fetch_data import fetch_nse_data
+from app.utils.urls import ALL_INDICES, STOCK_URL
 
 
 def get_nifty_index_stocks(url: str) -> list[StockPriceInfo]:

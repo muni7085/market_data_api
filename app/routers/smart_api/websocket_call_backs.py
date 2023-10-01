@@ -1,17 +1,19 @@
-from SmartApi.smartWebSocketV2 import SmartWebSocketV2
-from logzero import logger
 from time import perf_counter
+
+from logzero import logger
+from SmartApi.smartWebSocketV2 import SmartWebSocketV2
+
 
 class DataWebSocket(SmartWebSocketV2):
     def __init__(
         self,
-        auth_token:str,
-        api_key:str,
-        client_code:str,
-        feed_token:str,
-        tokens_list:dict,
-        correlation_id:str,
-        mode:int,
+        auth_token: str,
+        api_key: str,
+        client_code: str,
+        feed_token: str,
+        tokens_list: dict,
+        correlation_id: str,
+        mode: int,
     ) -> None:
         super().__init__(auth_token, api_key, client_code, feed_token)
         self.correlation_id = correlation_id
@@ -19,13 +21,11 @@ class DataWebSocket(SmartWebSocketV2):
         self.tokens_list = tokens_list
         self.counter = 0
         self.max_count = 10
-        
+
     def on_open(self, wsapp):
         logger.info("on websocket open")
         self.subscribe(self.correlation_id, self.mode, self.tokens_list)
         # sws.unsubscribe(correlation_id, mode, token_list1)
-
-
 
     def on_data(self, wsapp, message):
         file_mode = "a+"
@@ -47,10 +47,8 @@ class DataWebSocket(SmartWebSocketV2):
             ) as fp:
                 fp.write(str(format_msg))
 
-
-
     def on_error(self, wsapp, error):
         logger.error(error)
 
-    def on_close(self,wsapp):
+    def on_close(self, wsapp):
         logger.info("Close")

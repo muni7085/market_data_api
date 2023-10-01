@@ -1,6 +1,8 @@
-from core.routers.smart_api.utils.constants import API_KEY, CLIENT_ID, PWD, TOKEN
-from SmartApi import SmartConnect, smartWebSocketV2
 import pyotp
+from SmartApi import SmartConnect, smartWebSocketV2
+
+from app.routers.smart_api.utils.constants import (API_KEY, CLIENT_ID, PWD,
+                                                    TOKEN)
 
 
 class Singleton(type):
@@ -39,14 +41,15 @@ class SmartApiConnection(metaclass=Singleton):
             "X-PrivateKey": API_KEY,
         }
         return headers
+
     @staticmethod
     def get_connection():
-        connection=SmartApiConnection()
+        connection = SmartApiConnection()
         return connection
-    
+
 
 def get_smart_websocket_connection():
-    smart_api_connection=SmartApiConnection.get_connection()
-    auth_token=smart_api_connection.get_auth_token()
-    feed_token=smart_api_connection.data.getfeedToken()
+    smart_api_connection = SmartApiConnection.get_connection()
+    auth_token = smart_api_connection.get_auth_token()
+    feed_token = smart_api_connection.data.getfeedToken()
     return smartWebSocketV2(auth_token, API_KEY, CLIENT_ID, feed_token)
