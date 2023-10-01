@@ -1,4 +1,4 @@
-from data_provider.models.option_model import (
+from core.schemas.option_model import (
     StrikePriceData,
     ExpiryOptionData,
     Option,

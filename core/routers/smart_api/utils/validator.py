@@ -1,5 +1,5 @@
-from data_provider.smart_api.utils.constants import NSE_SYMBOLS_PATH, BSE_SYMBOLS_PATH
-from data_provider.utils.file_utls import get_symbols
+from core.routers.smart_api.utils.constants import NSE_SYMBOLS_PATH, BSE_SYMBOLS_PATH
+from core.utils.file_utls import get_symbols
 from typing import Optional
 
 

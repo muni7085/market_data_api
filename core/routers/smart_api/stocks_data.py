@@ -1,4 +1,4 @@
-from data_provider.smart_api.get_connection import SmartApiConnection
+from core.routers.smart_api.get_connection import SmartApiConnection
 
 import http.client
 from http.client import HTTPConnection

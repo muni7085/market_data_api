@@ -5,9 +5,9 @@ CURRENT_DIR = os.getcwd()
 
 # file paths for symbols
 
-NSE_STOCK_SYMBOLS = f"{CURRENT_DIR}/data/nse/nse_stock_symbols.json"
-NSE_INDEX_SYMBOLS = f"{CURRENT_DIR}/data/nse/nse_index_symbols.json"
-NSE_F_AND_O_SYMBOLS = f"{CURRENT_DIR}/data/nse/nse_futures_and_options.json"
+NSE_STOCK_SYMBOLS = f"{CURRENT_DIR}/core/data/nse/nse_stock_symbols.json"
+NSE_INDEX_SYMBOLS = f"{CURRENT_DIR}/core/data/nse/nse_index_symbols.json"
+NSE_F_AND_O_SYMBOLS = f"{CURRENT_DIR}/core/data/nse/nse_futures_and_options.json"
 
 # Stock Urls from nse
 NIFTY_INDEX_BASE = f"{NSE_BASE_URL}/api/equity-stockIndices?index="

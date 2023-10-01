@@ -2,12 +2,12 @@
 from typing import Annotated
 
 from fastapi import HTTPException, Path
-from data_provider.nse_official.utils.urls import (
+from core.routers.nse.utils.urls import (
     NSE_INDEX_SYMBOLS,
     NSE_STOCK_SYMBOLS,
     NSE_F_AND_O_SYMBOLS,
 )
-from data_provider.utils.file_utls import get_symbols
+from core.utils.file_utls import get_symbols
 
 
 def validate_stock_symbol(stock_symbol: str):

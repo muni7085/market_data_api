@@ -1,4 +1,5 @@
-from data_provider.models.stock_model import StockPriceInfo
+
+from core.schemas.stock_model import StockPriceInfo
 
 
 def filter_nifty_stocks(stocks_data: dict) -> list[StockPriceInfo]:

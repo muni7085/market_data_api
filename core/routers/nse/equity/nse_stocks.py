@@ -1,33 +1,33 @@
-from data_provider.nse_official.equity.stock_data_cleaner import (
+from core.routers.nse.equity.stock_data_cleaner import (
     filter_nifty_stocks,
     filter_single_stock,
     filter_single_index,
 )
-from data_provider.nse_official.utils.urls import STOCK_URL, ALL_INDICES
-from data_provider.nse_official.utils.fetch_data import fetch_nse_data
-from data_provider.models.stock_model import StockPriceInfo
+from core.routers.nse.utils.urls import STOCK_URL, ALL_INDICES
+from core.routers.nse.utils.fetch_data import fetch_nse_data
+from core.schemas.stock_model import StockPriceInfo
 from typing import Optional
 
 
-def get_nifty_index_stocks(url: str)->list[StockPriceInfo]:
+def get_nifty_index_stocks(url: str) -> list[StockPriceInfo]:
     """
     Fetch the price information about the stocks that are in the provided NSE index.
 
     Parameters:
-    ----------- 
+    -----------
     url: `str`
         Url for fetching the nse index stocks data.
 
     Return:
-    -------              
-    list[StockData]         
+    -------
+    list[StockData]
         List of StockData models that contain the price information about the stocks.
     """
     nifty_fifty_socks = fetch_nse_data(url)
     return filter_nifty_stocks(nifty_fifty_socks["data"])
 
 
-def get_stock_trade_info(symbol: str)->StockPriceInfo:
+def get_stock_trade_info(symbol: str) -> StockPriceInfo:
     """
     Provide the price information about given stock symbol.
 
@@ -48,7 +48,7 @@ def get_stock_trade_info(symbol: str)->StockPriceInfo:
     return filter_single_stock(symbol, price_info)
 
 
-def get_index_data(symbol: str)->Optional[StockPriceInfo]:
+def get_index_data(symbol: str) -> Optional[StockPriceInfo]:
     """
     Provide the price information about the Nse indices like NIFTY 50, NIFTY BANK etc.
 

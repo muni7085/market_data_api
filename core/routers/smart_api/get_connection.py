@@ -1,4 +1,4 @@
-from data_provider.smart_api.utils.constants import API_KEY, CLIENT_ID, PWD, TOKEN
+from core.routers.smart_api.utils.constants import API_KEY, CLIENT_ID, PWD, TOKEN
 from SmartApi import SmartConnect, smartWebSocketV2
 import pyotp
 
