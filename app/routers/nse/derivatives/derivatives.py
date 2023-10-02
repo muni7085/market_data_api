@@ -3,13 +3,19 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from app.routers.nse.derivatives.data_retrieval import get_index_option_chain
-from app.utils.validators import (validate_derivative_symbols,
-                                   validate_expiry_date)
+from app.schemas.option_model import ExpiryOptionData
+from app.utils.validators import (
+    validate_derivative_symbol_with_type,
+    validate_and_reformat_expiry_date,
+)
 
 router = APIRouter(prefix="/nse/derivatives", tags=["derivatives"])
 
 
-@router.get("/{derivative_symbol}", dependencies=[Depends(validate_derivative_symbols)])
+@router.get(
+    "/{derivative_symbol}",
+    response_model=ExpiryOptionData,
+)
 async def index_option_chain(
     derivative_symbol: Annotated[str, Path()],
     expiry_date: Annotated[
@@ -28,7 +34,13 @@ async def index_option_chain(
         ),
     ],
 ):
-    is_date_valid = validate_expiry_date
+    validate_derivative_symbol_with_type(
+        derivative_symbol, derivative_type
+    )
+    
+    formatted_expiry_date, is_date_valid = validate_and_reformat_expiry_date(
+        expiry_date
+    )
     if not is_date_valid:
         raise HTTPException(
             status_code=400,
@@ -37,4 +49,6 @@ async def index_option_chain(
             },
         )
 
-    return get_index_option_chain(expiry_date, derivative_symbol, derivative_type)
+    return get_index_option_chain(
+        formatted_expiry_date, derivative_symbol, derivative_type
+    )

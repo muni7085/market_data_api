@@ -1,10 +1,11 @@
-from typing import Annotated
+from typing import Annotated, Optional, Tuple
 
+from datetime import datetime
+import re
 from fastapi import HTTPException, Path
 
 from app.utils.file_utls import get_symbols
-from app.utils.urls import (NSE_F_AND_O_SYMBOLS, NSE_INDEX_SYMBOLS,
-                             NSE_STOCK_SYMBOLS)
+from app.utils.urls import NSE_F_AND_O_SYMBOLS, NSE_INDEX_SYMBOLS, NSE_STOCK_SYMBOLS
 
 months = {
     "Jan",
@@ -81,33 +82,70 @@ def validate_index_symbol(index_symbol: Annotated[str, Path()]) -> str:
     return symbols[index_symbol]
 
 
-def validate_derivative_symbols(derivative_symbol: str):
+def validate_derivative_symbol_with_type(
+    derivative_symbol: str, derivative_type: str
+) -> None:
     """
     Validate derivative symbol with the available derivative symbols in the Nse official website.
 
     Parameters:
     -----------
     derivative_symbol: `str`
-        derivative symbol to be validated
+        Derivative symbol to be validated.
          eg: "NIFTY", "ABB", etc.
+    derivative_type: `str`
+        Derivative type should be either index of stock.
 
     Raises:
     -------
     HTTPException:
-        Raises when the derivative symbol is not available in the Nse official website.
+        If derivative type and derivate symbol mismatch.
+        If derivative symbol is not present the symbols file.
     """
     all_derivative_symbols = get_symbols(NSE_F_AND_O_SYMBOLS)
+    index_derivatives = ["NIFTY", "BANKNIFTY", "MIDCPNIFTY", "FINNIFTY"]
+
+    if (derivative_type == "index" and derivative_symbol not in index_derivatives) or (
+        derivative_type == "stock" and derivative_symbol in index_derivatives
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "Error": f"{derivative_symbol} and {derivative_type} not matched. "
+                + "If derivative is index like NIFTY then derivative type should be index and vice versa"
+            },
+        )
+
     if derivative_symbol not in all_derivative_symbols:
         raise HTTPException(
-            status_code=404,
+            status_code=400,
             detail={
-                "Error": f"{derivative_symbol} is not a valid index symbol. "
-                + "Please refer nse official website to get index symbols"
+                "Error": f"{derivative_symbol} is not a valid derivative symbol. "
+                + "Please refer nse official website to get derivative symbols"
             },
         )
 
 
-def validate_expiry_date(expiry_data: str) -> bool:
+def get_date_format(date: str) -> str:
+    """
+    Gives the format of given date eg, if date is `09/09/2023` then format is `%d/%m/%Y`.
+
+    Parameters:
+    -----------
+    date: `str`
+        Date to get the format.
+
+    Return:
+    -------
+    str
+        Format of the given date.
+    """
+    date_separator = "/" if len(date.split("/")) > 1 else "-"
+    month_format = "%b" if re.search("[a-zA-Z]+", date) else "%m"
+    return f"%d{date_separator}{month_format}{date_separator}%Y"
+
+
+def validate_and_reformat_expiry_date(expiry_data: str) -> Tuple[str, bool]:
     """
     Validate the given expiry date to ensure that the given date is in "dd-MM-yyyy" format.
 
@@ -118,10 +156,14 @@ def validate_expiry_date(expiry_data: str) -> bool:
 
     Return:
     -------
-    bool
-        whether the given date is valid or not.
+    Tuple[str,bool]
+        Reformated expiry date and validation status of expiry date.
     """
-    day, mon, _ = expiry_data.split("-")
-    if mon not in months or day > 31:
-        return False
-    return True
+    required_date_format = "%d-%b-%Y"
+    date_format = get_date_format(expiry_data)
+
+    try:
+        date_obj = datetime.strptime(expiry_data, date_format)
+        return date_obj.strftime(required_date_format), True
+    except ValueError:
+        return date_format, False

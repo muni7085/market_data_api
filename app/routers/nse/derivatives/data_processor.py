@@ -80,4 +80,4 @@ def filter_index_option(
             strike_price=strike_price["strikePrice"], ce=ce, pe=pe
         )
         all_strike_prices.append(strike_price_data)
-    return ExpiryOptionData(strike_prices=all_strike_prices, expiry_data=expiry_date)
+    return ExpiryOptionData(strike_prices=all_strike_prices, expiry_date=expiry_date)

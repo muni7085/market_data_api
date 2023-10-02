@@ -1,6 +1,9 @@
 from app.routers.nse.derivatives.data_processor import (
-    filter_index_option, filter_strike_prices_with_expiry_date)
-from app.schemas.option_model import ExpiryOptionData, Option, StrikePriceData
+    filter_index_option,
+    filter_strike_prices_with_expiry_date,
+)
+from app.schemas.option_model import ExpiryOptionData
+from fastapi import HTTPException
 from app.utils.fetch_data import fetch_nse_data
 from app.utils.urls import INDEX_OPTION_CHAIN_URL, STOCK_OPTION_CHAIN_URL
 
@@ -21,6 +24,11 @@ def get_index_option_chain(
     derivative_type: `str`
         The derivative type that is either "stock" or "index"
 
+    Raises:
+    -------
+    HTTPException:
+        If there is no expiry for the given derivative on the given expiry date.
+
     Return:
     -------
     ExpiryOptionData
@@ -30,11 +38,15 @@ def get_index_option_chain(
 
     if derivative_type == "stock":
         base_url = STOCK_OPTION_CHAIN_URL
-
     option_chain_url = f"{base_url}{derivative_symbol}"
-    index_option_chain_data = fetch_nse_data(option_chain_url)
+    option_chain_data = fetch_nse_data(option_chain_url)
+    if expiry_date not in option_chain_data["records"]["expiryDates"]:
+        raise HTTPException(
+            status_code=400,
+            detail={"Error": f"No expiry for {derivative_symbol} on {expiry_date}"},
+        )
     filtered_strike_price_data = filter_strike_prices_with_expiry_date(
-        records=index_option_chain_data["records"]["data"], expiry_date=expiry_date
+        records=option_chain_data["records"]["data"], expiry_date=expiry_date
     )
     expiry_option_data = filter_index_option(filtered_strike_price_data, expiry_date)
 

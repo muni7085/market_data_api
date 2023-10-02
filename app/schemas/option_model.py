@@ -19,4 +19,4 @@ class StrikePriceData(BaseModel):
 
 class ExpiryOptionData(BaseModel):
     strike_prices: list[StrikePriceData]
-    expiry_data: str
+    expiry_date: str
