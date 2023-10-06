@@ -1,8 +1,7 @@
 import pyotp
 from SmartApi import SmartConnect, smartWebSocketV2
 
-from app.routers.smart_api.utils.constants import (API_KEY, CLIENT_ID, PWD,
-                                                    TOKEN)
+from app.routers.smart_api.utils.credentails import Credentials
 
 
 class Singleton(type):
@@ -15,10 +14,13 @@ class Singleton(type):
 
 
 class SmartApiConnection(metaclass=Singleton):
-    def __init__(self):
-        self.api = SmartConnect(API_KEY)
-        totp = pyotp.TOTP(TOKEN).now()
-        self.data = self.api.generateSession(CLIENT_ID, PWD, totp)
+    def __init__(self, credentials: Credentials):
+        self.credentials = credentials
+        self.api = SmartConnect(self.credentials.api_key)
+        totp = pyotp.TOTP(self.credentials.token).now()
+        self.data = self.api.generateSession(
+            self.credentials.client_id, self.credentials.pwd, totp
+        )
 
     def get_auth_token(self):
         if "data" in self.data:
@@ -38,18 +40,12 @@ class SmartApiConnection(metaclass=Singleton):
             "X-ClientLocalIP": "CLIENT_LOCAL_IP",
             "X-ClientPublicIP": "CLIENT_PUBLIC_IP",
             "X-MACAddress": "MAC_ADDRESS",
-            "X-PrivateKey": API_KEY,
+            "X-PrivateKey": self.credentials.api_key,
         }
         return headers
 
     @staticmethod
     def get_connection():
-        connection = SmartApiConnection()
+        credentials = Credentials.get_credentials()
+        connection = SmartApiConnection(credentials)
         return connection
-
-
-def get_smart_websocket_connection():
-    smart_api_connection = SmartApiConnection.get_connection()
-    auth_token = smart_api_connection.get_auth_token()
-    feed_token = smart_api_connection.data.getfeedToken()
-    return smartWebSocketV2(auth_token, API_KEY, CLIENT_ID, feed_token)

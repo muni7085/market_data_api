@@ -41,11 +41,7 @@ class DataWebSocket(SmartWebSocketV2):
                 }
             }
 
-            with open(
-                "/home/munikumar/Desktop/python_project/option_chain_api/test.json",
-                file_mode,
-            ) as fp:
-                fp.write(str(format_msg))
+            print(format_msg)
 
     def on_error(self, wsapp, error):
         logger.error(error)

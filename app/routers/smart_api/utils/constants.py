@@ -1,6 +1,5 @@
 import os
 
-BASE_URL = "https://www.nseindia.com/api/option-chain-indices?symbol="
 API_KEY = "zQi2vgME"
 CLIENT_ID = "M200589"
 PWD = "3257"
