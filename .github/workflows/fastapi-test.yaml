@@ -62,10 +62,15 @@ jobs:
       - name: Install poetry and dependencies
         run: |
           conda activate ${{env.APP}}
+          conda env list
+          conda list
           curl -sSL https://install.python-poetry.org | python3 -
           poetry install
+          conda list
       - name: testing
         run: |
           conda activate ${{env.APP}}
+          echo $CONDA_DEFAULT_ENV
+          conda list
           pytest .
     
