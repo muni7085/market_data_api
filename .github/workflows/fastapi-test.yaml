@@ -32,10 +32,7 @@ jobs:
       - name: isort check
         run: isort --diff --check --profile black $(git ls-files '*.py')
       - name: mypy check
-        run: |
-          pwd
-          ls
-          mypy $(git ls-files '*.py')
+        run: mypy $(git ls-files '*.py')
       - name: pylint check
         run: pylint $(git ls-files '*.py')
       
