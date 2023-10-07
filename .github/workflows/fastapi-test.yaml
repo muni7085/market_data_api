@@ -29,8 +29,7 @@ jobs:
     - name: conda package list
       run: conda list -n "$CONDA_ENV"
     
-    - name: install poetry
-      uses: Gr1N/setup-poetry@v8
+    - uses: Gr1N/setup-poetry@v8
   
     - name: Install dependencies
       run: |
