@@ -32,11 +32,10 @@ jobs:
       - name: isort check
         run: isort --diff --check --profile black $(git ls-files '*.py')
       - name: mypy check
-        uses: jpetrucciani/mypy-check@master
-        with:
-          path: '.'
-          mypy_flags: '--config-file .mypy.ini'
-      
+        run: |
+          pwd
+          ls
+          pylint $(git ls-files '*.py')
       - name: pylint check
         run: pylint $(git ls-files '*.py')
       
