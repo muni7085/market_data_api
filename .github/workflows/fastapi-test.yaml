@@ -41,6 +41,27 @@ jobs:
       - name: Install poetry and dependencies
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
-          poetry --version
           poetry install
+    
+  check:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # This job needs the setup job to finish before running
+    needs: setup
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Run black, isort, mypy, and pylint checks on the code
+      - name: Run static checks
+        run: |
+          conda activate ${{env.APP}}
+          black --check .
+          isort --check .
+          mypy .
+          pylint .
+
 
