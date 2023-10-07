@@ -37,6 +37,7 @@ jobs:
       # Install poetry and all the packages in pyproject.toml file
       - name: Install poetry and dependencies
         run: |
+          conda list -n ${{env.APP}}
           curl -sSL https://install.python-poetry.org | python3 -
           source $HOME/.poetry/env
           poetry install
