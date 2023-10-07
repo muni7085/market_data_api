@@ -5,8 +5,7 @@ from typing import Annotated, Tuple
 from fastapi import HTTPException, Path
 
 from app.utils.file_utls import get_symbols
-from app.utils.urls import (NSE_F_AND_O_SYMBOLS, NSE_INDEX_SYMBOLS,
-                            NSE_STOCK_SYMBOLS)
+from app.utils.urls import NSE_F_AND_O_SYMBOLS, NSE_INDEX_SYMBOLS, NSE_STOCK_SYMBOLS
 
 
 def validate_stock_symbol(stock_symbol: str) -> None:
@@ -103,7 +102,7 @@ def validate_derivative_symbol_with_type(
             },
         )
 
-    if derivative_symbol not in all_derivative_symbols and derivative_type!="index":
+    if derivative_symbol not in all_derivative_symbols and derivative_type != "index":
         raise HTTPException(
             status_code=400,
             detail={

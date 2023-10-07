@@ -1,8 +1,10 @@
 from typing import Any
 
-from app.routers.nse.equity.data_processor import (filter_nifty_stocks,
-                                                   filter_single_index,
-                                                   filter_single_stock)
+from app.routers.nse.equity.data_processor import (
+    filter_nifty_stocks,
+    filter_single_index,
+    filter_single_stock,
+)
 from app.schemas.stock_model import StockPriceInfo
 from app.utils.fetch_data import fetch_nse_data
 from app.utils.urls import ALL_INDICES, STOCK_URL

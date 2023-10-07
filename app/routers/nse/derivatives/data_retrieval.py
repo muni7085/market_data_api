@@ -1,7 +1,9 @@
 from fastapi import HTTPException
 
 from app.routers.nse.derivatives.data_processor import (
-    filter_index_option, filter_strike_prices_with_expiry_date)
+    filter_index_option,
+    filter_strike_prices_with_expiry_date,
+)
 from app.schemas.option_model import ExpiryOptionData
 from app.utils.fetch_data import fetch_nse_data
 from app.utils.urls import INDEX_OPTION_CHAIN_URL, STOCK_OPTION_CHAIN_URL

@@ -41,11 +41,11 @@ async def option_chain_data(
     -----------
     - **derivative_symbol**:
         Symbol of a derivative, for which you want option chain data.
-        It should be available in nse official website  
-        eg: `NIFTY`, `TCS`  
-    - **expiry date**: 
-        Expiry date of the derivate contract. 
-        Based on the expiry date the option chain date will be provided.  
+        It should be available in nse official website
+        eg: `NIFTY`, `TCS`
+    - **expiry date**:
+        Expiry date of the derivate contract.
+        Based on the expiry date the option chain date will be provided.
         eg: `28-sep-2023` or `28/09/2023`
     - **derivative type**:
         It should be `stock` or `index`.
