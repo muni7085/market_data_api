@@ -8,26 +8,24 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-env:
-  CONDA_ENV: app
 
 permissions:
   contents: read
 
 jobs:
-  setup:
+  build:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: Conda setup
       uses: conda-incubator/setup-miniconda@v2
       with: 
-        activate-environment: "$CONDA_ENV"
+        activate-environment: app
         python-version: 3.10
     - name: activate environmet
-      uses: conda activate "$CONDA_ENV"
+      uses: conda activate app
     - name: conda package list
-      run: conda list -n "$CONDA_ENV"
+      run: conda list -n app
     
     - uses: Gr1N/setup-poetry@v8
   
