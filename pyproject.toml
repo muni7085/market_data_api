@@ -19,6 +19,7 @@ sqlalchemy = "^2.0.15"
 pyotp = "^2.9.0"
 logzero = "^1.7.0"
 httpx = "^0.25.0"
+pytest = "^7.4.2"
 
 
 
