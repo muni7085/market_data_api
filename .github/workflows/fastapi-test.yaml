@@ -35,7 +35,7 @@ jobs:
         run: |
           pwd
           ls
-          pylint $(git ls-files '*.py')
+          mypy $(git ls-files '*.py')
       - name: pylint check
         run: pylint $(git ls-files '*.py')
       
