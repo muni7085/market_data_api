@@ -16,9 +16,7 @@ permissions:
 
 jobs:
   setup:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v3
     - name: Conda setup
