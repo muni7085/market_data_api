@@ -1,1 +1,0 @@
-NSE_BASE_URL="https://www.nseindia.com"
