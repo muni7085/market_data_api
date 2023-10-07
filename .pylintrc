@@ -1,6 +1,6 @@
 [MASTER]
-disable=  C0114, E0611, R0903, W0621
-         # missing-module-docstring, no-name-in-module, missing-class-docstring, edefined-outer-name
+disable=  C0114, E0611, R0903, W0621, E0401
+         # missing-module-docstring, no-name-in-module, missing-class-docstring, edefined-outer-name, import error
 
 
 [FORMAT]
