@@ -35,7 +35,7 @@ jobs:
         uses: jpetrucciani/mypy-check@master
         with:
           path: '.'
-          mypy_flags: '--config-file.mypy.ini'
+          mypy_flags: '--config-file .mypy.ini'
       
       - name: pylint check
         run: pylint $(git ls-files '*.py')
