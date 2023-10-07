@@ -14,54 +14,51 @@ permissions:
 
 jobs:
   # This job sets up the Python environment
-  setup:
+  static:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
-
-      # Set up an environment variable with value "app"
-      - name: Set up environment variable
-        run: echo "APP=app" >> $GITHUB_ENV
-
-      # Install miniconda and create a new environment with python 3.10
-      - name: Install miniconda and create environment
-        uses: conda-incubator/setup-miniconda@v2
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
         with:
           python-version: "3.10"
-          activate-environment: ${{ env.APP }}
-
-      # Install poetry and all the packages in pyproject.toml file
-      - name: Install poetry and dependencies
+      - name: install dependencies
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          poetry install
+         pip install --upgrade pip
+         pip install black isort mypy pylint
+      - name: black check
+        run: black --diff --check $(git ls-files '*.py')
+      - name: isort check
+        run: isort --diff --check --profile black $(git ls-files '*.py')
+      - name: mypy check
+        run: mypy $(git ls-files '*.py')
+      - name: pylint check
+        run: pylint $(git ls-files '*.py')
+      
+    # defaults:
+    #   run:
+    #     shell: bash -l {0}
+
+    # # Steps represent a sequence of tasks that will be executed as part of the job
+    # steps:
+    #   # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    #   - uses: actions/checkout@v3
+
+    #   # Set up an environment variable with value "app"
+    #   - name: Set up environment variable
+    #     run: echo "APP=app" >> $GITHUB_ENV
+
+    #   # Install miniconda and create a new environment with python 3.10
+    #   - name: Install miniconda and create environment
+    #     uses: conda-incubator/setup-miniconda@v2
+    #     with:
+    #       python-version: "3.10"
+    #       activate-environment: ${{ env.APP }}
+
+    #   # Install poetry and all the packages in pyproject.toml file
+    #   - name: Install poetry and dependencies
+    #     run: |
+    #       curl -sSL https://install.python-poetry.org | python3 -
+    #       poetry install
     
-  check:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # This job needs the setup job to finish before running
-    needs: setup
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-
-      # Run black, isort, mypy, and pylint checks on the code
-      - name: Run static checks
-        run: |
-          conda activate ${{env.APP}}
-          black --check .
-          isort --check .
-          mypy .
-          pylint .
-
-
