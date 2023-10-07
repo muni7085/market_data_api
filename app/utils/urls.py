@@ -1,5 +1,3 @@
-import os
-
 from app import ROOT_DIR
 
 NSE_BASE_URL = "https://www.nseindia.com"

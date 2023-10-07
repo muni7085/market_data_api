@@ -1,18 +1,19 @@
-from datetime import datetime, timedelta
-
+# pylint: disable=missing-function-docstring
 import json
+from datetime import datetime, timedelta
+from typing import Any
+
 import pytest
-from fastapi.testclient import TestClient
 from fastapi import HTTPException
+from fastapi.testclient import TestClient
 
 from app.routers.nse.derivatives.derivatives import router
-
 
 client = TestClient(router)
 
 
 @pytest.fixture
-def next_expiry_date():
+def next_expiry_date() -> str:
     today = datetime.today()
     days_ahead = 3 - today.weekday()
     if days_ahead < 0:
@@ -22,7 +23,7 @@ def next_expiry_date():
     return next_thursday.strftime("%d-%b-%Y")
 
 
-def validate_option(option: dict):
+def validate_option(option: dict[str, Any]) -> None:
     assert "ltp" in option
     assert "change" in option
     assert "percent_change" in option
@@ -30,7 +31,7 @@ def validate_option(option: dict):
     assert "percent_change_in_oi" in option
 
 
-def test_index_option_chain_valid(next_expiry_date):
+def test_index_option_chain_valid(next_expiry_date: str):
     expiry_date_lower_case = next_expiry_date.lower()
     response = client.get(
         f"/nse/derivatives/NIFTY?expiry_date={expiry_date_lower_case}&derivative_type=index"
@@ -52,7 +53,11 @@ def test_index_option_chain_valid(next_expiry_date):
 
 
 def validate_error_response(
-    derivative_symbol, derivative_type, status_code, expected_error, expiry_date
+    derivative_symbol: str,
+    derivative_type: str,
+    status_code: int,
+    expected_error: dict[str, Any],
+    expiry_date: str,
 ):
     with pytest.raises(HTTPException) as http_exception:
         client.get(
@@ -85,7 +90,7 @@ def test_index_option_chain_invalid_expiry_dates():
         )
 
 
-def test_index_option_chain_invalid_symbol_and_type(next_expiry_date):
+def test_index_option_chain_invalid_symbol_and_type(next_expiry_date: str):
     derivative_symbols = ["NIFTY", "INFY"]
     derivative_types = ["stock", "index"]
     for derivative_symbol, derivative_type in zip(derivative_symbols, derivative_types):

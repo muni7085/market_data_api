@@ -1,14 +1,16 @@
+from typing import Any
+
 from app.schemas.stock_model import StockPriceInfo
 
 
-def filter_nifty_stocks(stocks_data: dict) -> list[StockPriceInfo]:
+def filter_nifty_stocks(stocks_data: list[dict[str, Any]]) -> list[StockPriceInfo]:
     """
     Filter the required data and create a list of pydantic models from
     the given api response for the list of index stocks.
 
     Parameters:
     -----------
-    stocks_data: `dict`
+    stocks_data: `list[dict[str,Any]]`
         Json parsed response of s stock from the Nse api
 
     Return:
@@ -33,7 +35,7 @@ def filter_nifty_stocks(stocks_data: dict) -> list[StockPriceInfo]:
     return filtered_stocks_data
 
 
-def filter_single_stock(symbol: str, stock_data: dict) -> StockPriceInfo:
+def filter_single_stock(symbol: str, stock_data: dict[str, Any]) -> StockPriceInfo:
     """
     Filter the required data and create a pydantic model from the given api response for single stock.
 
@@ -42,7 +44,7 @@ def filter_single_stock(symbol: str, stock_data: dict) -> StockPriceInfo:
     symbol: `str`
         Nse stock symbol, can be obtained from the nse official website.
             eg: "SBIN","TCS" etc.
-    raw_stock_data: `dict`
+    raw_stock_data: `dict[str,Any]`
         Json parsed response of s stock from the Nse api
 
     Return:
@@ -61,13 +63,13 @@ def filter_single_stock(symbol: str, stock_data: dict) -> StockPriceInfo:
     )
 
 
-def filter_single_index(index_data: dict) -> StockPriceInfo:
+def filter_single_index(index_data: dict[str, Any]) -> StockPriceInfo:
     """
     Filter the required data and create a pydantic model from the given api response for single index.
 
     Parameters:
     -----------
-    index_data: `dict`
+    index_data: `dict[str,Any]`
         Json parsed response of s stock from the Nse api
 
     Return:

@@ -1,10 +1,12 @@
-from typing import Annotated, Optional
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path
 
-from app.routers.nse.equity.data_retrieval import (get_index_data,
-                                                    get_nifty_index_stocks,
-                                                    get_stock_trade_info)
+from app.routers.nse.equity.data_retrieval import (
+    get_index_data,
+    get_nifty_index_stocks,
+    get_stock_trade_info,
+)
 from app.schemas.stock_model import StockPriceInfo
 from app.utils.urls import NIFTY_INDEX_BASE
 from app.utils.validators import validate_index_symbol, validate_stock_symbol
@@ -18,6 +20,18 @@ router = APIRouter(prefix="/nse/equity", tags=["equity"])
     response_model=StockPriceInfo,
 )
 async def get_stock_data(stock_symbol: Annotated[str, Path()]):
+    """
+    Get the stock data for a given symbol.
+    This endpoint provides the latest trade information for the stock symbol from an external API.
+
+    Parameters:
+    -----------
+    - **stock_symbol**:
+        It must be a valid stock symbol that is registered in the NSE website.
+        eg: `TCS`, `RELIANCE`
+
+    """
+
     return get_stock_trade_info(stock_symbol)
 
 
@@ -25,11 +39,30 @@ async def get_stock_data(stock_symbol: Annotated[str, Path()]):
 async def nifty_fifty_stocks(
     index_symbol: Annotated[dict[str, str], Depends(validate_index_symbol)]
 ):
+    """
+    Get the trade information about list of stocks that are belong to the given index.
+
+    Parameters:
+    -----------
+    - **index_symbol**:
+        It must be a valid index symbol that is registered in the NSE website.
+        eg: `NIFTY 50`, `NIFTY BANK`
+    """
+
     index_url = f"{NIFTY_INDEX_BASE}{index_symbol}"
     return get_nifty_index_stocks(index_url)
 
 
-@router.get("/index/{index_symbol}", response_model=Optional[StockPriceInfo])
+@router.get("/index/{index_symbol}", response_model=StockPriceInfo)
 async def nse_index_data(index_symbol: Annotated[str, Path()]):
+    """
+    Get the trade information about a Nse index.
+
+     Parameters:
+     -----------
+     - **index_symbol**:
+         It must be a valid index symbol that is registered in the NSE website.
+         eg: `NIFTY 50`
+    """
     validate_index_symbol(index_symbol)
     return get_index_data(index_symbol)

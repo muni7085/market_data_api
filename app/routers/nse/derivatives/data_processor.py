@@ -1,10 +1,15 @@
+from typing import Any, Optional
+
 from app.schemas.option_model import ExpiryOptionData, Option, StrikePriceData
 
 
-def filter_strike_prices_with_expiry_date(records: list, expiry_date: str) -> list:
+def filter_strike_prices_with_expiry_date(
+    records: list[dict[str, Any]], expiry_date: str
+) -> list[dict[str, Any]]:
     """
     Filter the strike prices with given expiry date.
-        eg: if expiry date is 28-Sep-2023 then filtered data contain strike prices information for that particular expiry
+        eg: if expiry date is 28-Sep-2023 then filtered data contain strike prices information
+            for that particular expiry
 
     Parameters:
     -----------
@@ -19,7 +24,7 @@ def filter_strike_prices_with_expiry_date(records: list, expiry_date: str) -> li
         list of stock prices data for the given expiry.
     """
 
-    def filterer(record):
+    def filterer(record: dict[str, Any]) -> Optional[dict[str, Any]]:
         if record["expiryDate"] == expiry_date:
             return record
         return None
@@ -28,18 +33,19 @@ def filter_strike_prices_with_expiry_date(records: list, expiry_date: str) -> li
     return filter_data
 
 
-def get_option(option: dict) -> dict:
+def get_option(option: dict[str, Any]) -> dict[str, float]:
     """
-    Filter the option data required to initialize `Option` model class, from the given "CE" or "PE" data.
+    Filter the option data required to initialize `Option` model class,
+    from the given "CE" or "PE" data.
 
     Parameters:
     -----------
-    option: `dict`
+    option: `dict[str, Any]`
         dictionary of either "PE" or "CE" data
 
     Return:
     -------
-    dict
+    dict[str, float]:
         dictionary contain the option data that is required to initialize `Option` model class.
     """
     return {
@@ -52,14 +58,14 @@ def get_option(option: dict) -> dict:
 
 
 def filter_index_option(
-    strike_prices: list[dict], expiry_date: str
+    strike_prices: list[dict[str, Any]], expiry_date: str
 ) -> ExpiryOptionData:
     """
     Filter the index option chain data based on the expiry and required data.
 
     Parameters:
     -----------
-    strike_prices: `list[dict]`
+    strike_prices: `list[dict[str, Any]]`
         List of strike prices data of an derivative.
     expiry_date: `str`
         Expiry date in "dd-MM-yyyy".

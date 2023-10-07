@@ -1,8 +1,8 @@
-from typing import Optional
+from typing import Any
 
 from app.routers.nse.equity.data_processor import (filter_nifty_stocks,
-                                                    filter_single_index,
-                                                    filter_single_stock)
+                                                   filter_single_index,
+                                                   filter_single_stock)
 from app.schemas.stock_model import StockPriceInfo
 from app.utils.fetch_data import fetch_nse_data
 from app.utils.urls import ALL_INDICES, STOCK_URL
@@ -47,7 +47,7 @@ def get_stock_trade_info(symbol: str) -> StockPriceInfo:
     return filter_single_stock(symbol, price_info)
 
 
-def get_index_data(symbol: str) -> Optional[StockPriceInfo]:
+def get_index_data(symbol: str) -> StockPriceInfo:
     """
     Provide the price information about the Nse indices like NIFTY 50, NIFTY BANK etc.
 
@@ -59,11 +59,12 @@ def get_index_data(symbol: str) -> Optional[StockPriceInfo]:
 
     Return:
     -------
-    Optional[StockData]
+    StockPriceInfo
         StockData model contain the information about the index
     """
-    indices_data = fetch_nse_data(ALL_INDICES)["data"]
+    indices_data: list[dict[str, Any]] = fetch_nse_data(ALL_INDICES)["data"]
+    stock_price_info: StockPriceInfo
     for index in indices_data:
         if index["index"] == symbol:
-            return filter_single_index(index)
-    return None
+            stock_price_info = filter_single_index(index)
+    return stock_price_info

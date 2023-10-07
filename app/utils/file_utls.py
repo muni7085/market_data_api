@@ -48,7 +48,7 @@ def load_json_data(file_path: str | Path) -> Any:
         Loaded data from the given file path.
     """
     file_path = resolve_path(file_path)
-    with open(file_path, "r") as fp:
+    with open(file_path, "r", encoding="utf-8") as fp:
         data = json.load(fp)
     return data
 

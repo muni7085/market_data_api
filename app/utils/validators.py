@@ -1,29 +1,15 @@
-from typing import Annotated, Optional, Tuple
-
-from datetime import datetime
 import re
+from datetime import datetime
+from typing import Annotated, Tuple
+
 from fastapi import HTTPException, Path
 
 from app.utils.file_utls import get_symbols
-from app.utils.urls import NSE_F_AND_O_SYMBOLS, NSE_INDEX_SYMBOLS, NSE_STOCK_SYMBOLS
-
-months = {
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-}
+from app.utils.urls import (NSE_F_AND_O_SYMBOLS, NSE_INDEX_SYMBOLS,
+                            NSE_STOCK_SYMBOLS)
 
 
-def validate_stock_symbol(stock_symbol: str):
+def validate_stock_symbol(stock_symbol: str) -> None:
     """
     validate stock symbol with the available stock symbols in the Nse official website
 
@@ -38,7 +24,7 @@ def validate_stock_symbol(stock_symbol: str):
     HTTPException:
         Raises when the stock symbol is not available in the Nse official website
     """
-    symbols = set(get_symbols(NSE_STOCK_SYMBOLS)["symbols"])
+    symbols: set[str] = set(get_symbols(NSE_STOCK_SYMBOLS)["symbols"])
     if stock_symbol not in symbols:
         raise HTTPException(
             status_code=404,
@@ -69,7 +55,7 @@ def validate_index_symbol(index_symbol: Annotated[str, Path()]) -> str:
     `str`
         Url path to the index symbol endpoint.
     """
-    symbols = get_symbols(NSE_INDEX_SYMBOLS)
+    symbols: dict[str, str] = get_symbols(NSE_INDEX_SYMBOLS)
     print(index_symbol)
     if index_symbol not in symbols:
         raise HTTPException(
@@ -79,6 +65,7 @@ def validate_index_symbol(index_symbol: Annotated[str, Path()]) -> str:
                 + "Please refer nse official website to get index symbols"
             },
         )
+
     return symbols[index_symbol]
 
 
@@ -116,7 +103,7 @@ def validate_derivative_symbol_with_type(
             },
         )
 
-    if derivative_symbol not in all_derivative_symbols:
+    if derivative_symbol not in all_derivative_symbols and derivative_type!="index":
         raise HTTPException(
             status_code=400,
             detail={
