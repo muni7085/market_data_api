@@ -9,7 +9,7 @@ on:
   pull_request:
     branches: [ "master" ]
 env:
-  CONDA_ENV: "app"
+  CONDA_ENV: app
 
 permissions:
   contents: read
