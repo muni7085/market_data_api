@@ -57,7 +57,7 @@ def get_option(option: dict[str, Any]) -> dict[str, float]:
     }
 
 
-def filter_index_option(
+def filter_option_chain(
     strike_prices: list[dict[str, Any]], expiry_date: str
 ) -> ExpiryOptionData:
     """
