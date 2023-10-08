@@ -37,8 +37,8 @@ def last_date_of_weekday(year: int, month: int, weekday: int):
     """
     try:
         datetime.datetime(year, month, weekday)
-    except ValueError:
-        raise ValueError(f"{weekday}/{month}/{year} is not a valid date")
+    except ValueError as exc:
+        raise ValueError(f"{weekday}/{month}/{year} is not a valid date") from exc
 
     last_day = calendar.monthrange(year, month)[1]
 
@@ -59,7 +59,7 @@ def last_date_of_weekday(year: int, month: int, weekday: int):
 
 def get_date(weekday: str, monthly: bool = False):
     """
-    Returns the date of a given weekday in the next week of last week in the month based on monthly flag.
+    Returns the date of a given weekday in the next week of last week in the month based on monthly flag.  
     If the weekday and today is same then returns today date.
 
     Parameters
@@ -69,9 +69,12 @@ def get_date(weekday: str, monthly: bool = False):
         The input is case-insensitive and must be a valid weekday.
 
     monthly : `bool`, (default = False)
-        A flag indicating whether to return the date of the given weekday in the next week or last week in the month.
-        If True, the function will return the last date of the weekday in the current month if it is not before today,
-        otherwise it will return the last date of the weekday in the next month.
+        A flag indicating whether to return the date of the given weekday in the next week 
+        or last week in the month.
+        
+        If True, the function will return the last date of the weekday in the current month 
+        if it is not before today, otherwise it will return the last date of the weekday in the next month.
+        
         If False, the function will return the date of the next occurrence of the weekday from today.
 
     Returns
