@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 
 from app.routers.nse.derivatives.data_processor import (
-    filter_index_option,
+    filter_option_chain,
     filter_strike_prices_with_expiry_date,
 )
 from app.schemas.option_model import ExpiryOptionData
@@ -49,6 +49,6 @@ def get_option_chain(
     filtered_strike_price_data = filter_strike_prices_with_expiry_date(
         records=option_chain_data["records"]["data"], expiry_date=expiry_date
     )
-    expiry_option_data = filter_index_option(filtered_strike_price_data, expiry_date)
+    expiry_option_data = filter_option_chain(filtered_strike_price_data, expiry_date)
 
     return expiry_option_data
