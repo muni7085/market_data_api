@@ -1,8 +1,10 @@
-from app.routers.nse.derivatives.data_retrieval import get_option_chain
-from app.schemas.option_model import ExpiryOptionData, StrikePriceData, Option
+from typing import Any
+
 import pytest
 from fastapi import HTTPException
-from typing import Any
+
+from app.routers.nse.derivatives.data_retrieval import get_option_chain
+from app.schemas.option_model import ExpiryOptionData, Option, StrikePriceData
 
 
 def test_get_option_chain(get_option_chain_io: list[dict[str, Any]]):

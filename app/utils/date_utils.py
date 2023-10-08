@@ -1,5 +1,5 @@
-import datetime
 import calendar
+import datetime
 
 
 def last_date_of_weekday(year: int, month: int, weekday: int):
@@ -137,5 +137,5 @@ def get_date(weekday: str, monthly: bool = False):
                 year += 1
                 month = 1
             weekday_date = last_date_of_weekday(year, month, weekday_num)
-            
+
     return weekday_date.strftime("%d-%b-%Y")
