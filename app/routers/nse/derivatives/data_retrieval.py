@@ -9,7 +9,7 @@ from app.utils.fetch_data import fetch_nse_data
 from app.utils.urls import INDEX_OPTION_CHAIN_URL, STOCK_OPTION_CHAIN_URL
 
 
-def get_index_option_chain(
+def get_option_chain(
     expiry_date: str, derivative_symbol: str, derivative_type: str
 ) -> ExpiryOptionData:
     """
