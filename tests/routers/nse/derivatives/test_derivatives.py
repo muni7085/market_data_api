@@ -1,6 +1,5 @@
 # pylint: disable=missing-function-docstring
 import json
-from datetime import datetime, timedelta
 from typing import Any
 
 import pytest
@@ -8,19 +7,9 @@ from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from app.routers.nse.derivatives.derivatives import router
+from app.utils.date_utils import get_date
 
 client = TestClient(router)
-
-
-@pytest.fixture
-def next_expiry_date() -> str:
-    today = datetime.today()
-    days_ahead = 3 - today.weekday()
-    if days_ahead < 0:
-        days_ahead += 7
-    next_thursday = today + timedelta(days=days_ahead)
-
-    return next_thursday.strftime("%d-%b-%Y")
 
 
 def validate_option(option: dict[str, Any]) -> None:
@@ -31,7 +20,8 @@ def validate_option(option: dict[str, Any]) -> None:
     assert "percent_change_in_oi" in option
 
 
-def test_index_option_chain_valid(next_expiry_date: str):
+def test_index_option_chain_valid():
+    next_expiry_date = get_date("thursday")
     expiry_date_lower_case = next_expiry_date.lower()
     response = client.get(
         f"/nse/derivatives/NIFTY?expiry_date={expiry_date_lower_case}&derivative_type=index"
@@ -90,7 +80,8 @@ def test_index_option_chain_invalid_expiry_dates():
         )
 
 
-def test_index_option_chain_invalid_symbol_and_type(next_expiry_date: str):
+def test_index_option_chain_invalid_symbol_and_type():
+    next_expiry_date = get_date("thursday")
     derivative_symbols = ["NIFTY", "INFY"]
     derivative_types = ["stock", "index"]
     for derivative_symbol, derivative_type in zip(derivative_symbols, derivative_types):

@@ -2,7 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Path, Query
 
-from app.routers.nse.derivatives.data_retrieval import get_index_option_chain
+from app.routers.nse.derivatives.data_retrieval import get_option_chain
 from app.schemas.option_model import ExpiryOptionData
 from app.utils.validators import (
     validate_and_reformat_expiry_date,
@@ -64,6 +64,4 @@ async def option_chain_data(
             },
         )
 
-    return get_index_option_chain(
-        formatted_expiry_date, derivative_symbol, derivative_type
-    )
+    return get_option_chain(formatted_expiry_date, derivative_symbol, derivative_type)
