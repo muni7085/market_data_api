@@ -9,14 +9,13 @@ from app.routers.nse.equity.data_retrieval import (
 )
 from app.schemas.stock_model import StockPriceInfo
 from app.utils.urls import NIFTY_INDEX_BASE
-from app.utils.validators import validate_index_symbol, validate_stock_symbol
+from app.utils.validators import validate_and_format_stock_symbol, validate_index_symbol
 
 router = APIRouter(prefix="/nse/equity", tags=["equity"])
 
 
 @router.get(
-    "{stock_symbol}",
-    dependencies=[Depends(validate_stock_symbol)],
+    "/{stock_symbol}",
     response_model=StockPriceInfo,
 )
 async def get_stock_data(stock_symbol: Annotated[str, Path()]):
@@ -32,11 +31,13 @@ async def get_stock_data(stock_symbol: Annotated[str, Path()]):
 
     """
 
-    return get_stock_trade_info(stock_symbol)
+    formatted_stock_symbol = validate_and_format_stock_symbol(stock_symbol)
+
+    return get_stock_trade_info(formatted_stock_symbol)
 
 
 @router.get("/index_stocks/{index_symbol}", response_model=list[StockPriceInfo])
-async def nifty_fifty_stocks(
+async def nifty_index_stocks(
     index_symbol: Annotated[dict[str, str], Depends(validate_index_symbol)]
 ):
     """

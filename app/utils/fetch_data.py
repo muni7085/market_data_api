@@ -32,7 +32,7 @@ def fetch_nse_data(url: str, max_tries: int = 1000) -> Any:
         Json loaded response from the api.
     """
     session = requests.Session()
-    request = session.get(NSE_BASE_URL, headers=REQUEST_HEADERS, timeout=5)
+    request = session.get(NSE_BASE_URL, headers=REQUEST_HEADERS)
     for _ in range(max_tries):
         cookies = dict(request.cookies)
         response = session.get(url, headers=REQUEST_HEADERS, timeout=5, cookies=cookies)
