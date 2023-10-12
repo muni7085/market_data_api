@@ -10,16 +10,16 @@ def get_stock_data_io():
             "input": "AAAAB",
             "status_code": 404,
             "detail": {
-                "Error": "AAAAB is not a valid stock symbol. \
-                Please refer nse official website to get stock symbols"
+                "Error": "AAAAB is not a valid stock symbol. "
+                + "Please refer nse official website to get stock symbols"
             },
         },
         {
             "input": "",
             "status_code": 404,
             "detail": {
-                "Error": " is not a valid stock symbol. \
-                Please refer nse official website to get stock symbols"
+                "Error": " is not a valid stock symbol. "
+                + "Please refer nse official website to get stock symbols"
             },
         },
     ]
@@ -34,8 +34,8 @@ def get_nifty_index_stocks_io():
             "symbol": "NIFF",
             "status_code": 404,
             "detail": {
-                "Error": "NIFF is not a valid index symbol. \
-                    Please refer nse official website to get index symbols"
+                "Error": "NIFF is not a valid index symbol. "
+                + "Please refer nse official website to get index symbols"
             },
         },
     ]
@@ -50,8 +50,8 @@ def nse_index_data_io():
             "symbol": "bank",
             "status_code": 404,
             "detail": {
-                "Error": "bank is not a valid index symbol. \
-                    Please refer nse official website to get index symbols"
+                "Error": "bank is not a valid index symbol. "
+                + "Please refer nse official website to get index symbols"
             },
         },
     ]
