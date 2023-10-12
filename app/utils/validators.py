@@ -8,9 +8,10 @@ from app.utils.file_utls import get_symbols
 from app.utils.urls import NSE_F_AND_O_SYMBOLS, NSE_INDEX_SYMBOLS, NSE_STOCK_SYMBOLS
 
 
-def validate_stock_symbol(stock_symbol: str) -> None:
+def validate_and_format_stock_symbol(stock_symbol: str) -> str:
     """
-    validate stock symbol with the available stock symbols in the Nse official website
+    validate stock symbol with the available stock symbols in the Nse official website and change the symbol
+    case to upper.
 
     Parameters:
     -----------
@@ -22,9 +23,15 @@ def validate_stock_symbol(stock_symbol: str) -> None:
     -------
     HTTPException:
         Raises when the stock symbol is not available in the Nse official website
+
+    Return:
+    -------
+    str:
+        Given stock symbol in upper case
     """
     symbols: set[str] = set(get_symbols(NSE_STOCK_SYMBOLS)["symbols"])
-    if stock_symbol not in symbols:
+
+    if stock_symbol.upper() not in symbols:
         raise HTTPException(
             status_code=404,
             detail={
@@ -32,6 +39,8 @@ def validate_stock_symbol(stock_symbol: str) -> None:
                 + "Please refer nse official website to get stock symbols"
             },
         )
+
+    return stock_symbol.upper()
 
 
 def validate_index_symbol(index_symbol: Annotated[str, Path()]) -> str:
@@ -55,7 +64,6 @@ def validate_index_symbol(index_symbol: Annotated[str, Path()]) -> str:
         Url path to the index symbol endpoint.
     """
     symbols: dict[str, str] = get_symbols(NSE_INDEX_SYMBOLS)
-    print(index_symbol)
     if index_symbol not in symbols:
         raise HTTPException(
             status_code=404,
