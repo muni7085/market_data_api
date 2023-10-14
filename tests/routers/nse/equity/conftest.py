@@ -50,7 +50,7 @@ def nse_index_data_io():
             "symbol": "bank",
             "status_code": 404,
             "detail": {
-                "Error": "bank is not a valid index symbol. "
+                "Error": "BANK is not a valid index symbol. "
                 + "Please refer nse official website to get index symbols"
             },
         },

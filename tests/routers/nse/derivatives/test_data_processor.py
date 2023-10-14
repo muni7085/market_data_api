@@ -39,7 +39,6 @@ def test_filter_option_chain(get_filter_option_chain_io):
         if option_data_io["output"] is not None:
             expiry_option_data = filter_option_chain(*option_data_input)
             assert isinstance(expiry_option_data, ExpiryOptionData)
-            print(expiry_option_data.dict())
             assert expiry_option_data.dict() == option_data_io["output"]
         else:
             with pytest.raises(TypeError):

@@ -64,6 +64,7 @@ def validate_index_symbol(index_symbol: Annotated[str, Path()]) -> str:
         Url path to the index symbol endpoint.
     """
     symbols: dict[str, str] = get_symbols(NSE_INDEX_SYMBOLS)
+    index_symbol = index_symbol.upper()
     if index_symbol not in symbols:
         raise HTTPException(
             status_code=404,
@@ -139,25 +140,25 @@ def get_date_format(date: str) -> str:
     return f"%d{date_separator}{month_format}{date_separator}%Y"
 
 
-def validate_and_reformat_expiry_date(expiry_data: str) -> Tuple[str, bool]:
+def validate_and_reformat_date(data: str) -> Tuple[str, bool]:
     """
     Validate the given expiry date to ensure that the given date is in "dd-MM-yyyy" format.
 
     Parameters:
     -----------
-    expiry_data: `str`
+    date: `str`
         expiry date to be validated.
 
     Return:
     -------
     Tuple[str,bool]
-        Reformated expiry date and validation status of expiry date.
+        Reformated expiry date is date is valid else input date and validation status of expiry date.
     """
     required_date_format = "%d-%b-%Y"
-    date_format = get_date_format(expiry_data)
+    date_format = get_date_format(data)
 
     try:
-        date_obj = datetime.strptime(expiry_data, date_format)
+        date_obj = datetime.strptime(data, date_format)
         return date_obj.strftime(required_date_format), True
     except ValueError:
-        return date_format, False
+        return data, False

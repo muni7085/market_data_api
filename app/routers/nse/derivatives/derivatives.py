@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Path, Query
 from app.routers.nse.derivatives.data_retrieval import get_option_chain
 from app.schemas.option_model import ExpiryOptionData
 from app.utils.validators import (
-    validate_and_reformat_expiry_date,
+    validate_and_reformat_date,
     validate_derivative_symbol_with_type,
 )
 
@@ -53,9 +53,7 @@ async def option_chain_data(
     """
     validate_derivative_symbol_with_type(derivative_symbol, derivative_type)
 
-    formatted_expiry_date, is_date_valid = validate_and_reformat_expiry_date(
-        expiry_date
-    )
+    formatted_expiry_date, is_date_valid = validate_and_reformat_date(expiry_date)
     if not is_date_valid:
         raise HTTPException(
             status_code=400,

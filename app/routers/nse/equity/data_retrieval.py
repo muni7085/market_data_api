@@ -64,10 +64,10 @@ def get_stock_trade_info(symbol: str) -> StockPriceInfo:
     stock_url = f"{STOCK_URL}{symbol}"
     stock_data = fetch_nse_data(stock_url)
 
-    if "msg" in stock_data:
+    if "priceInfo" not in stock_data:
         raise HTTPException(
             status_code=503,
-            detail={"Error": stock_data["msg"]},
+            detail={"Error": "no data found for the given symbol at the moment"},
         )
     price_info = stock_data["priceInfo"]
 
@@ -96,7 +96,7 @@ def get_index_data(symbol: str) -> StockPriceInfo:
     stock_price_info: StockPriceInfo
 
     for index in indices_data:
-        if index["index"] == symbol:
+        if index["index"] == symbol.upper():
             stock_price_info = filter_single_index(index)
 
     return stock_price_info

@@ -43,6 +43,7 @@ def fetch_nse_data(url: str, max_tries: int = 1000) -> Any:
 
         if response.status_code == 200:
             return json.loads(response.content.decode("utf-8"))
+
         if response.status_code == 404:
             raise HTTPException(
                 status_code=404,

@@ -20,9 +20,9 @@ def filter_nifty_stocks(stocks_data: list[dict[str, Any]]) -> list[StockPriceInf
     """
     if len(stocks_data) == 0:
         raise ValueError("Stocks data is empty")
-    
+
     filtered_stocks_data = []
-    
+
     for stock_data in stocks_data:
         filtered_stocks_data.append(
             StockPriceInfo(

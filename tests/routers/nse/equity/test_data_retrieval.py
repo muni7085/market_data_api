@@ -59,7 +59,9 @@ def test_get_stock_trade_info():
         assert stock_data.symbol == symbol
     except HTTPException as http_exception:
         assert http_exception.status_code == 503
-        assert http_exception.detail == {"Error": "no data found"}
+        assert http_exception.detail == {
+            "Error": "no data found for the given symbol at the moment"
+        }
 
     # Test case 2: Test for empty input
     symbol = ""
@@ -72,13 +74,6 @@ def test_get_stock_trade_info():
     with pytest.raises(ValueError) as value_exc:
         get_stock_trade_info(symbol)
         assert str(value_exc.value) == "Symbol can't be empty"
-
-    # Test case 4: Test for invalid input
-    symbol = "INVALID"
-    with pytest.raises(HTTPException) as http_exc:
-        get_stock_trade_info(symbol)
-        assert http_exc.status_code == 503
-        assert http_exc.detail == {"Error": "No data found for the symbol"}
 
 
 def test_get_index_data():

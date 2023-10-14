@@ -1,4 +1,6 @@
+# pylint: disable=too-many-arguments
 import pytest
+
 from app.routers.nse.equity.data_processor import (
     filter_nifty_stocks,
     filter_single_index,
@@ -10,6 +12,31 @@ from app.schemas.stock_model import StockPriceInfo
 def get_stock_io_data(
     symbol, last_traded_price, day_open, day_low, day_high, change, percent_change
 ):
+    """
+    Returns a tuple containing input and expected output data for a stock.
+
+    Parameters:
+    -----------
+    symbol: `str`
+        The stock symbol.
+    last_traded_price:`float`
+        The last traded price of the stock.
+    day_open:`float`
+        The opening price of the stock for the day.
+    day_low:`float`
+        The lowest price of the stock for the day.
+    day_high:`float`
+        The highest price of the stock for the day.
+    change:`float`
+        The change in the stock price.
+    percent_change:`float`
+        The percentage change in the stock price.
+
+    Returns:
+    --------
+    tuple:
+        A tuple containing the input data and expected output data for the stock.
+    """
     stock_input_data = {
         "symbol": symbol,
         "lastPrice": last_traded_price,
@@ -29,9 +56,6 @@ def get_stock_io_data(
         percent_change=percent_change,
     )
     return stock_input_data, expected_output_data
-
-
-import pytest
 
 
 def test_filter_nifty_stocks():
@@ -67,9 +91,6 @@ def test_filter_nifty_stocks():
         stocks_output.append(stock_output)
 
     assert filter_nifty_stocks(stocks_data) == stocks_output
-
-
-import pytest
 
 
 def test_filter_single_stock():
