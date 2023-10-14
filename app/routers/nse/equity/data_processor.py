@@ -18,7 +18,11 @@ def filter_nifty_stocks(stocks_data: list[dict[str, Any]]) -> list[StockPriceInf
     list[StockData]
         List of StockData models that contain the price information about the stocks.
     """
+    if len(stocks_data) == 0:
+        raise ValueError("Stocks data is empty")
+    
     filtered_stocks_data = []
+    
     for stock_data in stocks_data:
         filtered_stocks_data.append(
             StockPriceInfo(
@@ -52,6 +56,9 @@ def filter_single_stock(symbol: str, stock_data: dict[str, Any]) -> StockPriceIn
     StockData
         StockData model contain the information about the stock.
     """
+    if len(stock_data) == 0:
+        raise ValueError("Stock data is empty")
+
     return StockPriceInfo(
         symbol=symbol,
         last_traded_price=stock_data["lastPrice"],
@@ -77,6 +84,9 @@ def filter_single_index(index_data: dict[str, Any]) -> StockPriceInfo:
     StockData
         StockData model contains the price information about the index.
     """
+    if len(index_data) == 0:
+        raise ValueError("Index data is empty")
+
     return StockPriceInfo(
         symbol=index_data["index"],
         last_traded_price=index_data["last"],
