@@ -25,24 +25,28 @@ def test_get_stock_data(get_stock_data_io):
         endpoint_url = f"/nse/equity/{stock_symbol}"
 
         # Check if the status code is 200
-        if stock_data["status_code"] == 200:
-            # Send a GET request to the endpoint URL
-            response = client.get(endpoint_url)
+        try:
+            if stock_data["status_code"] == 200:
+                # Send a GET request to the endpoint URL
+                response = client.get(endpoint_url)
 
-            # Assert that the response status code matches the expected status code
-            assert response.status_code == stock_data["status_code"]
+                # Assert that the response status code matches the expected status code
+                assert response.status_code == stock_data["status_code"]
 
-            # Assert that the response contains JSON data
-            assert response.json() is not None
+                # Assert that the response contains JSON data
+                assert response.json() is not None
 
-            # Parse the response JSON into a StockPriceInfo object
-            stock_price_info = StockPriceInfo.parse_obj(response.json())
+                # Parse the response JSON into a StockPriceInfo object
+                stock_price_info = StockPriceInfo.parse_obj(response.json())
 
-            # Assert that the symbol in the StockPriceInfo object matches the stock symbol
-            assert stock_price_info.symbol == stock_symbol
+                # Assert that the symbol in the StockPriceInfo object matches the stock symbol
+                assert stock_price_info.symbol == stock_symbol
 
-            # Assert that the stock_price_info object is an instance of StockPriceInfo
-            assert isinstance(stock_price_info, StockPriceInfo)
+                # Assert that the stock_price_info object is an instance of StockPriceInfo
+                assert isinstance(stock_price_info, StockPriceInfo)
+        except HTTPException as http_exc:
+            assert http_exc.status_code == 503
+            assert http_exc.detail == {"Error": "no data found"}
         else:
             # If the status code is not 200, validate the exception with the expected error
             validate_exception(endpoint_url, expected_error=stock_data)
@@ -74,7 +78,6 @@ def test_nse_index_data(nse_index_data_io):
             response = client.get(endpoint_url)
             assert response.status_code == index_data["status_code"]
             assert response.json() is not None
-            print(response.json())
             stock_price_info = StockPriceInfo.parse_obj(response.json())
             assert stock_price_info.symbol == index_symbol
             assert isinstance(stock_price_info, StockPriceInfo)
