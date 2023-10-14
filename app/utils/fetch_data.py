@@ -31,15 +31,25 @@ def fetch_nse_data(url: str, max_tries: int = 1000) -> Any:
     Any:
         Json loaded response from the api.
     """
+    if max_tries < 1:
+        raise ValueError("max_tries should be greater than 0")
+
     session = requests.Session()
     request = session.get(NSE_BASE_URL, headers=REQUEST_HEADERS)
+
     for _ in range(max_tries):
         cookies = dict(request.cookies)
         response = session.get(url, headers=REQUEST_HEADERS, timeout=5, cookies=cookies)
+
         if response.status_code == 200:
             return json.loads(response.content.decode("utf-8"))
+        if response.status_code == 404:
+            raise HTTPException(
+                status_code=404,
+                detail={"Error": "Resource not found or invalid Url"},
+            )
 
     raise HTTPException(
-        status_code=404,
-        detail={"Error": "Not able to get the stock data due server maintenance"},
+        status_code=503,
+        detail={"Error": "Service Unavailable"},
     )

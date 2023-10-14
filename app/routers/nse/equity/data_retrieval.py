@@ -1,5 +1,7 @@
 from typing import Any
 
+from fastapi import HTTPException
+
 from app.routers.nse.equity.data_processor import (
     filter_nifty_stocks,
     filter_single_index,
@@ -10,22 +12,35 @@ from app.utils.fetch_data import fetch_nse_data
 from app.utils.urls import ALL_INDICES, STOCK_URL
 
 
-def get_nifty_index_stocks(url: str) -> list[StockPriceInfo]:
+def get_nifty_index_stocks(url: str, max_tries: int = 1000) -> list[StockPriceInfo]:
     """
-    Fetch the price information about the stocks that are in the provided NSE index.
+    Fetch the price information about the list stocks that are in the provided NSE index.
 
     Parameters:
     -----------
     url: `str`
         Url for fetching the nse index stocks data.
+    max_tries: `int` (defaults = 1000)
+        Maximum number of times the request has to send to get response.
+        Requests are made until either get the status code `200` or exceed max_tries.
 
     Return:
     -------
     list[StockData]
         List of StockData models that contain the price information about the stocks.
     """
-    nifty_fifty_socks = fetch_nse_data(url)
-    return filter_nifty_stocks(nifty_fifty_socks["data"])
+    if url == "":
+        raise ValueError("Url can't be empty")
+
+    nifty_index_stocks = fetch_nse_data(url, max_tries=max_tries)
+
+    if "data" not in nifty_index_stocks:
+        raise HTTPException(
+            status_code=404,
+            detail={"Error": "Resource not found or invalid Url"},
+        )
+
+    return filter_nifty_stocks(nifty_index_stocks["data"])
 
 
 def get_stock_trade_info(symbol: str) -> StockPriceInfo:
@@ -43,9 +58,19 @@ def get_stock_trade_info(symbol: str) -> StockPriceInfo:
     StockData
         StockData model contain the information about the stock.
     """
+    if symbol == "" or symbol is None:
+        raise ValueError("Symbol can't be empty")
+
     stock_url = f"{STOCK_URL}{symbol}"
     stock_data = fetch_nse_data(stock_url)
+
+    if "msg" in stock_data:
+        raise HTTPException(
+            status_code=503,
+            detail={"Error": stock_data["msg"]},
+        )
     price_info = stock_data["priceInfo"]
+
     return filter_single_stock(symbol, price_info)
 
 
@@ -64,9 +89,14 @@ def get_index_data(symbol: str) -> StockPriceInfo:
     StockPriceInfo
         StockData model contain the information about the index
     """
+    if symbol == "" or symbol is None:
+        raise ValueError("Symbol can't be empty")
+
     indices_data: list[dict[str, Any]] = fetch_nse_data(ALL_INDICES)["data"]
     stock_price_info: StockPriceInfo
+
     for index in indices_data:
         if index["index"] == symbol:
             stock_price_info = filter_single_index(index)
+
     return stock_price_info
