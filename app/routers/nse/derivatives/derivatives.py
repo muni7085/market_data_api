@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Path, Query
 
 from app.routers.nse.derivatives.data_retrieval import get_option_chain
-from app.schemas.option_model import ExpiryOptionData
+from app.schemas.option_scheme import ExpiryOptionData
 from app.utils.validators import (
     validate_and_reformat_date,
     validate_derivative_symbol_with_type,

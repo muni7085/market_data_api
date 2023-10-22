@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from app.routers.nse.equity.equity import router
-from app.schemas.stock_model import StockPriceInfo
+from app.schemas.stock_scheme import StockPriceInfo
 
 client = TestClient(router)
 

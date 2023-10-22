@@ -1,6 +1,6 @@
 from typing import Any
 
-from app.schemas.stock_model import StockPriceInfo
+from app.schemas.stock_scheme import StockPriceInfo
 
 
 def filter_nifty_stocks(stocks_data: list[dict[str, Any]]) -> list[StockPriceInfo]:

@@ -2,7 +2,7 @@ from typing import Optional
 
 from app.routers.smart_api.utils.constants import (BSE_SYMBOLS_PATH,
                                                     NSE_SYMBOLS_PATH)
-from app.utils.file_utls import get_symbols
+from app.utils.file_utils import get_symbols
 
 
 def validate_symbol_and_get_token(

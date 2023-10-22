@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from app.schemas.option_model import ExpiryOptionData, Option, StrikePriceData
+from app.schemas.option_scheme import ExpiryOptionData, Option, StrikePriceData
 
 
 def filter_strike_prices_with_expiry_date(

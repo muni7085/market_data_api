@@ -1,26 +1,27 @@
 from app.routers.smart_api.get_connection import SmartApiConnection
 from app.routers.smart_api.utils.constants import API_KEY, CLIENT_ID
 from app.routers.smart_api.smart_websocket import DataWebSocket
+import json
 
 action = 0
-mode = 2
-correlation_id = "abc123"
+mode = 3
+correlation_id = "abcde12345"
+
+
+def get_tokens(num):
+    with open(
+        "/home/munikumar/Desktop/python_project/market_data_api/app/data/smart_api/nse_symbols.json",
+        "r",
+    ) as fp:
+        data = json.load(fp)
+        tokens = [val for key, val in data.items()]
+    return tokens[:num]
+
 
 tokens = [
     {
         "exchangeType": 1,
-        "tokens": [
-            "11377",
-            "2643",
-            "8050",
-            "10604",
-            "3757",
-            "6596",
-            "28859",
-            "14687",
-            "592",
-            "17659",
-        ],
+        "tokens": ["11536"],
     }
 ]
 smart_api_connection = SmartApiConnection.get_connection()
@@ -36,3 +37,4 @@ data_websocket = DataWebSocket(
     mode,
 )
 data_websocket.connect()
+data_websocket.send_heart_beat()

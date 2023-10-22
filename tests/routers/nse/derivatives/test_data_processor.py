@@ -6,7 +6,7 @@ from app.routers.nse.derivatives.data_processor import (
     filter_strike_prices_with_expiry_date,
     get_option,
 )
-from app.schemas.option_model import ExpiryOptionData
+from app.schemas.option_scheme import ExpiryOptionData
 
 
 def test_filter_strike_prices_with_expiry_date(

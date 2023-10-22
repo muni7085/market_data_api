@@ -6,7 +6,7 @@ from app.routers.nse.equity.data_retrieval import (
     get_nifty_index_stocks,
     get_stock_trade_info,
 )
-from app.schemas.stock_model import StockPriceInfo
+from app.schemas.stock_scheme import StockPriceInfo
 
 
 def test_get_nifty_index_stocks():

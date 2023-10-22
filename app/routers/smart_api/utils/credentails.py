@@ -1,5 +1,5 @@
 import os
-from app.utils.file_utls import load_json_data
+from app.utils.file_utils import load_json_data
 
 
 class Credentials:

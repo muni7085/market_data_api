@@ -31,10 +31,10 @@ async def partial_price_quote(stock_symbol: str, stock_token: str):
     return json.loads(data.decode("utf-8"))
 
 
-async def full_price_quote(exchange: str, stock_token: str):
-    payload = {"mode": "FULL", "exchangeTokens": {exchange.upper(): [stock_token]}}
-    url = "rest/secure/angelbroking/market/v1/quote/"
-    connection = get_endpoint_connection(payload=payload, method_type="POST", url=url)
-    res = connection.getresponse()
-    data = res.read()
-    return json.loads(data.decode("utf-8"))
+# async def full_price_quote(exchange: str, stock_token: str):
+#     payload = {"mode": "FULL", "exchangeTokens": {exchange.upper(): [stock_token]}}
+#     url = "rest/secure/angelbroking/market/v1/quote/"
+#     connection = get_endpoint_connection(payload=payload, method_type="POST", url=url)
+#     res = connection.getresponse()
+#     data = res.read()
+#     return json.loads(data.decode("utf-8"))

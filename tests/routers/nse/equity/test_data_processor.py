@@ -6,7 +6,7 @@ from app.routers.nse.equity.data_processor import (
     filter_single_index,
     filter_single_stock,
 )
-from app.schemas.stock_model import StockPriceInfo
+from app.schemas.stock_scheme import StockPriceInfo
 
 
 def get_stock_io_data(

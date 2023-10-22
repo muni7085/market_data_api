@@ -7,7 +7,7 @@ from app.routers.nse.equity.data_retrieval import (
     get_nifty_index_stocks,
     get_stock_trade_info,
 )
-from app.schemas.stock_model import StockPriceInfo
+from app.schemas.stock_scheme import StockPriceInfo
 from app.utils.urls import NIFTY_INDEX_BASE
 from app.utils.validators import validate_and_format_stock_symbol, validate_index_symbol
 

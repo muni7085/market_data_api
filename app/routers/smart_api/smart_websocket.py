@@ -1,9 +1,7 @@
-from time import perf_counter
-
 from logzero import logger
-from SmartApi.smartWebSocketV2 import SmartWebSocketV2
+from app.routers.smart_api.smart_websocket_v2 import SmartWebSocketV2
 
-
+total_tokens = []
 class DataWebSocket(SmartWebSocketV2):
     def __init__(
         self,
@@ -21,6 +19,7 @@ class DataWebSocket(SmartWebSocketV2):
         self.tokens_list = tokens_list
         self.counter = 0
         self.max_count = 10
+        self.total_tokens = []
 
     def on_open(self, wsapp):
         logger.info("on websocket open")
@@ -28,23 +27,36 @@ class DataWebSocket(SmartWebSocketV2):
         # sws.unsubscribe(correlation_id, mode, token_list1)
 
     def on_data(self, wsapp, message):
-        file_mode = "a+"
-        # self.counter += 1
-        if self.counter <= self.max_count:
+        self.counter += 1
+        if self.counter == self.max_count:
+            total_tokens.append(self.total_tokens)
+            self.total_tokens = []
+            self.counter = 0
+        
+        if isinstance(message,dict):
             format_msg = {
-                message["token"]: {
-                    "ltp": message["last_traded_price"],
-                    "open": message["open_price_of_the_day"],
-                    "high": message["high_price_of_the_day"],
-                    "low": message["low_price_of_the_day"],
-                    "prev_close": message["closed_price"],
-                }
+            message["token"]: {
+                "ltp": message["last_traded_price"],
+                "open": message["open_price_of_the_day"],
+                "high": message["high_price_of_the_day"],
+                "low": message["low_price_of_the_day"],
+                "prev_close": message["closed_price"],
+                "last_traded_timestamp":message["last_traded_timestamp"],
             }
+        }
 
             print(format_msg)
+            self.total_tokens.append(format_msg)
 
     def on_error(self, wsapp, error):
         logger.error(error)
 
     def on_close(self, wsapp):
+        for t in total_tokens:
+            print("*"*50)
+            print(t)
+            print(f"total tokens: {len(t)}")
+            print("#"*50)
+
+
         logger.info("Close")
