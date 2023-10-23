@@ -1,13 +1,13 @@
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from app.models.user import User
+from app.models.user import CreateUser, User
 from app.schemas.auth_token_scheme import TokenData
-from sqlmodel import Session
+from sqlmodel import Session, select
 from app.database.db_connection import engine
 from app.models.user import User
-from app.utils.constants import SECRET_KEY,ALGORITHM
+from app.utils.constants import SECRET_KEY, ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="user/login")
@@ -23,7 +23,7 @@ def get_password_hash(password):
 
 def get_user(username: str):
     with Session(engine) as session:
-        user=session.get(User,username)
+        user = session.get(User, username)
         return user
 
 
@@ -60,3 +60,5 @@ async def current_active_user(user: User = Depends(get_current_user)):
     if user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return user
+
+
