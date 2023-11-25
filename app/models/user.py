@@ -14,3 +14,7 @@ class CreateUser(SQLModel):
     email: str 
     full_name: str or None = None
     password:str
+    
+class LoginUser(SQLModel):
+    username: str
+    password:str

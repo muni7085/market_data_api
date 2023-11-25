@@ -22,8 +22,8 @@ pytest = "^7.4.2"
 passlib = "^1.7.4"
 python-jose = "^3.3.0"
 sqlmodel = "^0.0.8"
-pyscopg2 = "^66.0.2"
-psycopg2 = "^2.9.9"
+psycopg2-binary = "^2.9.9"
+python-multipart = "^0.0.6"
 
 
 
