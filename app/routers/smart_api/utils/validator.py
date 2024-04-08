@@ -12,7 +12,6 @@ def validate_symbol_and_get_token(
     if stock_exchange == "nse":
         symbols_path = NSE_SYMBOLS_PATH
         stock_symbol = stock_symbol.upper() + "-EQ"
-    print(stock_symbol)
     all_symbols_data = get_symbols(symbols_path)
     if stock_symbol not in all_symbols_data:
         return None, None

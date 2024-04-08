@@ -3,12 +3,13 @@ from urllib.parse import quote
 import os
 
 
-db_password = quote(os.environ.get("MARKET_DB_PASSWORD"))
-db_url = f"postgresql://muni:{db_password}@localhost:5432/market_data"
+# db_password = quote(os.environ.get("MARKET_DB_PASSWORD"))
+# db_url = f"postgresql://muni:{db_password}@localhost:5432/market_data"
 
 
-engine = create_engine(db_url, echo=True)
+# engine = create_engine(db_url, echo=True)
 
 
 def create_db_and_tables():
-    SQLModel.metadata.create_all(engine)
+    # SQLModel.metadata.create_all(engine)
+    pass
