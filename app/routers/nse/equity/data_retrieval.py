@@ -68,7 +68,7 @@ def get_stock_url(stock_symbol: str) -> str:
         raise ValueError("Stock symbol can't be empty")
 
     stock_url = f"{STOCK_URL}{stock_symbol}"
-    
+
     return stock_url
 
 
@@ -95,7 +95,7 @@ def get_stock_trade_info(symbol: str) -> StockPriceInfo:
             status_code=503,
             detail={"Error": "no data found for the given symbol at the moment"},
         )
-        
+
     price_info = stock_data["priceInfo"]
 
     return filter_single_stock(symbol, price_info)
@@ -119,15 +119,15 @@ def get_stock_listing_date(stock_symbol: str) -> str:
     """
     stock_url = get_stock_url(stock_symbol)
     stock_data = fetch_nse_data(stock_url)
-    
+
     if "metadata" not in stock_data:
         raise HTTPException(
             status_code=503,
             detail={"Error": "no metadata found for the given symbol at the moment"},
         )
-        
+
     listing_date = stock_data.get("metadata").get("listingDate")
-    
+
     return listing_date
 
 

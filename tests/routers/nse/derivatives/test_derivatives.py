@@ -27,20 +27,20 @@ def test_index_option_chain_valid():
         f"/nse/derivatives/NIFTY?expiry_date={expiry_date_lower_case}&derivative_type=index"
     )
     assert response.status_code == 200
-    
+
     response_data = json.loads(response.content.decode("utf-8"))
     assert isinstance(response_data, dict)
     assert "strike_prices" in response_data
     assert "expiry_date" in response_data
     assert next_expiry_date == response_data["expiry_date"]
-    
+
     strike_prices = response_data["strike_prices"]
     assert isinstance(strike_prices, list)
     assert isinstance(strike_prices[0], dict)
     assert "strike_price" in strike_prices[0]
     assert "ce" in strike_prices[0]
     assert "pe" in strike_prices[0]
-    
+
     validate_option(strike_prices[0]["ce"])
     validate_option(strike_prices[0]["pe"])
 
@@ -73,7 +73,7 @@ def test_index_option_chain_invalid_date():
 def test_index_option_chain_invalid_expiry_dates():
     derivative_symbol = "BANKNIFTY"
     invalid_expiry_dates = ["28-Sep-2023", "08-May-2025", "02-Oct-2023"]
-    
+
     for expiry_date in invalid_expiry_dates:
         expected_error = {
             "Error": f"No expiry for {derivative_symbol} on {expiry_date}"
@@ -87,7 +87,7 @@ def test_index_option_chain_invalid_symbol_and_type():
     next_expiry_date = get_date("thursday")
     derivative_symbols = ["NIFTY", "INFY"]
     derivative_types = ["stock", "index"]
-    
+
     for derivative_symbol, derivative_type in zip(derivative_symbols, derivative_types):
         expected_error = {
             "Error": f"{derivative_symbol} and {derivative_type} not matched. "

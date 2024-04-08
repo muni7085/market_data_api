@@ -1,9 +1,10 @@
 import calendar
 import datetime
 from typing import List
-from app.utils.urls import STOCK_OPTION_CHAIN_URL, INDEX_OPTION_CHAIN_URL
-from app.utils.type_utils import SymbolType
+
 from app.utils.fetch_data import fetch_nse_data
+from app.utils.type_utils import SymbolType
+from app.utils.urls import INDEX_OPTION_CHAIN_URL, STOCK_OPTION_CHAIN_URL
 
 
 def last_date_of_weekday(year: int, month: int, weekday: int):
@@ -160,7 +161,7 @@ def get_expiry_dates(
         The symbol that represents stock or index to which expiry dates are required.
     symbol_type: ``SymbolType``
         The type of symbol it is, means either `equity` or `derivative`
-        
+
     Returns:
     --------
     ``List[str]``
@@ -168,11 +169,11 @@ def get_expiry_dates(
     """
 
     base_url = STOCK_OPTION_CHAIN_URL
-    
+
     if symbol_type == SymbolType.DERIVATIVE:
         base_url = INDEX_OPTION_CHAIN_URL
-        
+
     option_chain_url = f"{base_url}{symbol.upper()}"
     option_data = fetch_nse_data(option_chain_url)
-    
-    return option_data['records']["expiryDates"]
+
+    return option_data["records"]["expiryDates"]

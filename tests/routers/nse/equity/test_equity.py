@@ -5,7 +5,6 @@ from fastapi.testclient import TestClient
 from app.routers.nse.equity.equity import router
 from app.schemas.stock_model import StockPriceInfo
 
-
 client = TestClient(router)
 
 
@@ -28,7 +27,6 @@ def test_get_stock_data(get_stock_data_io):
         # Check if the status code is 200
         try:
             if stock_data["status_code"] == 200:
-                
                 # Send a GET request to the endpoint URL
                 response = client.get(endpoint_url)
                 print(endpoint_url)
@@ -87,6 +85,7 @@ def test_nse_index_data(nse_index_data_io):
         else:
             validate_exception(endpoint_url, index_data)
 
+
 def test_stock_listing_date_nse(nse_stock_listing_date_io):
     for stock_data in nse_stock_listing_date_io:
         stock_symbol = stock_data["input"]
@@ -95,18 +94,16 @@ def test_stock_listing_date_nse(nse_stock_listing_date_io):
         # Check if the status code is 200
         try:
             if stock_data["status_code"] == 200:
-                
                 # Send a GET request to the endpoint URL
                 response = client.get(endpoint_url)
-                
 
                 # Assert that the response status code matches the expected status code
                 assert response.status_code == stock_data["status_code"]
 
                 # Assert that the response contains JSON data
                 assert response.json() is not None
-                
-                assert response.json()== stock_data['listing_date']
+
+                assert response.json() == stock_data["listing_date"]
 
         except HTTPException as http_exc:
             assert http_exc.status_code == 503
