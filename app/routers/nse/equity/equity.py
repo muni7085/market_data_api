@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Path
 from app.routers.nse.equity.data_retrieval import (
     get_index_data,
     get_nifty_index_stocks,
+    get_stock_listing_date,
     get_stock_trade_info,
 )
 from app.schemas.stock_scheme import StockPriceInfo
@@ -15,7 +16,7 @@ router = APIRouter(prefix="/nse/equity", tags=["equity"])
 
 
 @router.get(
-    "/{stock_symbol}",
+    "/stock/{stock_symbol}",
     response_model=StockPriceInfo,
 )
 async def get_stock_data(stock_symbol: Annotated[str, Path()]):
@@ -30,7 +31,6 @@ async def get_stock_data(stock_symbol: Annotated[str, Path()]):
         eg: `TCS`, `RELIANCE`
 
     """
-
     formatted_stock_symbol = validate_and_format_stock_symbol(stock_symbol)
 
     return get_stock_trade_info(formatted_stock_symbol)
@@ -67,3 +67,19 @@ async def nse_index_data(index_symbol: Annotated[str, Path()]):
     """
     validate_index_symbol(index_symbol)
     return get_index_data(index_symbol)
+
+
+@router.get("/listing/{stock_symbol}", response_model=str)
+async def stock_listing_date_nse(stock_symbol: Annotated[str, Path()]):
+    """
+    Get the listing date of the given stock in the NSE.
+
+    Parameters:
+    -----------
+    - **stock_symbol**:
+        It must be a valid stock symbol that is registered in the NSE website.
+        eg: `tcs` or `TCS`
+    """
+    formatted_stock_symbol = validate_and_format_stock_symbol(stock_symbol)
+
+    return get_stock_listing_date(formatted_stock_symbol)

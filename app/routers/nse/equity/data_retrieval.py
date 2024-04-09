@@ -43,6 +43,35 @@ def get_nifty_index_stocks(url: str, max_tries: int = 1000) -> list[StockPriceIn
     return filter_nifty_stocks(nifty_index_stocks["data"])
 
 
+def get_stock_url(stock_symbol: str) -> str:
+    """
+    Returns the stock url based on the stock symbol.
+
+    Parameters:
+    -----------
+    stock_symbol: ``str``
+        Nse stock symbol, can be obtained from the nse official website.
+                eg: "SBIN","TCS" etc.
+
+    Raises:
+    ------
+    ``ValueError``
+        If the given stock symbol was not registered symbol in NSE
+
+    Returns:
+    --------
+    stock_url: ``str``
+        stock url to the stock information
+    """
+
+    if stock_symbol == "" or stock_symbol is None:
+        raise ValueError("Stock symbol can't be empty")
+
+    stock_url = f"{STOCK_URL}{stock_symbol}"
+
+    return stock_url
+
+
 def get_stock_trade_info(symbol: str) -> StockPriceInfo:
     """
     Provide the price information about given stock symbol.
@@ -58,10 +87,7 @@ def get_stock_trade_info(symbol: str) -> StockPriceInfo:
     StockData
         StockData model contain the information about the stock.
     """
-    if symbol == "" or symbol is None:
-        raise ValueError("Symbol can't be empty")
-
-    stock_url = f"{STOCK_URL}{symbol}"
+    stock_url = get_stock_url(symbol)
     stock_data = fetch_nse_data(stock_url)
 
     if "priceInfo" not in stock_data:
@@ -69,9 +95,40 @@ def get_stock_trade_info(symbol: str) -> StockPriceInfo:
             status_code=503,
             detail={"Error": "no data found for the given symbol at the moment"},
         )
+
     price_info = stock_data["priceInfo"]
 
     return filter_single_stock(symbol, price_info)
+
+
+def get_stock_listing_date(stock_symbol: str) -> str:
+    """
+    Returns the listing date of the stock in NSE.
+
+    Parameters:
+    -----------
+    stock_symbol: ``str``
+        Nse index symbol, can be obtained from the nse official website
+            eg: "NIFTY 50","NIFTY NEXT 50" etc.
+
+    Returns:
+    --------
+    listing_date: ``str``
+        Listing date of the given stock symbol.
+
+    """
+    stock_url = get_stock_url(stock_symbol)
+    stock_data = fetch_nse_data(stock_url)
+
+    if "metadata" not in stock_data:
+        raise HTTPException(
+            status_code=503,
+            detail={"Error": "no metadata found for the given symbol at the moment"},
+        )
+
+    listing_date = stock_data.get("metadata").get("listingDate")
+
+    return listing_date
 
 
 def get_index_data(symbol: str) -> StockPriceInfo:

@@ -1,7 +1,8 @@
 # pylint: disable=missing-function-docstring
 import pytest
 
-from app.utils.date_utils import get_date
+from app.utils.date_utils import get_date, get_expiry_dates
+from app.utils.type_utils import SymbolType
 
 option_chain_data = [
     {
@@ -103,11 +104,15 @@ option_chain_data = [
 def get_option_chain_io():
     return [
         {
-            "input": [get_date("thursday"), "NIFTY", "index"],
+            "input": [
+                get_expiry_dates("NIFTY", SymbolType.DERIVATIVE)[0],
+                "NIFTY",
+                "index",
+            ],
             "output": None,
         },
         {
-            "input": [get_date("thursday", True), "TCS", "stock"],
+            "input": [get_expiry_dates("TCS")[0], "TCS", "stock"],
             "output": None,
         },
         {
