@@ -20,6 +20,7 @@ pyotp = "^2.9.0"
 logzero = "^1.7.0"
 httpx = "^0.25.0"
 pytest = "^7.4.2"
+dvc = {extras = ["gdrive"], version = "^3.49.0"}
 
 
 
@@ -32,4 +33,3 @@ pylint = "^3.0.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
