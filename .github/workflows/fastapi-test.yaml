@@ -56,6 +56,7 @@ jobs:
 
       - name: Set up credentials path
         run: export SMARTAPI_CREDENTIALS=smartapi_credentials.json
+        run: echo $SMARTAPI_CREDENTIALS
 
       # Install miniconda and create a new environment with python 3.10
       - name: Install miniconda and create environment
