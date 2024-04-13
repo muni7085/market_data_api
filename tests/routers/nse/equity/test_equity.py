@@ -29,7 +29,7 @@ def test_get_stock_data(get_stock_data_io):
             if stock_data["status_code"] == 200:
                 # Send a GET request to the endpoint URL
                 response = client.get(endpoint_url)
-                print(endpoint_url)
+
                 # Assert that the response status code matches the expected status code
                 assert response.status_code == stock_data["status_code"]
 
