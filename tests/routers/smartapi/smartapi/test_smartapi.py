@@ -1,4 +1,6 @@
 # pylint: disable=missing-function-docstring
+from typing import Any
+
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
@@ -8,7 +10,21 @@ from app.schemas.stock_model import SmartAPIStockPriceInfo
 client = TestClient(router)
 
 
-def validate_exception(endpoint_url, expected_error):
+def validate_exception(endpoint_url: str, expected_error: dict[str, Any]):
+    """
+    Test function to validate exception.
+
+    This function checks if the exception is valid or not
+    for the given invalid input request.
+
+    Parameters:
+    -----------
+    endpoint_url: `str`
+        url
+    expected_error: `dict[str, Any]`
+        _description_
+    """
+
     try:
         # Make a GET request to the endpoint URL
         client.get(endpoint_url)
@@ -19,7 +35,18 @@ def validate_exception(endpoint_url, expected_error):
         assert http_exc.detail == expected_error["error"]
 
 
-def test_latest_price_quotes(stock_symbol_io):
+def test_latest_price_quotes(stock_symbol_io: list[dict[str, Any]]):
+    """
+    Test function to validate latest_price_quote end point.
+
+    This function verifies the operational behaviour of the
+    latest_price_quote end point across various input scenarios.
+
+    Parameters:
+    -----------
+    stock_symbol_io: `list[dict[str, Any]]`
+        List of inputs and corresponding outputs.
+    """
     for stock_symbol_data in stock_symbol_io:
         endpoint_url = f"/smart-api/equity/price/{stock_symbol_data['input']}"
 
