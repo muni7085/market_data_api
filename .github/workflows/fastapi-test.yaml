@@ -57,8 +57,6 @@ jobs:
         run: |
          echo "APP=app" >> $GITHUB_ENV
          echo "SMARTAPI_CREDENTIALS=smartapi_credentials.json" >>$GITHUB_ENV
-         echo $APP
-         echo $SMARTAPI_CREDENTIALS
 
       # Install miniconda and create a new environment with python 3.10
       - name: Install miniconda and create environment
