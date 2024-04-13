@@ -47,9 +47,16 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # Set up an environment variable with value "app"
+
+
+      - name: Decode json credentials
+        run: echo ${{ secrets.SMARTAPI_CREDENTIALS }} | jq > smartapi_credentials.json
+
+     # Set up an environment variable with value "app"
       - name: Set up environment variable
-        run: echo "APP=app" >> $GITHUB_ENV
+        run: |
+         echo "APP=app" >> $GITHUB_ENV
+         echo "SMARTAPI_CREDENTIALS=smartapi_credentials.json" >>$GITHUB_ENV
 
       # Install miniconda and create a new environment with python 3.10
       - name: Install miniconda and create environment
@@ -61,7 +68,7 @@ jobs:
       # Install poetry and all the packages in pyproject.toml file
       - name: Install poetry and dependencies
         run: |
-          curl -sSL https://install.python-poetry.org | python3 -
+          curl -sSL https://install.python-poetry.org | python3 - --version 1.8.2 -y
           poetry install
   
       - name: testing
