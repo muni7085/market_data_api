@@ -1,4 +1,6 @@
+# pylint: disable=missing-class-docstring
 from enum import Enum
+
 
 class RequestType(Enum):
     GET = "GET"

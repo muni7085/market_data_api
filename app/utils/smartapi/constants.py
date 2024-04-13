@@ -1,4 +1,3 @@
-
 from app import ROOT_DIR
 
 SYMBOLS_PATH = f"{ROOT_DIR}/data/smart_api/symbols.json"

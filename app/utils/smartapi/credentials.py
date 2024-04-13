@@ -1,7 +1,9 @@
+# pylint: disable=too-many-arguments
 import os
-from app.utils.file_utils import load_json_data
+
 from app.utils.common.exceptions import CredentialsException
-from app.utils.smart_api.constants import SMART_API_CREDENTIALS
+from app.utils.file_utils import load_json_data
+from app.utils.smartapi.constants import SMART_API_CREDENTIALS
 
 
 class Credentials:

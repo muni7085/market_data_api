@@ -7,11 +7,9 @@ class SymbolNotFoundException(HTTPException):
     """
 
     def __init__(self, symbol: str):
-
         super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail= f"Symbol {symbol} not found. Please provide a valid symbol. Refer to the NSE symbols list for valid symbols."
-            
+            detail=f"Symbol {symbol} not found. Please provide a valid symbol. Refer to the NSE symbols list for valid symbols.",
         )
 
 

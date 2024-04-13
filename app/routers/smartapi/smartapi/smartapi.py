@@ -1,15 +1,15 @@
 import json
-
-from app.utils.smart_api.validator import validate_symbol_and_get_token
 from typing import Annotated
-from app.utils.smart_api.connection import get_endpoint_connection
+
 from fastapi import APIRouter, Path
+
 from app.schemas.stock_model import SmartAPIStockPriceInfo
 from app.utils.common.types.financial_types import Exchange
-from app.utils.smart_api.urls import LAST_TRADED_PRICE_URL
 from app.utils.common.types.reques_types import RequestType
-from app.utils.smart_api.data_processor import process_smart_api_stock_data
-
+from app.utils.smartapi.connection import get_endpoint_connection
+from app.utils.smartapi.data_processor import process_smart_api_stock_data
+from app.utils.smartapi.urls import LAST_TRADED_PRICE_URL
+from app.utils.smartapi.validator import validate_symbol_and_get_token
 
 router = APIRouter(prefix="/smart-api/equity", tags=["equity"])
 
@@ -25,9 +25,9 @@ async def latest_price_quote(stock_symbol: Annotated[str, Path()]):
     - **stock_symbol**:
         It must be a valid stock symbol that is registered in the NSE website.
         eg: `TCS`, `RELIANCE`
-    
+
     """
-    
+
     stock_token, stock_symbol = validate_symbol_and_get_token(
         stock_exchange=Exchange.NSE, stock_symbol=stock_symbol
     )
@@ -39,9 +39,11 @@ async def latest_price_quote(stock_symbol: Annotated[str, Path()]):
     json_payload = json.dumps(payload)
 
     connection = get_endpoint_connection(
-        payload=json_payload, request_method_type=RequestType.POST, url=LAST_TRADED_PRICE_URL
+        payload=json_payload,
+        request_method_type=RequestType.POST,
+        url=LAST_TRADED_PRICE_URL,
     )
     res = connection.getresponse()
     data = res.read()
-    
+
     return process_smart_api_stock_data(json.loads(data.decode("utf-8"))["data"])

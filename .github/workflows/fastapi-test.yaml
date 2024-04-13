@@ -52,8 +52,8 @@ jobs:
         run: echo "APP=app" >> $GITHUB_ENV
 
       - name: Decode json credentials
-        run: echo ${{ secrets.SMARTAPI_CREDENTIALS }} | base64 -d > smartapi_credentials.json
-        
+        run: echo ${{ secrets.SMARTAPI_CREDENTIALS }} | jq > smartapi_credentials.json
+
       - name: Set up credentials path
         run: export SMARTAPI_CREDENTIALS=smartapi_credentials.json
 

@@ -1,5 +1,6 @@
-from app.schemas.stock_model import HistoricalStockPriceInfo, SmartAPIStockPriceInfo
 from typing import Any, Dict
+
+from app.schemas.stock_model import SmartAPIStockPriceInfo
 
 
 def process_smart_api_stock_data(
@@ -7,17 +8,17 @@ def process_smart_api_stock_data(
 ) -> SmartAPIStockPriceInfo:
     """
     Processes the data from the SmartAPI and returns the processed data
-    
+
     Parameters:
     -----------
     stock_price_data: ``Dict[str, Any]``
         The data from the SmartAPI to be processed
-    
+
     Returns:
     --------
     ``SmartAPIStockPriceInfo``
         The processed data from the SmartAPI as a SmartAPIStockPriceInfo object
-    
+
     """
     return SmartAPIStockPriceInfo(
         symbol=stock_price_data["tradingsymbol"],

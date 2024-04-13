@@ -1,10 +1,12 @@
+import http.client
+from http.client import HTTPConnection
+from typing import Dict, Optional, Union
+
 import pyotp
 from SmartApi import SmartConnect
-from app.utils.smart_api.credentials import Credentials
-from http.client import HTTPConnection
-from typing import Optional, Dict, Union
+
 from app.utils.common.types.reques_types import RequestType
-import http.client
+from app.utils.smartapi.credentials import Credentials
 
 
 class Singleton(type):
@@ -12,7 +14,7 @@ class Singleton(type):
     Singleton class to create a single instance of the SmartApiConnection class.
     """
 
-    _instances = {}
+    _instances: dict = {}
 
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
@@ -57,7 +59,7 @@ class SmartApiConnection(metaclass=Singleton):
                 return client_data["jwtToken"]
         return None
 
-    def get_headers(self) -> Dict[str, str]:
+    def get_headers(self) -> Dict[str, Optional[str]]:
         """
         The method to get the headers for the API request.
 
@@ -82,6 +84,9 @@ class SmartApiConnection(metaclass=Singleton):
 
     @staticmethod
     def get_connection():
+        """
+        Initialze the SmartApiConnection
+        """
         credentials = Credentials.get_credentials()
         connection = SmartApiConnection(credentials)
         return connection
@@ -114,5 +119,5 @@ def get_endpoint_connection(
     connection = http.client.HTTPSConnection("apiconnect.angelbroking.com")
     headers = api_connection.get_headers()
     connection.request(request_method_type.value, url, body=payload, headers=headers)
-    
+
     return connection

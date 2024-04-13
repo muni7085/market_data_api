@@ -1,7 +1,7 @@
 [MASTER]
-disable=  C0114, E0611, R0903, W0621, E0401
-         # missing-module-docstring, no-name-in-module, missing-class-docstring, edefined-outer-name, import error
+disable=  C0114, E0611, R0903, W0621, E0401, R0801
+         # missing-module-docstring, no-name-in-module, missing-class-docstring, edefined-outer-name, import error, Similar lines
 
 
 [FORMAT]
-max-line-length=120
+max-line-length=130
