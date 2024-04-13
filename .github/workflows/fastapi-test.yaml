@@ -47,18 +47,18 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      # Set up an environment variable with value "app"
-      - name: Set up environment variable
-        run: echo "APP=app" >> $GITHUB_ENV
+
 
       - name: Decode json credentials
         run: echo ${{ secrets.SMARTAPI_CREDENTIALS }} | jq > smartapi_credentials.json
 
-      - name: Set up credentials path
-        run: export SMARTAPI_CREDENTIALS=smartapi_credentials.json
-        
-      - name: check credentials
-        run: echo $SMARTAPI_CREDENTIALS
+     # Set up an environment variable with value "app"
+      - name: Set up environment variable
+        run: |
+         echo "APP=app" >> $GITHUB_ENV
+         echo "SMARTAPI_CREDENTIALS=smartapi_credentials.json" >>$GITHUB_ENV
+         echo $APP
+         echo $SMARTAPI_CREDENTIALS
 
       # Install miniconda and create a new environment with python 3.10
       - name: Install miniconda and create environment
