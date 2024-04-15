@@ -21,6 +21,7 @@ logzero = "^1.7.0"
 httpx = "^0.25.0"
 pytest = "^7.4.2"
 dvc = {extras = ["gdrive"], version = "^3.49.0"}
+platformdirs = "3.10.0"
 
 
 
