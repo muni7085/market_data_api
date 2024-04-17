@@ -10,6 +10,7 @@ from app.utils.smartapi.connection import get_endpoint_connection
 from app.utils.smartapi.data_processor import process_smart_api_stock_data
 from app.utils.smartapi.urls import LAST_TRADED_PRICE_URL
 from app.utils.smartapi.validator import validate_symbol_and_get_token
+from app.utils.common.exceptions import UnkownException
 
 router = APIRouter(prefix="/smart-api/equity", tags=["equity"])
 
@@ -44,6 +45,9 @@ async def latest_price_quote(stock_symbol: Annotated[str, Path()]):
         url=LAST_TRADED_PRICE_URL,
     )
     res = connection.getresponse()
-    data = res.read()
+    data = json.loads(res.read().decode("utf-8"))
+    
+    if not data["data"]:
+        raise UnkownException(error_message=data["message"], status_code=res.status)
 
-    return process_smart_api_stock_data(json.loads(data.decode("utf-8"))["data"])
+    return process_smart_api_stock_data(data["data"])

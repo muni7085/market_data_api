@@ -23,3 +23,16 @@ class CredentialsException(HTTPException):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"{credential_name} environment variable is not set.",
         )
+
+
+class UnkownException(HTTPException):
+    """
+    UnkownException is raised when an unknown exception occurs.
+    This class can be used to raise exceptions that are not handled by the application.
+    """
+
+    def __init__(self, error_message: str, status_code: int):
+        super().__init__(
+            status_code=status_code,
+            detail=error_message,
+        )
