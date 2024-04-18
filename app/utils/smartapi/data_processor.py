@@ -1,6 +1,6 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
-from app.schemas.stock_model import SmartAPIStockPriceInfo
+from app.schemas.stock_model import HistoricalStockPriceInfo, SmartAPIStockPriceInfo
 
 
 def process_smart_api_stock_data(
@@ -35,3 +35,38 @@ def process_smart_api_stock_data(
         symbol_token=stock_price_data["symboltoken"],
         prev_day_close=stock_price_data["close"],
     )
+
+
+def process_smart_api_historical_stock_data(
+    historical_stock_data: List[List[Any]],
+) -> List[HistoricalStockPriceInfo]:
+    """
+    Processes the data from the SmartAPI and returns the processed data.
+
+    Parameters:
+    -----------
+    stock_symbol: `str`
+        stock symbol.
+    historical_stock_data: `List[List[Any]]`
+        The data from the SmartAPI to be processed.
+
+    Return:
+    -------
+    List[HistoricalStockPriceInfo]
+        The processed data from the SmartAPI as a list of HistoricalStockPriceInfo.
+    """
+    processed_historical_stock_data = []
+    for stock_data in historical_stock_data:
+        if len(stock_data) == 0:
+            continue
+        processed_historical_stock_data.append(
+            HistoricalStockPriceInfo(
+                timestamp=stock_data[0],
+                open=stock_data[1],
+                close=stock_data[2],
+                low=stock_data[3],
+                high=stock_data[4],
+                volume=stock_data[5],
+            )
+        )
+    return processed_historical_stock_data
