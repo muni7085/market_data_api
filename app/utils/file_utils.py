@@ -53,6 +53,26 @@ def load_json_data(file_path: str | Path) -> Any:
     return data
 
 
+def read_text_data(file_path: str | Path) -> Any:
+    """
+    Read the data from given text file path.
+
+    Parameters:
+    -----------
+    file_path: `str | Path`
+        Path to the text file.
+
+    Return:
+    -------
+    Any
+        Reded data from the given file path.
+    """
+    file_path = resolve_path(file_path)
+    with open(file_path, "r", encoding="utf-8") as fp:
+        data = fp.read().splitlines()
+    return data
+
+
 @lru_cache(10)
 def get_symbols(symbol_file: str) -> Any:
     """
