@@ -26,7 +26,7 @@ class HistoricalStockPriceInfo(BaseModel):
     low: float
     close: float
     volume: int
-    symbol_token: str
+    stock_symbol: str
     candle_interval: str
 
 
