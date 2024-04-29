@@ -18,10 +18,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.10
+      - name: Set up Python 3.12.3
         uses: actions/setup-python@v3
         with:
-          python-version: "3.10"
+          python-version: "3.12.3"
       - name: install dependencies
         run: |
          pip install --upgrade pip
@@ -62,7 +62,7 @@ jobs:
       - name: Install miniconda and create environment
         uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: "3.10"
+          python-version: "3.12.3"
           activate-environment: ${{ env.APP }}
 
       # Install poetry and all the packages in pyproject.toml file
