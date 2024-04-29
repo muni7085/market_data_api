@@ -7,3 +7,5 @@ sample.py
 /.idea
 *.tar.bz2
 .vscode
+*.coverage
+*.log
