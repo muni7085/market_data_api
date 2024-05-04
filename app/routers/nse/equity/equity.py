@@ -59,11 +59,11 @@ async def nse_index_data(index_symbol: Annotated[str, Path()]):
     """
     Get the trade information about a Nse index.
 
-     Parameters:
-     -----------
+    Parameters:
+    -----------
      - **index_symbol**:
-         It must be a valid index symbol that is registered in the NSE website.
-         eg: `NIFTY 50`
+        It must be a valid index symbol that is registered in the NSE website.
+        eg: `NIFTY 50`
     """
     validate_index_symbol(index_symbol)
     return get_index_data(index_symbol)

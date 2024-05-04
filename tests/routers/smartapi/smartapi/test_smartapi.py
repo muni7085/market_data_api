@@ -1,22 +1,11 @@
 # pylint: disable=missing-function-docstring
-from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from app.routers.smartapi.smartapi.smartapi import router
 from app.schemas.stock_model import SmartAPIStockPriceInfo
+from tests.utils.common.exception_validators import validate_exception
 
 client = TestClient(router)
-
-
-def validate_exception(endpoint_url, expected_error):
-    try:
-        # Make a GET request to the endpoint URL
-        client.get(endpoint_url)
-    except HTTPException as http_exc:
-        # Check if the status code of the exception matches the expected error status code
-        assert http_exc.status_code == expected_error["status_code"]
-        # Check if the detail message of the exception matches the expected error detail
-        assert http_exc.detail == expected_error["error"]
 
 
 def test_latest_price_quotes(stock_symbol_io):
@@ -49,4 +38,4 @@ def test_latest_price_quotes(stock_symbol_io):
             assert smart_api_stock_price_info.symbol == stock_symbol_data["symbol"]
 
         else:
-            validate_exception(endpoint_url, stock_symbol_data)
+            validate_exception(endpoint_url, stock_symbol_data, client)

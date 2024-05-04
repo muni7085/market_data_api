@@ -1,7 +1,8 @@
 import calendar
-import datetime
+from datetime import date, datetime, timedelta
 from typing import List
 
+from app.utils.common.exceptions import InvalidDateTimeFormatException
 from app.utils.fetch_data import fetch_nse_data
 from app.utils.type_utils import SymbolType
 from app.utils.urls import INDEX_OPTION_CHAIN_URL, STOCK_OPTION_CHAIN_URL
@@ -13,16 +14,16 @@ def last_date_of_weekday(year: int, month: int, weekday: int):
 
     Parameters
     ----------
-    year : int
+    year : ``int``
     The year as a four-digit number, such as 2023.
-    month : int
+    month : ``int``
     The month as a number from 1 to 12, where 1 is January and 12 is December.
-    weekday : int
+    weekday : ``int``
     The weekday as a number from 0 to 6, where 0 is Monday and 6 is Sunday.
 
     Returns
     -------
-    datetime.date
+    ``datetime.date``
     The date object representing the last occurrence of the input weekday in the input month and year.
 
     Examples
@@ -36,19 +37,19 @@ def last_date_of_weekday(year: int, month: int, weekday: int):
 
     Raises
     ------
-    ValueError:
+    ``ValueError``
         If the input year, month or weekday is out of range.
 
     """
     try:
-        datetime.datetime(year, month, weekday)
+        datetime(year, month, weekday)
     except ValueError as exc:
         raise ValueError(f"{weekday}/{month}/{year} is not a valid date") from exc
 
     last_day = calendar.monthrange(year, month)[1]
 
     # create a date object for the last day of the current month
-    last_date = datetime.date(year, month, last_day)
+    last_date = date(year, month, last_day)
 
     # get the weekday number of the last day of the current month
     last_weekday = last_date.weekday()
@@ -57,7 +58,7 @@ def last_date_of_weekday(year: int, month: int, weekday: int):
     days_to_subtract = (last_weekday - weekday + 7) % 7
 
     # subtract the number of days from the last date and get the result as a date object
-    result_date = last_date - datetime.timedelta(days=days_to_subtract)
+    result_date = last_date - timedelta(days=days_to_subtract)
 
     return result_date
 
@@ -69,11 +70,11 @@ def get_date(weekday: str, monthly: bool = False):
 
     Parameters
     ----------
-    weekday : `str`
+    weekday : ``str``
         The name or abbreviation of the weekday, such as "monday" or "mon".
         The input is case-insensitive and must be a valid weekday.
 
-    monthly : `bool`, (default = False)
+    monthly : ``bool``, (default = False)
         A flag indicating whether to return the date of the given weekday in the next week
         or last week in the month.
 
@@ -84,13 +85,13 @@ def get_date(weekday: str, monthly: bool = False):
 
     Returns
     -------
-    str:
+    ``str``
         The date of the weekday in the format "%d-%b-%Y", such as "08-Oct-2023".
 
 
     Raises
     ------
-    ValueError:
+    ``ValueError``
         If the input weekday is invalid.
 
     Examples
@@ -130,14 +131,14 @@ def get_date(weekday: str, monthly: bool = False):
     if weekday not in weekdays:
         raise ValueError(f"{weekday} is not a valid day")
 
-    today = datetime.date.today()
+    today = date.today()
     today_num = today.weekday()
     weekday_num = weekdays[weekday]
     days_to_add = (weekday_num - today_num + 7) % 7
 
     year = today.year
     month = today.month
-    weekday_date = today + datetime.timedelta(days=days_to_add)
+    weekday_date = today + timedelta(days=days_to_add)
     if monthly:
         weekday_date = last_date_of_weekday(year, month, weekday_num)
         if weekday_date < today:
@@ -177,3 +178,36 @@ def get_expiry_dates(
     option_data = fetch_nse_data(option_chain_url)
 
     return option_data["records"]["expiryDates"]
+
+
+def validate_datetime_format(date_time: str) -> datetime:
+    """
+    Validates given string is in a valid datetime format or not. Datetime must be in the form of 'year-month-day hour:minute'.
+
+    Parameters:
+    -----------
+    date_time: ``str``
+        date and time to be validated.
+
+    Exceptions:
+    -----------
+    ``InvalidDateTimeFormatException``
+        If the date and time is in wrong format.
+    Return:
+    -------
+    ``datetime``
+        validated given date and time and returns valid datetime object.
+    """
+    date_separator = "/" if len(date_time.split("/")) > 1 else "-"
+    month_format_codes = ["m", "b", "B"]
+    for month_format_code in month_format_codes:
+        try:
+            datetime_format = (
+                f"%Y{date_separator}%{month_format_code}{date_separator}%d %H:%M"
+            )
+            datetime_obj = datetime.strptime(date_time, datetime_format)
+            return datetime_obj
+
+        except ValueError:
+            continue
+    raise InvalidDateTimeFormatException(date_time)

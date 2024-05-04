@@ -10,12 +10,12 @@ def filter_nifty_stocks(stocks_data: list[dict[str, Any]]) -> list[StockPriceInf
 
     Parameters:
     -----------
-    stocks_data: `list[dict[str,Any]]`
-        Json parsed response of s stock from the Nse api
+    stocks_data: ``list[dict[str,Any]]``
+        Json parsed response of stock from the Nse api
 
     Return:
     -------
-    list[StockData]
+    ``list[StockData]``
         List of StockData models that contain the price information about the stocks.
     """
     if len(stocks_data) == 0:
@@ -45,15 +45,15 @@ def filter_single_stock(symbol: str, stock_data: dict[str, Any]) -> StockPriceIn
 
     Parameters:
     -----------
-    symbol: `str`
+    symbol: ``str``
         Nse stock symbol, can be obtained from the nse official website.
             eg: "SBIN","TCS" etc.
-    raw_stock_data: `dict[str,Any]`
+    raw_stock_data: ``dict[str,Any]``
         Json parsed response of s stock from the Nse api
 
     Return:
     -------
-    StockData
+    ``StockData``
         StockData model contain the information about the stock.
     """
     if len(stock_data) == 0:
@@ -76,12 +76,12 @@ def filter_single_index(index_data: dict[str, Any]) -> StockPriceInfo:
 
     Parameters:
     -----------
-    index_data: `dict[str,Any]`
+    index_data: ``dict[str,Any]``
         Json parsed response of s stock from the Nse api
 
     Return:
     -------
-    StockData
+    ``StockData``
         StockData model contains the price information about the index.
     """
     if len(index_data) == 0:

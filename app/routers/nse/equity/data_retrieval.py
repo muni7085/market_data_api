@@ -18,15 +18,15 @@ def get_nifty_index_stocks(url: str, max_tries: int = 1000) -> list[StockPriceIn
 
     Parameters:
     -----------
-    url: `str`
+    url: ``str``
         Url for fetching the nse index stocks data.
-    max_tries: `int` (defaults = 1000)
+    max_tries: ``int`` (defaults = 1000)
         Maximum number of times the request has to send to get response.
         Requests are made until either get the status code `200` or exceed max_tries.
 
     Return:
     -------
-    list[StockData]
+    ``list[StockData]``
         List of StockData models that contain the price information about the stocks.
     """
     if url == "":
@@ -51,7 +51,7 @@ def get_stock_url(stock_symbol: str) -> str:
     -----------
     stock_symbol: ``str``
         Nse stock symbol, can be obtained from the nse official website.
-                eg: "SBIN","TCS" etc.
+            eg: "SBIN","TCS" etc.
 
     Raises:
     ------
@@ -78,13 +78,13 @@ def get_stock_trade_info(symbol: str) -> StockPriceInfo:
 
     Parameters:
     -----------
-    symbol: `str`
+    symbol: ``str``
         Nse stock symbol, can be obtained from the nse official website.
             eg: "SBIN","TCS" etc.
 
     Return:
     -------
-    StockData
+    ``StockData``
         StockData model contain the information about the stock.
     """
     stock_url = get_stock_url(symbol)
@@ -137,13 +137,13 @@ def get_index_data(symbol: str) -> StockPriceInfo:
 
     Parameters:
     -----------
-    symbol: `str`
+    symbol: ``str``
         Nse index symbol, can be obtained from the nse official website
             eg: "NIFTY 50","NIFTY NEXT 50" etc.
 
     Return:
     -------
-    StockPriceInfo
+    ``StockPriceInfo``
         StockData model contain the information about the index
     """
     if symbol == "" or symbol is None:

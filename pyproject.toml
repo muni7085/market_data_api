@@ -22,6 +22,8 @@ httpx = "^0.25.0"
 pytest = "^7.4.2"
 dvc = {extras = ["gdrive"], version = "^3.49.0"}
 platformdirs = "3.10.0"
+numpy = "^1.26.4"
+pandas = "^2.2.2"
 
 
 

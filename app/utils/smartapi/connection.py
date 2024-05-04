@@ -50,7 +50,7 @@ class SmartApiConnection(metaclass=Singleton):
 
         Returns:
         --------
-        ``Optional[str]``:
+        ``Optional[str]``
             The authentication token if present, else None.
         """
         if "data" in self.data:
@@ -65,7 +65,7 @@ class SmartApiConnection(metaclass=Singleton):
 
         Returns:
         --------
-        ``dict``:
+        ``dict``
             The headers for the API request for the SmartAPI.
         """
         auth_token = self.get_auth_token()
@@ -110,7 +110,7 @@ def get_endpoint_connection(
     
     Returns:
     --------
-    ``HTTPConnection``:
+    ``HTTPConnection``
         The HTTP connection object for the given endpoint.
     
 

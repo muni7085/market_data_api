@@ -17,22 +17,22 @@ def get_option_chain(
 
     Parameters:
     -----------
-    expiry_date: `str`
+    expiry_date: ``str``
         Option expiry date in "dd-MM-yyyy" format.
             eg: 28-Sep-2023
-    derivative_symbol: `str`
+    derivative_symbol: ``str``
         derivative symbol to get the option chain.
-    derivative_type: `str`
+    derivative_type: ``str``
         The derivative type that is either "stock" or "index"
 
     Raises:
     -------
-    HTTPException:
+    ``HTTPException``
         If there is no expiry for the given derivative on the given expiry date.
 
     Return:
     -------
-    ExpiryOptionData
+    ``ExpiryOptionData``
         Option expiry data that contains the option chain information about the given derivative.
     """
     base_url = INDEX_OPTION_CHAIN_URL

@@ -15,18 +15,18 @@ def validate_and_format_stock_symbol(stock_symbol: str) -> str:
 
     Parameters:
     -----------
-    stock_symbol: `str`
+    stock_symbol: ``str``
         stock symbol to be validated
             eg: "TCS", "INFY", etc.
 
     Raises:
     -------
-    HTTPException:
+    ``HTTPException``
         Raises when the stock symbol is not available in the Nse official website
 
     Return:
     -------
-    str:
+    ``str``
         Given stock symbol in upper case
     """
     symbols: set[str] = set(get_symbols(NSE_STOCK_SYMBOLS)["symbols"])
@@ -49,18 +49,18 @@ def validate_index_symbol(index_symbol: Annotated[str, Path()]) -> str:
 
     Parameters:
     -----------
-    index_symbol: `Annotated[str, Path()]`
+    index_symbol: ``Annotated[str, Path()]``
         index symbol to be validated
             eg: "NIFTY 50","NIFTY 100", etc.
 
     Raises:
     -------
-    HTTPException:
+    ``HTTPException``
         Raises when the index symbol is not available in the Nse official website.
 
     Return:
     -------
-    `str`
+    ``str``
         Url path to the index symbol endpoint.
     """
     symbols: dict[str, str] = get_symbols(NSE_INDEX_SYMBOLS)
@@ -85,15 +85,15 @@ def validate_derivative_symbol_with_type(
 
     Parameters:
     -----------
-    derivative_symbol: `str`
+    derivative_symbol: ``str``
         Derivative symbol to be validated.
-         eg: "NIFTY", "ABB", etc.
-    derivative_type: `str`
+            eg: "NIFTY", "ABB", etc.
+    derivative_type: ``str``
         Derivative type should be either index of stock.
 
     Raises:
     -------
-    HTTPException:
+    ``HTTPException``
         If derivative type and derivate symbol mismatch.
         If derivative symbol is not present the symbols file.
     """
@@ -127,12 +127,12 @@ def get_date_format(date: str) -> str:
 
     Parameters:
     -----------
-    date: `str`
+    date: ``str``
         Date to get the format.
 
     Return:
     -------
-    str
+    ``str``
         Format of the given date.
     """
     date_separator = "/" if len(date.split("/")) > 1 else "-"
@@ -146,12 +146,12 @@ def validate_and_reformat_date(data: str) -> Tuple[str, bool]:
 
     Parameters:
     -----------
-    date: `str`
+    date: ``str``
         expiry date to be validated.
 
     Return:
     -------
-    Tuple[str,bool]
+    ``Tuple[str,bool]``
         Reformated expiry date is date is valid else input date and validation status of expiry date.
     """
     required_date_format = "%d-%b-%Y"

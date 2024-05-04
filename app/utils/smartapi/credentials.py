@@ -46,7 +46,7 @@ class Credentials:
 
         Returns:
         --------
-        ``Credentials``:
+        ``Credentials``
             The credentials object with the API key, client id, password, token and correlation id.
         """
         credentials_path = os.getenv(SMART_API_CREDENTIALS)

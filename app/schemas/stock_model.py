@@ -26,14 +26,24 @@ class HistoricalStockPriceInfo(BaseModel):
     low: float
     close: float
     volume: int
-    symbol_token: str
+    stock_symbol: str
     candle_interval: str
 
 
 class SmartAPIStockPriceInfo(StockPriceInfo):
     """
-    SmartAPIStockPriceInfo model represents the stock price information of a stock from a Angel Broking Smart API.
+    SmartAPIStockPriceInfo model represents the stock price information of a stock.
     """
 
     symbol_token: str
     prev_day_close: float
+
+
+class HistoricalStockDataBundle(BaseModel):
+    """
+    HistoricalStockDataBundle model represents the available historical stock price information
+    and timestamps of missing data points of a stock at a given time .
+    """
+
+    available_stock_data: list[HistoricalStockPriceInfo]
+    missing_timestamps: list[str]

@@ -10,17 +10,17 @@ def resolve_path(file_path: str | Path) -> Path:
 
     Parameters:
     -----------
-    file_path: `str | Path`
+    file_path: ``str | Path``
         File path to be resolved.
 
     Raises:
     -------
-    FileNotFoundError:
+    ``FileNotFoundError``
         Raised when the given file path not exists.
 
     Return:
     -------
-    Path
+    ``Path``
         Path object representation of the file.
     """
 
@@ -39,17 +39,37 @@ def load_json_data(file_path: str | Path) -> Any:
 
     Parameters:
     -----------
-    file_path: `str | Path`
+    file_path: ``str | Path``
         Path to the json file.
 
     Return:
     -------
-    Any
+    ``Any``
         Loaded data from the given file path.
     """
     file_path = resolve_path(file_path)
     with open(file_path, "r", encoding="utf-8") as fp:
         data = json.load(fp)
+    return data
+
+
+def read_text_data(file_path: str | Path) -> Any:
+    """
+    Read the data from given text file path.
+
+    Parameters:
+    -----------
+    file_path: ``str | Path``
+        Path to the text file.
+
+    Return:
+    -------
+    ``Any``
+        Reded data from the given file path.
+    """
+    file_path = resolve_path(file_path)
+    with open(file_path, "r", encoding="utf-8") as fp:
+        data = fp.read().splitlines()
     return data
 
 
@@ -62,13 +82,47 @@ def get_symbols(symbol_file: str) -> Any:
 
     Parameters:
     -----------
-    symbol_file: `str`
+    symbol_file: ``str``
         Path to the symbols file.
 
     Return:
     -------
-    Any
+    ``Any``
         symbols data from the file.
     """
     stock_symbols_data = load_json_data(symbol_file)
     return stock_symbols_data
+
+
+def write_to_json_file(file_path: str | Path, data: dict):
+    """
+    Write data into the given json file path.
+
+    Parameters:
+    -----------
+    file_path: ``str | Path``
+        Destination file path to write data.
+    """
+    with open(file_path, "w", encoding="utf-8") as fp:
+        json.dump(data, fp, indent=4)
+    print(f"Data successfully written into the file {file_path}")
+
+
+def create_dir(dir_path: str | Path) -> Path:
+    """Create a directory if it doesn't exist.
+
+    Parameters:
+    -----------
+    dir_path: ``str | Path``
+        The path of the directory to be created. It can be a string or a Path object.
+
+    Return:
+    -------
+    ``Path``
+        The Path object corresponding to the created directory.
+    """
+    if isinstance(dir_path, str):
+        dir_path = Path(dir_path)
+    if not dir_path.exists():
+        dir_path.mkdir(parents=True, exist_ok=True)
+    return dir_path

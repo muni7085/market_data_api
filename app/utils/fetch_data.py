@@ -14,21 +14,21 @@ def fetch_nse_data(url: str, max_tries: int = 1000) -> Any:
 
     Parameters:
     -----------
-    url: `str`
+    url: ``str``
         Url from nse to fetch the data.
-    max_tries: `int` (defaults = 1000)
+    max_tries: ``int`` (defaults = 1000)
         Maximum number of times the request has to send to get response.
         Requests are made until either get the status code `200` or exceed max_tries.
 
     Raises:
     -------
-    HTTPException:
+    ``HTTPException``
         If not get response even after max_tries.
 
 
     Returns:
     --------
-    Any:
+    ``Any``
         Json loaded response from the api.
     """
     if max_tries < 1:

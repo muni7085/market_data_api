@@ -35,7 +35,7 @@ async def option_chain_data(
     ],
 ):
     """
-    Provide the option chain data for a given derivative symbol and expiry date
+    Provide the option chain data for a given derivative symbol and expiry date.
 
     Parameters:
     -----------
