@@ -288,7 +288,7 @@ class SmartWebSocketV2(object):
                     self.input_request_dict[mode][token["exchangeType"]] = token[
                         "tokens"
                     ]
-
+            print(f"request_data: {request_data}")
             self.wsapp.send(json.dumps(request_data))
             self.RESUBSCRIBE_FLAG = True
 
