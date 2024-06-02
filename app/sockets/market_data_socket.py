@@ -5,6 +5,10 @@ from abc import ABC, abstractmethod
 class MarketDataSocket(ABC, Registrable):
     def __init__(self, auth_token: str):
         self._auth_token = auth_token
+    
+    @property
+    def auth_token(self):
+        return self._auth_token
 
     @abstractmethod
     def connect(self):
@@ -36,10 +40,6 @@ class MarketDataSocket(ABC, Registrable):
 
     @abstractmethod
     def decode_data(self, data):
-        raise NotImplementedError("Method not implemented")
-
-    @abstractmethod
-    def close(self):
         raise NotImplementedError("Method not implemented")
 
     @abstractmethod
