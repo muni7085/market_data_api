@@ -41,8 +41,10 @@ def test_index_option_chain_valid():
     assert "ce" in strike_prices[0]
     assert "pe" in strike_prices[0]
 
-    validate_option(strike_prices[0]["ce"])
-    validate_option(strike_prices[0]["pe"])
+    middle_strike_price = strike_prices[len(strike_prices) // 2]
+
+    validate_option(middle_strike_price["ce"])
+    validate_option(middle_strike_price["pe"])
 
 
 def validate_error_response(

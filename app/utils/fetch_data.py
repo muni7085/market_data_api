@@ -1,7 +1,7 @@
 import json
 from typing import Any
 
-import requests
+import httpx
 from fastapi import HTTPException
 
 from app.utils.headers import REQUEST_HEADERS
@@ -34,23 +34,22 @@ def fetch_nse_data(url: str, max_tries: int = 1000) -> Any:
     if max_tries < 1:
         raise ValueError("max_tries should be greater than 0")
 
-    session = requests.Session()
-    request = session.get(NSE_BASE_URL, headers=REQUEST_HEADERS)
+    response = httpx.get(NSE_BASE_URL, headers=REQUEST_HEADERS)
+    cookies = dict(response.cookies)
 
-    for _ in range(max_tries):
-        cookies = dict(request.cookies)
-        response = session.get(url, headers=REQUEST_HEADERS, timeout=5, cookies=cookies)
+    with httpx.Client(headers=REQUEST_HEADERS, cookies=cookies, timeout=5) as client:
+        for _ in range(max_tries):
+            response = client.get(url)
 
-        if response.status_code == 200:
-            return json.loads(response.content.decode("utf-8"))
+            if response.status_code == 200:
+                return json.loads(response.content.decode("utf-8"))
 
-        if response.status_code == 404:
-            raise HTTPException(
-                status_code=404,
-                detail={"Error": "Resource not found or invalid Url"},
-            )
-
-    raise HTTPException(
-        status_code=503,
-        detail={"Error": "Service Unavailable"},
-    )
+            if response.status_code == 404:
+                raise HTTPException(
+                    status_code=404,
+                    detail={"Error": "Resource not found or invalid Url"},
+                )
+        raise HTTPException(
+            status_code=503,
+            detail={"Error": "Service Unavailable"},
+        )
