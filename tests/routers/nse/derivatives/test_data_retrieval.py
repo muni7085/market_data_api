@@ -26,7 +26,13 @@ def test_get_option_chain(get_option_chain_io: list[dict[str, Any]]):
             assert isinstance(actual_option_data.strike_prices, list)
             assert len(actual_option_data.strike_prices) > 0
 
-            strike_price_data = actual_option_data.strike_prices[0]
+            # For far strike prices from the current spot price, the option contracts are not in trade and we will get empty data.
+            # So the middle strike price is taken to check the option contracts.
+            strike_price_data = actual_option_data.strike_prices[
+                len(actual_option_data.strike_prices) // 2
+            ]
 
             assert isinstance(strike_price_data, StrikePriceData)
+
             assert isinstance(strike_price_data.ce, Option)
+            assert isinstance(strike_price_data.pe, Option)
