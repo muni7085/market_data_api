@@ -1,14 +1,13 @@
-from app.sockets.market_data_socket import MarketDataSocket
-import websocket
+from app.sockets.async_market_data_socket import AsyncMarketDataSocket
 from app.utils.connections import SmartApiConnection
 from app.utils.smartapi.smart_socket_types import (
     SubscriptionMode,
     ExchangeType,
     SubscriptionAction,
 )
+import websockets
 import struct
 from app.utils.common.logger import get_logger
-import ssl
 import json
 from pathlib import Path
 import asyncio
@@ -16,7 +15,7 @@ import asyncio
 logger = get_logger(Path(__file__).name)
 
 
-class SmartSocket(MarketDataSocket):
+class SmartSocket(AsyncMarketDataSocket):
     WEBSOCKET_URI = "wss://smartapisocket.angelone.in/smart-stream"
     LITTLE_ENDIAN_BYTE_ORDER = "<"
 
@@ -30,11 +29,10 @@ class SmartSocket(MarketDataSocket):
         correlation_id: str,
         subscription_mode: SubscriptionMode,
     ):
-        super().__init__(auth_token)
+        self._auth_token = auth_token
         self.__api_key = api_key
         self.__client_code = client_code
         self.__feed_token = feed_token
-        self.ping_interval = 5
         self.sanity_check()
         self.__headers = {
             "Authorization": self._auth_token,
@@ -42,67 +40,11 @@ class SmartSocket(MarketDataSocket):
             "x-client-code": self.__client_code,
             "x-feed-token": self.__feed_token,
         }
-        self.resubscribe = False
         self.little_endian = "<"
         self.max_retries = max_retries
         self._tokens = []
         self.subscription_mode = subscription_mode
         self.correlation_id = correlation_id
-
-    def sanity_check(self):
-        if not self.auth_token:
-            raise ValueError("Auth token is required")
-        if not self.__api_key:
-            raise ValueError("API key is required")
-        if not self.__client_code:
-            raise ValueError("Client code is required")
-        if not self.__feed_token:
-            raise ValueError("Feed token is required")
-
-    def set_tokens(self, tokens: list):
-        assert isinstance(tokens, list)
-        for token in tokens:
-            assert isinstance(token, dict)
-            assert "exchangeType" in token
-            assert "tokens" in token
-            exchange = ExchangeType.get_exchange(token["exchangeType"])
-            assert isinstance(token["tokens"], list)
-            self._tokens.append(
-                {"exchangeType": exchange.value, "tokens": token["tokens"]}
-            )
-
-    def subscribe(self, wsapp):
-        try:
-            request_data = {
-                "correlationID": self.correlation_id,
-                "action": SubscriptionAction.SUBSCRIBE.value,
-                "params": {
-                    "mode": self.subscription_mode.value,
-                    "tokenList": self._tokens,
-                },
-            }
-            logger.info(f"Subscribing to websocket with data: {request_data}")
-            logger.info(wsapp)
-            wsapp.send(json.dumps(request_data))
-            self.resubscribe = True
-        except Exception as e:
-            logger.exception(f"Error in subscribing to websocket: {e}")
-
-    def on_message(self, wsapp, message):
-        pass
-
-    def on_error(self, wsapp, error):
-        if self.max_retries > 0:
-            print("Attempting to resubscribe/reconnect...")
-            self.max_retries -= 1
-            try:
-                wsapp.close()
-                self.connect()
-            except Exception as e:
-                logger.error("Error occurred during resubscribe/reconnect:", str(e))
-        else:
-            logger.warning(f"Max retries reached. Closing connection. Error: {error}")
-            wsapp.close()
 
     def _unpack_data(self, binary_data, start, end, byte_format="I"):
         """
@@ -113,7 +55,17 @@ class SmartSocket(MarketDataSocket):
             self.LITTLE_ENDIAN_BYTE_ORDER + byte_format, binary_data[start:end]
         )
 
-    def decode_data(self, binary_data):
+    def sanity_check(self):
+        if not self._auth_token:
+            raise ValueError("Auth token is required")
+        if not self.__api_key:
+            raise ValueError("API key is required")
+        if not self.__client_code:
+            raise ValueError("Client code is required")
+        if not self.__feed_token:
+            raise ValueError("Feed token is required")
+
+    async def decode_data(self, binary_data):
         """
         Parses binary data received from the websocket and returns a dictionary containing the parsed data.
 
@@ -197,7 +149,7 @@ class SmartSocket(MarketDataSocket):
         except Exception as e:
             logger.exception(f"Error in parsing binary data: {e}")
 
-    async def on_data(self, wsapp, data, data_type, continue_flag):
+    async def on_data(self, data):
         # TODO: Implement the logic to handle the data
         """
         Callback function that is called when data is received from the websocket connection.
@@ -214,7 +166,7 @@ class SmartSocket(MarketDataSocket):
             A flag indicating whether the data is complete or partial.
         """
 
-        parsed_data = self.decode_data(data)
+        parsed_data = await self.decode_data(data)
         format_msg = parsed_data
         if isinstance(parsed_data, dict):
             format_msg = {
@@ -227,45 +179,59 @@ class SmartSocket(MarketDataSocket):
                     "last_traded_timestamp": parsed_data["last_traded_timestamp"],
                 }
             }
-        logger.info(format_msg)
+            
+            with open("test.txt", "a+") as f:
+                f.write(json.dumps(format_msg))
+                
+        logger.info(f"Received data: {format_msg}")
 
-    def on_open(self, wsapp):
+    async def subscribe(self, ws):
+        try:
+            request_data = {
+                "correlationID": self.correlation_id,
+                "action": SubscriptionAction.SUBSCRIBE.value,
+                "params": {
+                    "mode": self.subscription_mode.value,
+                    "tokenList": self._tokens,
+                },
+            }
+            logger.info(f"Subscribing to websocket with data: {request_data}")
+            
+            await ws.send(json.dumps(request_data))
+            
+        except Exception as e:
+            logger.exception(f"Error in subscribing to websocket: {e}")
+
+    async def on_open(self, ws):
         logger.info("Websocket connection opened")
-        self.subscribe(wsapp)
+        await self.subscribe(ws)
 
-    def connect(self):
-        try:
-            self.wsapp = websocket.WebSocketApp(
-                self.WEBSOCKET_URI,
-                header=self.__headers,
-                on_data=self.on_data,
-                on_error=self.on_error,
-                on_close=self.on_close,
-                on_open=self.on_open,
+    def set_tokens(self, tokens: list):
+        assert isinstance(tokens, list)
+        for token in tokens:
+            assert isinstance(token, dict)
+            assert "exchangeType" in token
+            assert "tokens" in token
+            exchange = ExchangeType.get_exchange(token["exchangeType"])
+            assert isinstance(token["tokens"], list)
+            self._tokens.append(
+                {"exchangeType": exchange.value, "tokens": token["tokens"]}
             )
 
-            logger.info("Connecting to websocket...")
-            self.wsapp.run_forever(
-                sslopt={"cert_reqs": ssl.CERT_NONE},
-                ping_interval=self.ping_interval,
-            )
-        except Exception as e:
-            logger.exception(f"Error in connecting to websocket: {e}")
+    async def connect(self):
+        async for websocket in websockets.connect(
+            self.WEBSOCKET_URI, extra_headers=self.__headers
+        ):
+            try:
+                await self.on_open(websocket)
+                async for message in websocket:
+                    await asyncio.sleep(0.1)
+                    await self.on_data(websocket, message, 1, False)
 
-    def on_close(self):
-        try:
-            self.wsapp.close()
-        except Exception as e:
-            logger.error(f"Error in closing websocket connection: {e}")
-
-    def on_ping(self, ws, message):
-        pass
-
-    def on_pong(self, ws, message):
-        pass
-
-    def unsubscribe(self, ws):
-        pass
+            except websockets.exceptions.ConnectionClosed as e:
+                logger.error(f"Websocket connection closed: {e}")
+            except Exception as e:
+                logger.exception(f"Error occurred during websocket connection: {e}")
 
     @staticmethod
     def initialize_socket(cfg):
