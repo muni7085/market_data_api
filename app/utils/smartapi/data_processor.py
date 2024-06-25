@@ -12,7 +12,7 @@ from app.schemas.stock_model import (
 )
 from app.utils.common.types.reques_types import CandlestickInterval
 from app.utils.smartapi.validator import check_data_availability, find_open_market_days
-
+from app.database.sqlite.models.smartapi_models import SmartAPIToken
 
 def process_smart_api_stock_data(
     stock_price_data: Dict[str, Any]
@@ -222,3 +222,36 @@ def process_smart_api_historical_stock_data(
         available_stock_data=processed_available_stock_data,
         missing_timestamps=missing_timestamps,
     )
+
+
+def process_token_data(tokens_data: List[Dict[str, str]]) -> List[SmartAPIToken]:
+    """
+    Processes the token data from the SmartAPI and returns the processed data.
+
+    Parameters:
+    -----------
+    tokens_data: ``List[Dict[str, Any]]``
+        This tokens data contain the `token`, `symbol`, `name`, `expiry`, `strike`, `lotsize`, `instrumenttype`, `exch_seg` and 
+        `tick_size` for each of the token in the list.
+
+    Returns:
+    --------
+    ``Dict[str, int]``
+        The processed data from the SmartAPI as a dictionary.
+    """
+    df=pd.DataFrame(tokens_data)
+    df = df[~df['exch_seg'].isin(['CDS', 'MCX', 'NCDEX', 'BFO'])]
+    df = df[~df['name'].str.match(r"^\d")]
+    tokens_dict_data = df.to_dict('records')
+    
+    return [SmartAPIToken(
+        token=token['token'],
+        symbol=token['symbol'],
+        name=token['name'],
+        expiry=token['expiry'],
+        strike=token['strike'],
+        lot_size=token['lotsize'],
+        instrument_type=token['instrumenttype'],
+        exch_seg=token['exch_seg'],
+        tick_size=token['tick_size']
+        ) for token in tokens_dict_data]

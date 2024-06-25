@@ -3,7 +3,7 @@ from datetime import date, datetime, timedelta
 from typing import List
 
 from app.utils.common.exceptions import InvalidDateTimeFormatException
-from app.utils.fetch_data import fetch_nse_data
+from app.utils.fetch_data import fetch_data
 from app.utils.type_utils import SymbolType
 from app.utils.urls import INDEX_OPTION_CHAIN_URL, STOCK_OPTION_CHAIN_URL
 
@@ -175,7 +175,7 @@ def get_expiry_dates(
         base_url = INDEX_OPTION_CHAIN_URL
 
     option_chain_url = f"{base_url}{symbol.upper()}"
-    option_data = fetch_nse_data(option_chain_url)
+    option_data = fetch_data(option_chain_url)
 
     return option_data["records"]["expiryDates"]
 

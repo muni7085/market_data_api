@@ -19,3 +19,7 @@ STOCK_OPTION_CHAIN_URL = f"{NSE_BASE_URL}/api/option-chain-equities?symbol="
 
 # Index urls
 ALL_INDICES = f"{NSE_BASE_URL}/api/allIndices"
+
+
+# Database urls
+SQLITE_DB_URL = f"sqlite:///{ROOT_DIR}/database/db/sqlite/db.sqlite3"
