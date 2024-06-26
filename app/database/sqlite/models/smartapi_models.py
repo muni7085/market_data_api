@@ -1,8 +1,13 @@
-from sqlmodel import SQLModel, Field
 from typing import Optional
+
+from sqlmodel import Field, SQLModel
 
 
 class SmartAPIToken(SQLModel, table=True):
+    """
+    This class holds the information about the SmartAPI tokens.
+    """
+
     symbol: str = Field(primary_key=True)
     token: str
     name: str
@@ -14,6 +19,9 @@ class SmartAPIToken(SQLModel, table=True):
     tick_size: Optional[float] = None
 
     def to_dict(self):
+        """
+        Returns the object as a dictionary.
+        """
         return {
             "symbol": self.symbol,
             "token": self.token,

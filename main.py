@@ -12,6 +12,7 @@ app.include_router(derivatives.router)
 app.include_router(equity.router)
 app.include_router(smartapi.router)
 
+
 @app.on_event("startup")
 async def startup_event():
     create_smartapi_tokens_db()
