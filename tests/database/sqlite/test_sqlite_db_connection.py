@@ -9,6 +9,8 @@ from app.database.sqlite.sqlite_db_connection import (
     sqlite_engine,
 )
 from app.database.sqlite.models.smartapi_models import SmartAPIToken
+from pathlib import Path
+from app.utils.urls import SQLITE_DB_URL
 
 table_names = ["smartapitoken"]
 
@@ -17,8 +19,12 @@ def test_database_init_and_interaction():
     """ 
     Test if the database is created and tables are created and empty and able to interact with the database.
     """
+    
+    db_file_path = Path(SQLITE_DB_URL.split("sqlite:///")[-1])
+    remove_at_end = not db_file_path.exists()
+    
     create_db_and_tables()
-
+    
     # Check if the session is active
     session = next(get_session())
     assert session.is_active
@@ -31,6 +37,13 @@ def test_database_init_and_interaction():
         assert table in table_names
 
     # Check if the tables are empty and able to interact with the database
-    # results=session.exec(select(SmartAPIToken)).all()
+    try:
+        session.exec(select(SmartAPIToken)).all()
+    except Exception as e:
+        assert False, f"Failed to interact with the database: {e}"
+    
+    if remove_at_end:
+        db_file_path.unlink()
+    
     
     

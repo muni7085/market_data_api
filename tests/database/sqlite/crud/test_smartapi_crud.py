@@ -1,6 +1,9 @@
 import pytest
 from app.database.sqlite.sqlite_db_connection import get_session
-from app.database.sqlite.crud.smartapi_curd import get_smartapi_tokens_by_any_condition
+from app.database.sqlite.crud.smartapi_curd import (
+    get_smartapi_tokens_by_any_condition,
+    get_smartapi_tokens_by_all_conditions,
+)
 from app.database.sqlite.models.smartapi_models import SmartAPIToken
 from app.utils.startup_utils import create_smartapi_tokens_db
 from app.utils.urls import SQLITE_DB_URL
@@ -13,10 +16,11 @@ def session():
 
 
 def test_get_smartapi_tokens_by_any_condition(session):
-    db_file_path=Path(SQLITE_DB_URL.split("sqlite:///")[-1])
-    remove_at_end=not db_file_path.exists()
-    
+    db_file_path = Path(SQLITE_DB_URL.split("sqlite:///")[-1])
+    remove_at_end = not db_file_path.exists()
+
     create_smartapi_tokens_db(True)
+    
     # Insert test data
     token1 = SmartAPIToken(
         name="INFY",
@@ -35,9 +39,12 @@ def test_get_smartapi_tokens_by_any_condition(session):
 
     result = get_smartapi_tokens_by_any_condition(session, symbol="SBI-EQ")
     assert not result
-    
+
+    result = get_smartapi_tokens_by_all_conditions(session, symbol="INFY-EQ")
+    assert token1.to_dict() == result[0].to_dict()
+
+    result = get_smartapi_tokens_by_all_conditions(session, symbol="SBI-EQ")
+    assert not result
+
     if remove_at_end:
         db_file_path.unlink()
-    
-    
-    
