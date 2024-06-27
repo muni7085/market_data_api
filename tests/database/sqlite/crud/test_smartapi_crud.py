@@ -11,7 +11,7 @@ from app.database.sqlite.crud.smartapi_curd import (
     get_smartapi_tokens_by_any_condition,
 )
 from app.database.sqlite.models.smartapi_models import SmartAPIToken
-from app.database.sqlite.sqlite_db_connection import get_session
+from app.database.sqlite.sqlite_db_connection import get_session, sqlite_engine
 from app.utils.startup_utils import create_smartapi_tokens_db
 from app.utils.urls import SQLITE_DB_URL
 
@@ -61,5 +61,7 @@ def test_get_smartapi_tokens_by_any_and_all_condition(session):
         assert not result
 
     finally:
+        sqlite_engine.dispose()
+
         if remove_at_end:
             db_file_path.unlink()

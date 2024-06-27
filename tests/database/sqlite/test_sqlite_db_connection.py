@@ -45,5 +45,7 @@ def test_database_init_and_interaction():
         except Exception as e:
             assert False, f"Failed to interact with the database: {e}"
     finally:
+        sqlite_engine.dispose()
+
         if remove_at_end:
             db_file_path.unlink()
