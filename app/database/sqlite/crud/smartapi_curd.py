@@ -43,6 +43,7 @@ def insert_data(
     """
     if isinstance(data, SmartAPIToken):
         data = [data]
+        
     if remove_existing:
         deleted_all_data(session)
 
@@ -70,6 +71,7 @@ def get_conditions_list(condition_attributes: Dict[str, str]) -> List[BinaryExpr
         A list of SQLAlchemy BinaryExpression objects.
     """
     conditions = []
+    
     for key, value in condition_attributes.items():
         if value:
             try:
@@ -108,6 +110,7 @@ def get_smartapi_tokens_by_any_condition(
         or_(*conditions)  # pylint: disable=no-value-for-parameter
     )
     result = session.exec(statement).all()
+    
     return result
 
 
@@ -138,4 +141,5 @@ def get_smartapi_tokens_by_all_conditions(
 
     statement = select(SmartAPIToken).where(*conditions)
     result = session.exec(statement).all()
+    
     return result

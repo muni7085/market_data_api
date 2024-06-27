@@ -139,6 +139,7 @@ def get_date(weekday: str, monthly: bool = False):
     year = today.year
     month = today.month
     weekday_date = today + timedelta(days=days_to_add)
+    
     if monthly:
         weekday_date = last_date_of_weekday(year, month, weekday_num)
         if weekday_date < today:
@@ -200,14 +201,17 @@ def validate_datetime_format(date_time: str) -> datetime:
     """
     date_separator = "/" if len(date_time.split("/")) > 1 else "-"
     month_format_codes = ["m", "b", "B"]
+    
     for month_format_code in month_format_codes:
         try:
             datetime_format = (
                 f"%Y{date_separator}%{month_format_code}{date_separator}%d %H:%M"
             )
             datetime_obj = datetime.strptime(date_time, datetime_format)
+            
             return datetime_obj
 
         except ValueError:
             continue
+        
     raise InvalidDateTimeFormatException(date_time)

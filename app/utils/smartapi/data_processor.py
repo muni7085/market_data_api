@@ -114,6 +114,7 @@ def get_possible_timestamps_on_date(
         start_time = max(start_time, start_datetime.time())
     if end_datetime.date() == current_date.date():
         end_time = min(end_time, end_datetime.time())
+        
     # Create a datetime range for every given interval from 9:15 to 15:29 on the particular day
     time_range = pd.date_range(
         start=f"{current_date.date()} {start_time.strftime('%H:%M')}:00+05:30",
@@ -159,11 +160,13 @@ def get_missing_timestamps(
     available_timestamps = pd.DataFrame(historical_stock_data)[0]
     all_possible_timestamps = []
     missing_timestamps = []
+    
     try:
         start_datetime = check_data_availability(
             start_datetime, end_datetime, stock_symbol.split("-")[0], interval
         )
         open_dates = find_open_market_days(start_datetime, end_datetime)
+        
         all_possible_timestamps = list(
             chain.from_iterable(
                 get_possible_timestamps_on_date(
@@ -172,6 +175,7 @@ def get_missing_timestamps(
                 for open_date in open_dates
             )
         )
+        
         missing_timestamps = np.setdiff1d(
             all_possible_timestamps, available_timestamps
         ).tolist()

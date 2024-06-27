@@ -24,4 +24,5 @@ def get_session() -> Generator[Session, None, None]:
     Yields a session object to interact with the database.
     """
     with Session(sqlite_engine) as session:
+        
         yield session
