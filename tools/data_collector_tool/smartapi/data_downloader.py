@@ -36,17 +36,17 @@ def download_nifty500_stock_data(interval: str):
     # Initialize default start and end dates which are used to determine actual data availability dates of given interval.
     end_date = datetime.now()
     data_starting_dates = load_json_data(DATA_STARTING_DATES_PATH)
-    
+
     # Traverse the list of stocks and download each stock data.
     with httpx.Client() as client:
         for stock_symbol in tqdm(stocks_symbols):
-            
+
             # Get the date from which the data starts available for the given stock symbol and interval.
             start_date = data_starting_dates.get(stock_symbol).get(valid_interval.name)
             if not start_date:
                 continue
             start_date = datetime.strptime(start_date, "%Y-%m-%d")
-            
+
             # Destination location to store the downloaded stock data.
             dir_path = create_dir(f"{DATA_DOWNLOAD_PATH}/{stock_symbol}")
 

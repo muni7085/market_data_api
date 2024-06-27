@@ -11,7 +11,7 @@ from app.schemas.option_model import ExpiryOptionData, Option, StrikePriceData
 def test_get_option_chain(get_option_chain_io: list[dict[str, Any]]):
     for option_chain_io in get_option_chain_io:
         option_chain_input = option_chain_io["input"]
-        
+
         if option_chain_io["output"] is not None:
             with pytest.raises(HTTPException) as http_exception:
                 get_option_chain(*option_chain_input)
@@ -22,7 +22,7 @@ def test_get_option_chain(get_option_chain_io: list[dict[str, Any]]):
             assert http_exception.value.detail == option_chain_io["output"]["detail"]
         else:
             actual_option_data = get_option_chain(*option_chain_input)
-            
+
             assert isinstance(actual_option_data, ExpiryOptionData)
             assert actual_option_data.expiry_date == option_chain_input[0]
             assert isinstance(actual_option_data.strike_prices, list)
