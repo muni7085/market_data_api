@@ -25,24 +25,25 @@ def test_database_init_and_interaction():
     db_file_path = Path(SQLITE_DB_URL.split("sqlite:///")[-1])
     remove_at_end = not db_file_path.exists()
 
-    create_db_and_tables()
-
-    # Check if the session is active
-    session = next(get_session())
-    assert session.is_active
-    assert session.connection
-    assert session.bind
-
-    # Check if the tables are created
-    metadata = inspect(sqlite_engine)
-    for table in metadata.get_table_names():
-        assert table in table_names
-
-    # Check if the tables are empty and able to interact with the database
     try:
-        session.exec(select(SmartAPIToken)).all()
-    except Exception as e:
-        assert False, f"Failed to interact with the database: {e}"
+        create_db_and_tables()
 
-    if remove_at_end:
-        db_file_path.unlink()
+        # Check if the session is active
+        session = next(get_session())
+        assert session.is_active
+        assert session.connection
+        assert session.bind
+
+        # Check if the tables are created
+        metadata = inspect(sqlite_engine)
+        for table in metadata.get_table_names():
+            assert table in table_names
+
+        # Check if the tables are empty and able to interact with the database
+        try:
+            session.exec(select(SmartAPIToken)).all()
+        except Exception as e:
+            assert False, f"Failed to interact with the database: {e}"
+    finally:
+        if remove_at_end:
+            db_file_path.unlink()

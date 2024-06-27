@@ -15,8 +15,7 @@ def create_db_and_tables():
     """
     Creates the database and tables if they do not exist.
     """
-    print(f"db path : {SQLITE_DB_URL}")
-    print(f"sqlite_engine : {sqlite_engine}")
+
     SQLModel.metadata.create_all(sqlite_engine)
 
 
