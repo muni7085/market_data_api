@@ -8,7 +8,7 @@ from app.utils.headers import REQUEST_HEADERS
 from app.utils.urls import NSE_BASE_URL
 
 
-def fetch_nse_data(url: str, max_tries: int = 1000) -> Any:
+def fetch_data(url: str, max_tries: int = 1000) -> Any:
     """
     Fetch the data from given nse url and decode the response as a key value paris.
 

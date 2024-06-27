@@ -8,7 +8,7 @@ from app.routers.nse.equity.data_processor import (
     filter_single_stock,
 )
 from app.schemas.stock_model import StockPriceInfo
-from app.utils.fetch_data import fetch_nse_data
+from app.utils.fetch_data import fetch_data
 from app.utils.urls import ALL_INDICES, STOCK_URL
 
 
@@ -32,7 +32,7 @@ def get_nifty_index_stocks(url: str, max_tries: int = 1000) -> list[StockPriceIn
     if url == "":
         raise ValueError("Url can't be empty")
 
-    nifty_index_stocks = fetch_nse_data(url, max_tries=max_tries)
+    nifty_index_stocks = fetch_data(url, max_tries=max_tries)
 
     if "data" not in nifty_index_stocks:
         raise HTTPException(
@@ -88,7 +88,7 @@ def get_stock_trade_info(symbol: str) -> StockPriceInfo:
         StockData model contain the information about the stock.
     """
     stock_url = get_stock_url(symbol)
-    stock_data = fetch_nse_data(stock_url)
+    stock_data = fetch_data(stock_url)
 
     if "priceInfo" not in stock_data:
         raise HTTPException(
@@ -118,7 +118,7 @@ def get_stock_listing_date(stock_symbol: str) -> str:
 
     """
     stock_url = get_stock_url(stock_symbol)
-    stock_data = fetch_nse_data(stock_url)
+    stock_data = fetch_data(stock_url)
 
     if "metadata" not in stock_data:
         raise HTTPException(
@@ -149,7 +149,7 @@ def get_index_data(symbol: str) -> StockPriceInfo:
     if symbol == "" or symbol is None:
         raise ValueError("Symbol can't be empty")
 
-    indices_data: list[dict[str, Any]] = fetch_nse_data(ALL_INDICES)["data"]
+    indices_data: list[dict[str, Any]] = fetch_data(ALL_INDICES)["data"]
     stock_price_info: StockPriceInfo
 
     for index in indices_data:

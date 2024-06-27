@@ -9,3 +9,4 @@ sample.py
 .vscode
 *.coverage
 *.log
+*.sqlite3

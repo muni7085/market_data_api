@@ -36,3 +36,10 @@ def delete_pycache(root_dir: str, folder_name: str):
 
             # Delete the pycache folder and its contents
             shutil.rmtree(pycache_folder_path)
+
+
+if __name__ == "__main__":
+    delete_pycache(
+        "/home/munikumar-17774/Desktop/projects/python_projects/market_data_api",
+        "__pycache__",
+    )
