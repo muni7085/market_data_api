@@ -22,4 +22,4 @@ ALL_INDICES = f"{NSE_BASE_URL}/api/allIndices"
 
 
 # Database urls
-SQLITE_DB_URL = f"sqlite:///{ROOT_DIR}/database/db/sqlite/db.sqlite3"
+SQLITE_DB_URL = f"sqlite://{ROOT_DIR}/database/db/sqlite/db.sqlite3"
