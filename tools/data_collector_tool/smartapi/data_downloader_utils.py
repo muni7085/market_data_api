@@ -2,8 +2,8 @@ import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import httpx
 import pandas as pd
-import requests
 
 from app.utils.common.types.reques_types import CandlestickInterval
 from app.utils.file_utils import create_dir, load_json_data, write_to_json_file
@@ -62,32 +62,36 @@ def search_valid_date(
         searched month from where the availability of data starts for the given stock symbol and interval.
     """
     valid_date = end_date
-    while start_date <= end_date:
-        try:
-            total_days = (end_date - start_date).days
-            middle_date = start_date + timedelta(days=total_days // 2)
-            first_day = middle_date.replace(day=3)
-            last_day = (middle_date + timedelta(days=31)).replace(day=1) - timedelta(
-                days=1
-            )
-            stocks_url = get_historical_stock_data_url(
-                stock_symbol,
-                interval.name,
-                f"{first_day.strftime('%Y-%m-%d')} 09:15",
-                f"{last_day.strftime('%Y-%m-%d')} 15:29",
-            )
 
-            response = requests.get(stocks_url, timeout=(60, 60))
-            if response.status_code == 200 and response.json():
-                end_date = first_day - timedelta(days=3)
-                valid_date = first_day.replace(day=1)
-            else:
+    with httpx.Client() as client:
+        while start_date <= end_date:
+            try:
+                total_days = (end_date - start_date).days
+                middle_date = start_date + timedelta(days=total_days // 2)
+                first_day = middle_date.replace(day=3)
+                last_day = (middle_date + timedelta(days=31)).replace(
+                    day=1
+                ) - timedelta(days=1)
+
+                stocks_url = get_historical_stock_data_url(
+                    stock_symbol,
+                    interval.name,
+                    f"{first_day.strftime('%Y-%m-%d')} 09:15",
+                    f"{last_day.strftime('%Y-%m-%d')} 15:29",
+                )
+                response = client.get(stocks_url, timeout=60.0)
+
+                if response.status_code == 200 and response.json():
+                    end_date = first_day - timedelta(days=3)
+                    valid_date = first_day.replace(day=1)
+                else:
+                    start_date = last_day + timedelta(days=1)
+                time.sleep(0.3)
+            except Exception as e:
+                print(e)
                 start_date = last_day + timedelta(days=1)
-            time.sleep(0.3)
-        except Exception as e:
-            print(e)
-            start_date = last_day + timedelta(days=1)
-            continue
+                continue
+
     return valid_date
 
 
@@ -107,22 +111,25 @@ def dataframe_to_json_files(
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     df["year"] = df["timestamp"].dt.year
     df["day"] = df["timestamp"].dt.strftime("%Y-%m-%d")
+
     if interval.name == "ONE_DAY":
         grouped = df.groupby("year")
 
         # Iterate over each group
         for year, group in grouped:
+
             # Prepare data for JSON
             data = (
                 group.set_index("day")
                 .drop(columns=["year", "timestamp"])
                 .to_dict(orient="index")
             )
-            # Load
             json_file_path = dir_path / f"{year}.json"
+
             if json_file_path.exists():
                 stored_data = load_json_data(json_file_path)
                 stored_data.update(data)
+
             write_to_json_file(json_file_path, stored_data)
     else:
         df["time"] = df["timestamp"].dt.strftime("%H:%M")
@@ -132,6 +139,7 @@ def dataframe_to_json_files(
 
         # Iterate over each group
         for (year, day), group in grouped:
+
             # Create directory for the year if it doesn't exist
             year_dir = create_dir(dir_path / f"{year}")
 
@@ -141,6 +149,7 @@ def dataframe_to_json_files(
                 .drop(columns=["year", "day", "timestamp"])
                 .to_dict(orient="index")
             )
+
             # Write to JSON file
             json_file_path = year_dir / f"{day}.json"
             write_to_json_file(json_file_path, data)

@@ -5,6 +5,7 @@ from typing import Any, Dict, List
 import numpy as np
 import pandas as pd
 
+from app.database.sqlite.models.smartapi_models import SmartAPIToken
 from app.schemas.stock_model import (
     HistoricalStockDataBundle,
     HistoricalStockPriceInfo,
@@ -113,6 +114,7 @@ def get_possible_timestamps_on_date(
         start_time = max(start_time, start_datetime.time())
     if end_datetime.date() == current_date.date():
         end_time = min(end_time, end_datetime.time())
+
     # Create a datetime range for every given interval from 9:15 to 15:29 on the particular day
     time_range = pd.date_range(
         start=f"{current_date.date()} {start_time.strftime('%H:%M')}:00+05:30",
@@ -158,11 +160,13 @@ def get_missing_timestamps(
     available_timestamps = pd.DataFrame(historical_stock_data)[0]
     all_possible_timestamps = []
     missing_timestamps = []
+
     try:
         start_datetime = check_data_availability(
             start_datetime, end_datetime, stock_symbol.split("-")[0], interval
         )
         open_dates = find_open_market_days(start_datetime, end_datetime)
+
         all_possible_timestamps = list(
             chain.from_iterable(
                 get_possible_timestamps_on_date(
@@ -171,6 +175,7 @@ def get_missing_timestamps(
                 for open_date in open_dates
             )
         )
+
         missing_timestamps = np.setdiff1d(
             all_possible_timestamps, available_timestamps
         ).tolist()
@@ -222,3 +227,39 @@ def process_smart_api_historical_stock_data(
         available_stock_data=processed_available_stock_data,
         missing_timestamps=missing_timestamps,
     )
+
+
+def process_token_data(tokens_data: List[Dict[str, str]]) -> List[SmartAPIToken]:
+    """
+    Processes the token data from the SmartAPI and returns the processed data.
+
+    Parameters:
+    -----------
+    tokens_data: ``List[Dict[str, Any]]``
+        This tokens data contain the `token`, `symbol`, `name`, `expiry`, `strike`, `lotsize`, `instrumenttype`, `exch_seg` and
+        `tick_size` for each of the token in the list.
+
+    Returns:
+    --------
+    ``Dict[str, int]``
+        The processed data from the SmartAPI as a dictionary.
+    """
+    df = pd.DataFrame(tokens_data)
+    df = df[~df["exch_seg"].isin(["CDS", "MCX", "NCDEX", "BFO"])]
+    df = df[~df["name"].str.match(r"^\d")]
+    tokens_dict_data = df.to_dict("records")
+
+    return [
+        SmartAPIToken(
+            token=token["token"],
+            symbol=token["symbol"],
+            name=token["name"],
+            expiry=token["expiry"],
+            strike=token["strike"],
+            lot_size=token["lotsize"],
+            instrument_type=token["instrumenttype"],
+            exch_seg=token["exch_seg"],
+            tick_size=token["tick_size"],
+        )
+        for token in tokens_dict_data
+    ]
