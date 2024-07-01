@@ -275,11 +275,12 @@ class SmartWebSocketV2(object):
                 "action": self.SUBSCRIBE_ACTION,
                 "params": {"mode": mode, "tokenList": token_list},
             }
+            
 
             if self.input_request_dict.get(mode) is None:
                 self.input_request_dict[mode] = {}
-
             for token in token_list:
+                print(token)
                 if token["exchangeType"] in self.input_request_dict[mode]:
                     self.input_request_dict[mode][token["exchangeType"]].extend(
                         token["tokens"]
@@ -288,6 +289,7 @@ class SmartWebSocketV2(object):
                     self.input_request_dict[mode][token["exchangeType"]] = token[
                         "tokens"
                     ]
+                
             print(f"request_data: {request_data}")
             self.wsapp.send(json.dumps(request_data))
             self.RESUBSCRIBE_FLAG = True

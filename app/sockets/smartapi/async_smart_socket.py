@@ -226,7 +226,7 @@ class SmartSocket(AsyncMarketDataSocket):
                 await self.on_open(websocket)
                 async for message in websocket:
                     await asyncio.sleep(0.1)
-                    await self.on_data(websocket, message, 1, False)
+                    await self.on_data(message)
 
             except websockets.exceptions.ConnectionClosed as e:
                 logger.error(f"Websocket connection closed: {e}")

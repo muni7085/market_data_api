@@ -6,12 +6,14 @@ from app.utils.smartapi.smart_socket_types import (
     ExchangeType,
     SubscriptionAction,
 )
+from app.database.sqlite.models.websocket_models import WebsocketLTPData
 import struct
 from app.utils.common.logger import get_logger
+from app.database.sqlite.sqlite_db_connection import get_session
 import ssl
+import time
 import json
 from pathlib import Path
-import asyncio
 
 logger = get_logger(Path(__file__).name)
 
@@ -29,6 +31,7 @@ class SmartSocket(MarketDataSocket):
         max_retries: int,
         correlation_id: str,
         subscription_mode: SubscriptionMode,
+        on_data_save_callback=None,
     ):
         super().__init__(auth_token)
         self.__api_key = api_key
@@ -46,8 +49,10 @@ class SmartSocket(MarketDataSocket):
         self.little_endian = "<"
         self.max_retries = max_retries
         self._tokens = []
+        self.token_map = {}
         self.subscription_mode = subscription_mode
         self.correlation_id = correlation_id
+        self.on_data_save_callback = on_data_save_callback
 
     def sanity_check(self):
         if not self.auth_token:
@@ -66,10 +71,11 @@ class SmartSocket(MarketDataSocket):
             assert "exchangeType" in token
             assert "tokens" in token
             exchange = ExchangeType.get_exchange(token["exchangeType"])
-            assert isinstance(token["tokens"], list)
+            assert isinstance(token["tokens"], dict)
             self._tokens.append(
-                {"exchangeType": exchange.value, "tokens": token["tokens"]}
+                {"exchangeType": exchange.value, "tokens": list(token["tokens"].keys())}
             )
+            self.token_map.update(token["tokens"])
 
     def subscribe(self, wsapp):
         try:
@@ -83,6 +89,7 @@ class SmartSocket(MarketDataSocket):
             }
             logger.info(f"Subscribing to websocket with data: {request_data}")
             logger.info(wsapp)
+            
             wsapp.send(json.dumps(request_data))
             self.resubscribe = True
         except Exception as e:
@@ -197,7 +204,7 @@ class SmartSocket(MarketDataSocket):
         except Exception as e:
             logger.exception(f"Error in parsing binary data: {e}")
 
-    async def on_data(self, wsapp, data, data_type, continue_flag):
+    def on_data(self, wsapp, data, data_type, continue_flag):
         # TODO: Implement the logic to handle the data
         """
         Callback function that is called when data is received from the websocket connection.
@@ -216,17 +223,25 @@ class SmartSocket(MarketDataSocket):
 
         parsed_data = self.decode_data(data)
         format_msg = parsed_data
-        if isinstance(parsed_data, dict):
-            format_msg = {
-                parsed_data["token"]: {
-                    "ltp": parsed_data["last_traded_price"],
-                    "open": parsed_data["open_price_of_the_day"],
-                    "high": parsed_data["high_price_of_the_day"],
-                    "low": parsed_data["low_price_of_the_day"],
-                    "prev_close": parsed_data["closed_price"],
-                    "last_traded_timestamp": parsed_data["last_traded_timestamp"],
-                }
-            }
+        try:
+            if isinstance(parsed_data, dict):
+                format_msg=WebsocketLTPData(
+                    timestamp=str(time.time()),
+                    symbol=self.token_map[parsed_data['token']],
+                    token=parsed_data["token"],
+                    ltp=parsed_data["last_traded_price"],
+                    open=parsed_data["open_price_of_the_day"],
+                    high=parsed_data["high_price_of_the_day"],
+                    low=parsed_data["low_price_of_the_day"],
+                    close=parsed_data["closed_price"],
+                    last_traded_time=parsed_data["last_traded_timestamp"]
+                    
+                )
+                if self.on_data_save_callback:
+                    self.on_data_save_callback(format_msg,next(get_session()))
+            print(format_msg)
+        except Exception as e:
+            logger.error(f"Error in processing data: {e}")
         logger.info(format_msg)
 
     def on_open(self, wsapp):
@@ -268,7 +283,7 @@ class SmartSocket(MarketDataSocket):
         pass
 
     @staticmethod
-    def initialize_socket(cfg):
+    def initialize_socket(cfg,on_data_save_callback=None):
         smartapi_connection = SmartApiConnection.get_connection()
         auth_token = smartapi_connection.get_auth_token()
         feed_token = smartapi_connection.api.getfeedToken()
@@ -284,4 +299,5 @@ class SmartSocket(MarketDataSocket):
             SubscriptionMode.get_subscription_mode(
                 cfg.get("subscription_mode", "snap_quote")
             ),
+            on_data_save_callback
         )

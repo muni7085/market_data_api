@@ -24,7 +24,6 @@ class DataWebSocket(SmartWebSocketV2):
     def on_open(self, wsapp):
         logger.info("on websocket open")
         self.subscribe(self.correlation_id, self.mode, self.tokens_list)
-        # sws.unsubscribe(correlation_id, mode, token_list1)
 
     def on_data(self, wsapp, message):
         self.counter += 1
