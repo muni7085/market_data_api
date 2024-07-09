@@ -6,10 +6,12 @@ from app.utils.smartapi.smart_socket_types import (
     ExchangeType,
     SubscriptionAction,
 )
+import asyncio
 from app.database.sqlite.models.websocket_models import WebsocketLTPData
 import struct
 from app.utils.common.logger import get_logger
 from app.database.sqlite.sqlite_db_connection import get_session
+from app.database.sqlite.async_sqlite_db_connection import get_async_sqlite_session
 import ssl
 import time
 import json
@@ -53,6 +55,12 @@ class SmartSocket(MarketDataSocket):
         self.subscription_mode = subscription_mode
         self.correlation_id = correlation_id
         self.on_data_save_callback = on_data_save_callback
+        self.counter = 0
+        self.total_tokens = []
+        self.queue = asyncio.Queue()
+        self.max_count = 10
+        
+    
 
     def sanity_check(self):
         if not self.auth_token:
@@ -89,7 +97,7 @@ class SmartSocket(MarketDataSocket):
             }
             logger.info(f"Subscribing to websocket with data: {request_data}")
             logger.info(wsapp)
-            
+
             wsapp.send(json.dumps(request_data))
             self.resubscribe = True
         except Exception as e:
@@ -220,35 +228,49 @@ class SmartSocket(MarketDataSocket):
         continue_flag: `bool`
             A flag indicating whether the data is complete or partial.
         """
-
-        parsed_data = self.decode_data(data)
-        format_msg = parsed_data
         try:
-            if isinstance(parsed_data, dict):
-                format_msg=WebsocketLTPData(
-                    timestamp=str(time.time()),
-                    symbol=self.token_map[parsed_data['token']],
-                    token=parsed_data["token"],
-                    ltp=parsed_data["last_traded_price"],
-                    open=parsed_data["open_price_of_the_day"],
-                    high=parsed_data["high_price_of_the_day"],
-                    low=parsed_data["low_price_of_the_day"],
-                    close=parsed_data["closed_price"],
-                    last_traded_time=parsed_data["last_traded_timestamp"]
-                    
-                )
-                if self.on_data_save_callback:
-                    self.on_data_save_callback(format_msg,next(get_session()))
-            print(format_msg)
+            self.total_tokens.append(data)
+            self.counter += 1
+            if self.counter == self.max_count:
+                self.queue.put_nowait(self.total_tokens)
+                self.total_tokens = []
+                self.counter = 0
+
         except Exception as e:
             logger.error(f"Error in processing data: {e}")
-        logger.info(format_msg)
 
     def on_open(self, wsapp):
         logger.info("Websocket connection opened")
         self.subscribe(wsapp)
 
-    def connect(self):
+    async def save_to_db(self):
+        logger.info("Saving data to database...")
+        session = await anext(get_async_sqlite_session())
+        try:
+
+            while True:
+                tokens = await self.queue.get()
+                for token_data in tokens:
+                    parsed_data = self.decode_data(token_data)
+                    if isinstance(parsed_data, dict):
+                        format_msg = WebsocketLTPData(
+                            timestamp=str(time.time()),
+                            symbol=self.token_map[parsed_data["token"]],
+                            token=parsed_data["token"],
+                            ltp=parsed_data["last_traded_price"],
+                            open=parsed_data["open_price_of_the_day"],
+                            high=parsed_data["high_price_of_the_day"],
+                            low=parsed_data["low_price_of_the_day"],
+                            close=parsed_data["closed_price"],
+                            last_traded_time=parsed_data["last_traded_timestamp"],
+                        )
+                    session.add(format_msg)
+                await session.commit()
+                self.queue.task_done()
+        except Exception as e:
+            logger.error(f"Error in saving data to database: {e}")
+
+    async def connect(self):
         try:
             self.wsapp = websocket.WebSocketApp(
                 self.WEBSOCKET_URI,
@@ -283,7 +305,7 @@ class SmartSocket(MarketDataSocket):
         pass
 
     @staticmethod
-    def initialize_socket(cfg,on_data_save_callback=None):
+    def initialize_socket(cfg, on_data_save_callback=None):
         smartapi_connection = SmartApiConnection.get_connection()
         auth_token = smartapi_connection.get_auth_token()
         feed_token = smartapi_connection.api.getfeedToken()
@@ -299,5 +321,5 @@ class SmartSocket(MarketDataSocket):
             SubscriptionMode.get_subscription_mode(
                 cfg.get("subscription_mode", "snap_quote")
             ),
-            on_data_save_callback
+            on_data_save_callback,
         )

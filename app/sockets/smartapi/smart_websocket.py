@@ -1,6 +1,7 @@
 from logzero import logger
 from app.sockets.smartapi.smart_websocket_v2 import SmartWebSocketV2
 
+
 total_tokens = []
 class DataWebSocket(SmartWebSocketV2):
     def __init__(
