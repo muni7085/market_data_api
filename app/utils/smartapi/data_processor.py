@@ -247,6 +247,7 @@ def process_token_data(tokens_data: List[Dict[str, str]]) -> List[SmartAPIToken]
     df = pd.DataFrame(tokens_data)
     df = df[~df["exch_seg"].isin(["CDS", "MCX", "NCDEX", "BFO"])]
     df = df[~df["name"].str.match(r"^\d")]
+    df.drop_duplicates(subset=["symbol"], keep="first", inplace=True)
     tokens_dict_data = df.to_dict("records")
 
     return [
