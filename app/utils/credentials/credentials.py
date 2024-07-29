@@ -5,15 +5,17 @@ The `Credentials` class is an abstract base class that defines the common interf
 Subclasses of `Credentials` should implement the `get_credentials` method to provide the actual credentials.
 """
 
-from registrable import Registrable
 from abc import ABC, abstractmethod
+
+from registrable import Registrable
+
 
 @abstractmethod
 class Credentials(Registrable, ABC):
     """
     Base class for credentials used in the market data API.
     Subclasses of `Credentials` should implement the `get_credentials` method to provide the actual credentials.
-    
+
     Attributes:
     -----------
     api_key: ``str``

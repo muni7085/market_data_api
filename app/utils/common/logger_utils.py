@@ -13,7 +13,7 @@ Example usage:
 import logging
 
 
-def get_logger(name:str)->logging.Logger:
+def get_logger(name: str) -> logging.Logger:
     """
     Return a logger object configured with a stream handler and a file handler.
 
@@ -47,5 +47,5 @@ def get_logger(name:str)->logging.Logger:
     # Add handlers to the logger
     logger.addHandler(c_handler)
     logger.addHandler(f_handler)
-    
+
     return logger

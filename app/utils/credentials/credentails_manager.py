@@ -9,12 +9,18 @@ Example:
 
 """
 
-from app.utils.credentials.credentials import Credentials
 from enum import Enum
 
+from app.utils.credentials.credentials import Credentials
+
+
 class DataProvider(Enum):
+    """
+    Enum class representing different data providers.
+    """
+
     SMARTAPI = "smartapi"
-    
+
     @staticmethod
     def by_name(name: str):
         """
@@ -25,12 +31,12 @@ class DataProvider(Enum):
         name: ``str``
             The name of the Dataprovider, for which the enum value is to be retrieved.
             eg: "smartapi"
-        
+
         Returns
         -------
         ``Dataprovider``
             The Dataprovider enum value.
-        
+
         Raises
         ------
         ``ValueError``
@@ -38,9 +44,9 @@ class DataProvider(Enum):
         """
         if name in [item.value for item in DataProvider]:
             return DataProvider[name]
-        
+
         raise ValueError(f"Invalid data provider name: {name}")
-    
+
 
 def get_credentials(data_provider: DataProvider) -> Credentials:
     """
@@ -50,7 +56,7 @@ def get_credentials(data_provider: DataProvider) -> Credentials:
     ----------
     data_provider: ``Credentials``
         The data provider for which the credentials are to be retrieved. This should be a DataProvider enum value.
-    
+
     Returns
     -------
     ``Credentials``
@@ -58,5 +64,5 @@ def get_credentials(data_provider: DataProvider) -> Credentials:
 
     """
     credentials = Credentials.by_name(data_provider.value)
-    
+
     return credentials.get_credentials()

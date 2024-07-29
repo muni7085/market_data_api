@@ -6,7 +6,7 @@ import pyotp
 from SmartApi import SmartConnect
 
 from app.utils.common.types.reques_types import RequestType
-from app.utils.credentials.credentails_manager import ConnectionCredentials, get_credentials
+from app.utils.credentials.credentails_manager import DataProvider, get_credentials
 from app.utils.credentials.credentials import Credentials
 
 
@@ -88,7 +88,7 @@ class SmartApiConnection(metaclass=Singleton):
         """
         Initialze the SmartApiConnection
         """
-        credentials = get_credentials(ConnectionCredentials.SMARTAPI)
+        credentials = get_credentials(DataProvider.SMARTAPI)
         connection = SmartApiConnection(credentials)
         return connection
 

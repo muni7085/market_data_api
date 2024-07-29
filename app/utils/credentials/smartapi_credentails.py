@@ -1,13 +1,14 @@
 """ 
 This module contains the SmartapiCredentials class to store the credentials required to authenticate the SmartAPI connection. 
 """
+
 # pylint: disable=too-many-arguments
 import os
 
 from app.utils.common.exceptions import CredentialsException
+from app.utils.credentials.credentials import Credentials
 from app.utils.file_utils import load_json_data
 from app.utils.smartapi.constants import SMART_API_CREDENTIALS
-from app.utils.credentials.credentials import Credentials
 
 
 @Credentials.register("smartapi")
