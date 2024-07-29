@@ -2716,6 +2716,17 @@ files = [
 ]
 
 [[package]]
+name = "registrable"
+version = "0.0.4"
+description = "Python module for registering and instantiating classes by name. Based on the implementation from AllenNLP."
+optional = false
+python-versions = ">=3.6.1"
+files = [
+    {file = "registrable-0.0.4-py3-none-any.whl", hash = "sha256:475ec762101c50942f59d15256646162c497e91e6ecd1442ad9b34ada113f73c"},
+    {file = "registrable-0.0.4.tar.gz", hash = "sha256:20bb42aeeab062432f053a788c775106e45a2fab1fdae4103df45e465086d0a3"},
+]
+
+[[package]]
 name = "requests"
 version = "2.32.3"
 description = "Python HTTP for Humans."
@@ -3423,4 +3434,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "c11a1f11081e61b2070442f867a0c124d3d9bb280df823dab130b18f27fa05a7"
+content-hash = "145dcee8bf48b5e8d6c7cbe867b135d4980e85715fc18a620df33615cfda8d11"
