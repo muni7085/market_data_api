@@ -49,7 +49,7 @@ class Credentials:
         ``Credentials``
             The credentials object with the API key, client id, password, token and correlation id.
         """
-        credentials_path = os.getenv(SMART_API_CREDENTIALS)
+        credentials_path = os.environ.get(SMART_API_CREDENTIALS)
 
         if not credentials_path:
             raise CredentialsException(SMART_API_CREDENTIALS)

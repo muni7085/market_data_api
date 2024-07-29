@@ -187,7 +187,7 @@ class SmartSocket(AsyncMarketDataSocket):
         continue_flag: `bool`
             A flag indicating whether the data is complete or partial.
         """
-        logger.info(f"Data received {self.thread_id}: {self.data_counter}")
+        # logger.info(f"Data received {self.thread_id}: {self.data_counter}")
         self.data_counter += 1
         try:
             # self.total_tokens.append(data)
@@ -271,9 +271,8 @@ class SmartSocket(AsyncMarketDataSocket):
             )
 
     async def connect(self):
-        async for websocket in websockets.connect(
-            self.WEBSOCKET_URI, extra_headers=self.__headers
-        ):
+       async with websockets.connect(self.WEBSOCKET_URI, extra_headers=self.__headers) as websocket:
+            
             logger.info(f"Connected to websocket with {self.thread_id}")
             start = time.time()
             try:
@@ -282,8 +281,8 @@ class SmartSocket(AsyncMarketDataSocket):
                     await self.on_data(message)
                 logger.info(f"Time taken: {time.time()-start}")
 
-            except websockets.exceptions.ConnectionClosed as e:
-                logger.error(f"Websocket connection closed: {e}")
+            # except websockets.exceptions.ConnectionClosed as e:
+            #     logger.error(f"Websocket connection closed: {e}")
             except Exception as e:
                 logger.exception(f"Error occurred during websocket connection: {e}")
 
