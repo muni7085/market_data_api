@@ -55,4 +55,5 @@ class Credentials:
             raise CredentialsException(SMART_API_CREDENTIALS)
 
         credentials = load_json_data(credentials_path)
+
         return Credentials(**credentials)

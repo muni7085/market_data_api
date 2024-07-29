@@ -20,6 +20,7 @@ class Singleton(type):
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+
         return cls._instances[cls]
 
 
@@ -40,6 +41,7 @@ class SmartApiConnection(metaclass=Singleton):
     def __init__(self, credentials: Credentials):
         self.credentials = credentials
         self.api = SmartConnect(self.credentials.api_key)
+
         totp = pyotp.TOTP(self.credentials.token).now()
         self.data = self.api.generateSession(
             self.credentials.client_id, self.credentials.pwd, totp
@@ -56,8 +58,10 @@ class SmartApiConnection(metaclass=Singleton):
         """
         if "data" in self.data:
             client_data = self.data["data"]
+
             if "jwtToken" in client_data:
                 return client_data["jwtToken"]
+
         return None
 
     def get_headers(self) -> Dict[str, Optional[str]]:
@@ -81,6 +85,7 @@ class SmartApiConnection(metaclass=Singleton):
             "X-MACAddress": "MAC_ADDRESS",
             "X-PrivateKey": self.credentials.api_key,
         }
+
         return headers
 
     @staticmethod
@@ -90,6 +95,7 @@ class SmartApiConnection(metaclass=Singleton):
         """
         credentials = get_credentials(DataProvider.SMARTAPI)
         connection = SmartApiConnection(credentials)
+
         return connection
 
 
