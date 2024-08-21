@@ -1,5 +1,5 @@
 
-from app.sockets.smartapi.twisted_sockets import SmartApiTicker
+from app.sockets.smartapi.smart_twisted_socket import SmartApiTicker
 from omegaconf import OmegaConf
 from app.database.sqlite.crud.smartapi_curd import get_smartapi_tokens_by_all_conditions
 from app.utils.startup_utils import create_smartapi_tokens_db
@@ -17,18 +17,16 @@ correlation_id: smartapi01
 """
 
 
-def get_tokens(name: str, instrument_type: str, exch_seg: str, num_expiries: int = 6):
+def get_tokens(symbol_type):
     tokens = get_smartapi_tokens_by_all_conditions(
         next(get_session()),
-        name=name,
-        instrument_type=instrument_type,
-        exch_seg=exch_seg,
+        symbol_type=symbol_type
     )
-    if exch_seg.lower() == "nfo":
-        dates = get_expiry_dates(name, SymbolType.DERIVATIVE)
-        filtered_tokens = filter_tokens_by_expiry(tokens, dates[:6])
-        tokens = {token.token: token.symbol for token in filtered_tokens}
-    return tokens
+    # if exch_seg.lower() == "nfo":
+    #     dates = get_expiry_dates(name, SymbolType.DERIVATIVE)
+    #     filtered_tokens = filter_tokens_by_expiry(tokens, dates[:6])
+    #     tokens = {token.token: token.symbol for token in filtered_tokens}
+    return {token.token:token.name for token in tokens}
 
 
 def instantiate_smart_socket(tokens, id, queue):
@@ -37,7 +35,8 @@ def instantiate_smart_socket(tokens, id, queue):
     cfg["thread_id"] = id
     smart_socket = SmartApiTicker.initialize_socket(cfg, queue)
     smart_socket.set_tokens(tokens)
-    asyncio.run(smart_socket.connect(), debug=True)
+    # asyncio.run(smart_socket.connect(), debug=True)
+    smart_socket.connect(threaded=True)
 
 
 # Create the shared queue
@@ -47,17 +46,17 @@ queue = Queue()
 threads = []
 max_tokens_per_instance = 1
 create_smartapi_tokens_db(True)
-nifty_tokens = get_tokens("NIFTY", "OPTIDX", "NFO")
-banknifty_tokens = get_tokens("BANKNIFTY", "OPTIDX", "NFO")
-total_tokens = nifty_tokens | banknifty_tokens
-SmartApiTicker.token_map = total_tokens
+total_tokens = get_tokens("EQ")
+# banknifty_tokens = get_tokens("BANKNIFTY", "OPTIDX", "NFO")
+# total_tokens = nifty_tokens | banknifty_tokens
+# SmartApiTicker.token_map = total_tokens
 
 tokens = [
     {
-        "exchangeType": 2,
+        "exchangeType": 1,
         "tokens": dict(
             list(total_tokens.items())[
-                10:11
+                :1000
             ]
         ),
     }

@@ -44,13 +44,13 @@ queue = Queue()
 
 # Create 3 threads and start them
 threads = []
-max_tokens_per_instance = 1000
+max_tokens_per_instance = 10
 create_smartapi_tokens_db(True)
 nifty_tokens = get_tokens("NIFTY", "OPTIDX", "NFO")
 banknifty_tokens = get_tokens("BANKNIFTY", "OPTIDX", "NFO")
 total_tokens = nifty_tokens | banknifty_tokens
 SmartSocket.token_map = total_tokens
-for i in range(3):
+for i in range(1):
     tokens = [
         {
             "exchangeType": 2,

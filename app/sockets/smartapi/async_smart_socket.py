@@ -187,8 +187,9 @@ class SmartSocket(AsyncMarketDataSocket):
         continue_flag: `bool`
             A flag indicating whether the data is complete or partial.
         """
-        # logger.info(f"Data received {self.thread_id}: {self.data_counter}")
+        logger.info(f"Data received {self.thread_id}: {self.data_counter}")
         self.data_counter += 1
+        
         try:
             # self.total_tokens.append(data)
             # self.counter += 1

@@ -1,13 +1,13 @@
 import logging
 
 
-def get_logger(name):
+def get_logger(name, level=logging.INFO):
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
+    logger.setLevel(level)
     c_handler = logging.StreamHandler()
     f_handler = logging.FileHandler("file.log")
-    c_handler.setLevel(logging.INFO)
-    f_handler.setLevel(logging.INFO)
+    c_handler.setLevel(level)
+    f_handler.setLevel(level)
 
     c_format = logging.Formatter(
         "%(asctime)s - %(name)s:%(lineno)d  - %(levelname)s - %(message)s"

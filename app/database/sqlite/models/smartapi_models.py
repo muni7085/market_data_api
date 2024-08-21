@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, MetaData
 
 
 class SmartAPIToken(SQLModel, table=True):
@@ -17,6 +17,8 @@ class SmartAPIToken(SQLModel, table=True):
     instrument_type: str
     exch_seg: str
     tick_size: Optional[float] = None
+    symbol_type: Optional[str] = None
+    
 
     def to_dict(self):
         """
@@ -32,4 +34,5 @@ class SmartAPIToken(SQLModel, table=True):
             "instrument_type": self.instrument_type,
             "exch_seg": self.exch_seg,
             "tick_size": self.tick_size,
+            "symbol_type": self.symbol_type,
         }

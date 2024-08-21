@@ -261,6 +261,7 @@ def process_token_data(tokens_data: List[Dict[str, str]]) -> List[SmartAPIToken]
             instrument_type=token["instrumenttype"],
             exch_seg=token["exch_seg"],
             tick_size=token["tick_size"],
+            symbol_type=token['symbol'][-2:],
         )
         for token in tokens_dict_data
     ]

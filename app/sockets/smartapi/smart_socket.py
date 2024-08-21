@@ -1,4 +1,4 @@
-from app.sockets.market_data_socket import MarketDataSocket
+
 import websocket
 from app.utils.connections import SmartApiConnection
 from app.utils.smartapi.smart_socket_types import (
