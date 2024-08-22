@@ -252,8 +252,6 @@ class SmartApiTicker(MarketDatasetTwistedSocket):
         data['retrived_timestamp']=str(time.time())
         self.producer.send('muni', json.dumps(data).encode('utf-8'))
         self.producer.flush()
-        logger.info(self.counter)
-        self.counter+=1
 
     @staticmethod
     def initialize_socket(cfg, on_data_save_callback=None):
@@ -262,6 +260,7 @@ class SmartApiTicker(MarketDatasetTwistedSocket):
         feed_token = smartapi_connection.api.getfeedToken()
         api_key = smartapi_connection.credentials.api_key
         client_code = smartapi_connection.credentials.client_id
+        
         return SmartApiTicker(
             auth_token,
             api_key,

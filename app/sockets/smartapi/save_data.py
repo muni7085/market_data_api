@@ -1,6 +1,6 @@
 from kafka import KafkaConsumer
 from app.database.sqlite.sqlite_db_connection import get_session
-from app.database.sqlite.models.smartapi_models import SocketStockPriceInfo
+from app.database.sqlite.models.websocket_models import SocketStockPriceInfo
 import json
 
 consumer = KafkaConsumer('muni', bootstrap_servers='localhost:9094')
