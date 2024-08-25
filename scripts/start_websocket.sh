@@ -7,6 +7,12 @@ PARTITIONS=5
 REPLICATION_FACTOR=3
 KAFKA_PORT=9092
 
+mkdir -p ../docker/docker_data/kafka1
+mkdir -p ../docker/docker_data/kafka2
+mkdir -p ../docker/docker_data/kafka3
+
+sudo chown -R 1001:1001 ../docker/docker_data
+
 # Function to check if a Docker container is running
 is_container_running() {
     docker ps -f name=$1 --format '{{.Names}}' | grep -w $1 > /dev/null

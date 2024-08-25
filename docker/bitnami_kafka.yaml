@@ -71,3 +71,11 @@ services:
       BITNAMI_DEBUG: 'yes'
     volumes:
       - ./docker_data/kafka3:/bitnami/kafka
+
+volumes:
+  kafka1:
+    driver: local
+  kafka2:
+    driver: local
+  kafka3:
+    driver: local
