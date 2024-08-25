@@ -181,6 +181,7 @@ def get_missing_timestamps(
         ).tolist()
     except Exception as e:
         print(e)
+        
     return missing_timestamps
 
 
@@ -264,34 +265,4 @@ def process_token_data(tokens_data: List[Dict[str, str]]) -> List[SmartAPIToken]
             symbol_type=token['symbol'][-2:],
         )
         for token in tokens_dict_data
-    ]
-
-
-def filter_tokens_by_expiry(
-    tokens: List[SmartAPIToken], expiry_dates: List[str]
-) -> List[SmartAPIToken]:
-    """
-    Filters the tokens by the number of expiries from the current date.
-
-    Parameters:
-    -----------
-    tokens: ``List[SmartAPIToken]``
-        The list of tokens to be filtered.
-    num_expiries: ``int``
-        The number of expiries from the current date.
-
-    Returns:
-    --------
-    ``List[SmartAPIToken]``
-        The filtered tokens.
-    """
-    expiry_dates = [
-        datetime.strptime(expiry_date, "%d-%b-%Y").date()
-        for expiry_date in expiry_dates
-    ]
-
-    return [
-        token
-        for token in tokens
-        if datetime.strptime(token.expiry, "%d%b%Y").date() in expiry_dates
     ]

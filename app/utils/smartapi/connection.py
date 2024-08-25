@@ -6,7 +6,7 @@ import pyotp
 from SmartApi import SmartConnect
 
 from app.utils.common.types.reques_types import RequestType
-from app.utils.smartapi.credentials import Credentials
+from app.utils.credentials.smartapi_credentials import SmartapiCredentials
 
 
 class Singleton(type):
@@ -19,6 +19,7 @@ class Singleton(type):
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            
         return cls._instances[cls]
 
 
@@ -36,7 +37,7 @@ class SmartApiConnection(metaclass=Singleton):
         The data object to store the session data like jwtToken.
     """
 
-    def __init__(self, credentials: Credentials):
+    def __init__(self, credentials: SmartapiCredentials):
         self.credentials = credentials
         self.api = SmartConnect(self.credentials.api_key)
         totp = pyotp.TOTP(self.credentials.token).now()
@@ -55,8 +56,10 @@ class SmartApiConnection(metaclass=Singleton):
         """
         if "data" in self.data:
             client_data = self.data["data"]
+            
             if "jwtToken" in client_data:
                 return client_data["jwtToken"]
+            
         return None
 
     def get_headers(self) -> Dict[str, Optional[str]]:
@@ -80,6 +83,7 @@ class SmartApiConnection(metaclass=Singleton):
             "X-MACAddress": "MAC_ADDRESS",
             "X-PrivateKey": self.credentials.api_key,
         }
+        
         return headers
 
     @staticmethod
@@ -87,8 +91,9 @@ class SmartApiConnection(metaclass=Singleton):
         """
         Initialze the SmartApiConnection
         """
-        credentials = Credentials.get_credentials()
+        credentials = SmartapiCredentials.get_credentials()
         connection = SmartApiConnection(credentials)
+        
         return connection
 
 

@@ -1,6 +1,5 @@
 
 import json
-from kafka import KafkaProducer
 
 
 import struct
@@ -53,14 +52,13 @@ class SmartApiTicker(MarketDatasetTwistedSocket):
         self.on_data_save_callback = on_data_save_callback
         self.counter = 0
 
-        self.subscribed_tokens = {}
-        self.tick_counter={}
-        self.producer = KafkaProducer(bootstrap_servers='localhost:9092')
+        self.subscribed_tokens = []
         super().__init__(debug=debug)
 
     def sanity_check(self):
         for key, value in self.headers.items():
             assert value, f"{key} is empty"
+        
 
     def set_tokens(self, tokens: List[Dict[str, int | Dict[str, str]]]):
         """
@@ -118,6 +116,7 @@ class SmartApiTicker(MarketDatasetTwistedSocket):
         
         try:
             self.ws.sendMessage(json.dumps(request_data).encode("utf-8"))
+            
             for token in tokens[0]["tokens"]:
                 self.subscribed_tokens[token] = self.subscription_mode.value
                 
@@ -250,11 +249,10 @@ class SmartApiTicker(MarketDatasetTwistedSocket):
         data['name']=self.TOKEN_MAP.get(data['token'])
         data['socket_name']="smartapi"
         data['retrived_timestamp']=str(time.time())
-        self.producer.send('muni', json.dumps(data).encode('utf-8'))
-        self.producer.flush()
+        self.on_data_save_callback(data)
 
     @staticmethod
-    def initialize_socket(cfg, on_data_save_callback=None):
+    def initialize_socket(cfg, on_save_data_callback=None):
         smartapi_connection = SmartApiConnection.get_connection()
         auth_token = smartapi_connection.get_auth_token()
         feed_token = smartapi_connection.api.getfeedToken()
@@ -270,6 +268,6 @@ class SmartApiTicker(MarketDatasetTwistedSocket):
             SubscriptionMode.get_subscription_mode(
                 cfg.get("subscription_mode", "snap_quote")
             ),
-            on_data_save_callback,
+            on_save_data_callback,
             debug=False,
         )
