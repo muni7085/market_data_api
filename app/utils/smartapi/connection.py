@@ -40,6 +40,7 @@ class SmartApiConnection(metaclass=Singleton):
     def __init__(self, credentials: SmartapiCredentials):
         self.credentials = credentials
         self.api = SmartConnect(self.credentials.api_key)
+
         totp = pyotp.TOTP(self.credentials.token).now()
         self.data = self.api.generateSession(
             self.credentials.client_id, self.credentials.pwd, totp
