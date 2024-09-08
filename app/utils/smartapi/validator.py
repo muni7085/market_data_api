@@ -49,7 +49,7 @@ def validate_symbol_and_get_token(
     """
     symbols_path = BSE_SYMBOLS_PATH
 
-    if stock_exchange == Exchange.NSE:
+    if stock_exchange.upper() == Exchange.NSE:
         symbols_path = NSE_SYMBOLS_PATH
         stock_symbol = stock_symbol.upper() + "-EQ"
 

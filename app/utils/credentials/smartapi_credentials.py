@@ -9,7 +9,6 @@ from app.utils.common.exceptions import CredentialsException
 from app.utils.credentials.credentials import Credentials
 from app.utils.file_utils import load_json_data
 from app.utils.smartapi.constants import SMART_API_CREDENTIALS
-from app.utils.credentials.credentials import Credentials
 
 
 @Credentials.register("smartapi")
@@ -63,8 +62,5 @@ class SmartapiCredentials(Credentials):
             raise CredentialsException(SMART_API_CREDENTIALS)
 
         credentials = load_json_data(credentials_path)
-<<<<<<<< HEAD:app/utils/credentials/smartapi_credentials.py
-========
 
->>>>>>>> master:app/utils/credentials/smartapi_credentails.py
         return SmartapiCredentials(**credentials)

@@ -1,14 +1,15 @@
 import sys
 import threading
-from pathlib import Path
-from twisted.internet import reactor, ssl
-from twisted.python import log as twisted_log
-from typing import List, Dict, Optional, Any
 from abc import ABC, abstractmethod
-from autobahn.twisted.websocket import WebSocketClientProtocol
-from autobahn.twisted.websocket import connectWS
-from app.sockets.websocket_client_factory import MarketDataWebSocketClientFactory
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
+from autobahn.twisted.websocket import WebSocketClientProtocol, connectWS
+from twisted.internet import reactor, ssl
+from autobahn.websocket.types import ConnectionResponse
+from twisted.python import log as twisted_log
+
+from app.sockets.websocket_client_factory import MarketDataWebSocketClientFactory
 from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name)
@@ -122,7 +123,9 @@ class MarketDatasetTwistedSocket(ABC):
         if not reactor.running:
             if threaded:
                 opts["installSignalHandlers"] = False
-                self.websocket_thread = threading.Thread(target=reactor.run, kwargs=opts)
+                self.websocket_thread = threading.Thread(
+                    target=reactor.run, kwargs=opts
+                )
                 self.websocket_thread.deamon = True
                 self.websocket_thread.start()
             else:
@@ -215,7 +218,17 @@ class MarketDatasetTwistedSocket(ABC):
         """
         raise NotImplementedError
 
-    def _on_connect(self, ws: WebSocketClientProtocol, response):
+    def _on_connect(self, ws: WebSocketClientProtocol, response:ConnectionResponse):
+        """
+        This function is called when the WebSocket connection is established with the server
+        
+        Parameters
+        ----------
+        ws: ``WebSocketClientProtocol``
+            The WebSocket client protocol object
+        response: ``ConnectionResponse``
+            The response received from the server after establishing the connection
+        """
         self.ws = ws
 
         if self.debug:

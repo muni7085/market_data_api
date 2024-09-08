@@ -21,5 +21,5 @@ def get_logger(name, level=logging.INFO):
     # Add handlers to the logger
     logger.addHandler(c_handler)
     logger.addHandler(f_handler)
-    
+
     return logger

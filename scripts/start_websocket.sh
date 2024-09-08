@@ -7,11 +7,11 @@ PARTITIONS=5
 REPLICATION_FACTOR=3
 KAFKA_PORT=9092
 
-mkdir -p ../docker/docker_data/kafka1
-mkdir -p ../docker/docker_data/kafka2
-mkdir -p ../docker/docker_data/kafka3
+# mkdir -p ../docker/docker_data/kafka1
+# mkdir -p ../docker/docker_data/kafka2
+# mkdir -p ../docker/docker_data/kafka3
 
-sudo chown -R 1001:1001 ../docker/docker_data
+# sudo chown -R 1001:1001 ../docker/docker_data
 
 # Function to check if a Docker container is running
 is_container_running() {
@@ -28,7 +28,7 @@ if ! is_container_running $KAFKA_COMPOSE_SERVICE; then
     echo "Starting Kafka container..."
     docker compose -f ../docker/bitnami_kafka.yaml up -d
     echo "Waiting for Kafka to start..."
-    sleep 10 # Give Kafka some time to start
+    sleep 20 # Give Kafka some time to start
     create_topic
 else
     echo "Kafka container is already running."

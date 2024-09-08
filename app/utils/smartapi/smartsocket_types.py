@@ -34,7 +34,7 @@ class SubscriptionMode(Enum):
     DEPTH = 4
 
     @staticmethod
-    def get_subscription_mode(subscription_mode: str | int)-> "SubscriptionMode":
+    def get_subscription_mode(subscription_mode: str | int) -> "SubscriptionMode":
         return get_enum_member(SubscriptionMode, subscription_mode)
 
 

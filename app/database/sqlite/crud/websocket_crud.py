@@ -1,25 +1,22 @@
-from app.database.sqlite.models.websocket_models import WebsocketLTPData
 from typing import List
 
-from sqlmodel import Session
+from app.database.sqlite.models.websocket_models import SocketStockPriceInfo
+from app.database.sqlite.sqlite_db_connection import get_session
 
 
-def insert_socket_data_to_db(
-    data: WebsocketLTPData | List[WebsocketLTPData], session: Session
-):
+def insert_data(data: SocketStockPriceInfo | List[SocketStockPriceInfo]):
     """
-    Insert the provided data into `websocketltpdata` table in the database.
+    Insert the provided data into the SocketStockPriceInfo table in the SQLite database.
 
     Parameters
     ----------
-    data: ``WebsocketLTPData`` | ``List[WebsocketLTPData]``
-        The data to insert into the table.
-    session: ``Session``
-        The session object to interact with the database.
+    data: ``SocketStockPriceInfo`` | ``List[SocketStockPriceInfo]``
+        The data to insert.
     """
-    if isinstance(data, WebsocketLTPData):
-        data = [data]
+    with next(get_session()) as session:
+        if isinstance(data, SocketStockPriceInfo):
+            data = [data]
 
-    session.add_all(data)
-    session.commit()
-    session.close()
+        session.add_all(data)
+        session.commit()
+        session.close()

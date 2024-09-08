@@ -13,3 +13,4 @@ sample.py
 *.txt
 *credentials_cache.json
 /docker/docker_data
+*outputs/

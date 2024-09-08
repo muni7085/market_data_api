@@ -19,7 +19,7 @@ class Singleton(type):
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-            
+
         return cls._instances[cls]
 
 
@@ -57,10 +57,10 @@ class SmartApiConnection(metaclass=Singleton):
         """
         if "data" in self.data:
             client_data = self.data["data"]
-            
+
             if "jwtToken" in client_data:
                 return client_data["jwtToken"]
-            
+
         return None
 
     def get_headers(self) -> Dict[str, Optional[str]]:
@@ -84,7 +84,7 @@ class SmartApiConnection(metaclass=Singleton):
             "X-MACAddress": "MAC_ADDRESS",
             "X-PrivateKey": self.credentials.api_key,
         }
-        
+
         return headers
 
     @staticmethod
@@ -94,7 +94,7 @@ class SmartApiConnection(metaclass=Singleton):
         """
         credentials = SmartapiCredentials.get_credentials()
         connection = SmartApiConnection(credentials)
-        
+
         return connection
 
 

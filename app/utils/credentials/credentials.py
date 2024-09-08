@@ -1,5 +1,7 @@
-from registrable import Registrable
 from abc import ABC, abstractmethod
+
+from registrable import Registrable
+
 
 @abstractmethod
 class Credentials(Registrable, ABC):

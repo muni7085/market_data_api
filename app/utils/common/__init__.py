@@ -1,0 +1,1 @@
+from .instantiation import init_from_cfg

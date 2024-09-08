@@ -1,0 +1,7 @@
+defaults:
+  - _self_
+  - streaming_service: kafka
+
+data_saver:
+  name: sqlite_saver
+  streaming_service: kafka

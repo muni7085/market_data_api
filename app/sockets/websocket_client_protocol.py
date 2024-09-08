@@ -1,18 +1,20 @@
+import time
+from pathlib import Path
+
 from autobahn.twisted.websocket import WebSocketClientProtocol
 from autobahn.websocket.types import ConnectionResponse
-import time
+
 from app.utils.common.logger import get_logger
-from pathlib import Path
 
 logger = get_logger(Path(__file__).name)
 
 
 class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
-    """ 
+    """
     This class is a subclass of the `WebSocketClientProtocol` class from the `autobahn` library.
     It is used to create a WebSocket client protocol that can be used to connect to a WebSocket server
     and send and receive messages over the WebSocket connection.
-    
+
     Attributes
     ----------
     PING_INTERVAL: ``float``
@@ -60,8 +62,8 @@ class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
         self.factory.resetDelay()
 
     def onOpen(self):
-        """ 
-        This callback is triggered when the WebSocket connection has been established 
+        """
+        This callback is triggered when the WebSocket connection has been established
         and is open for sending and receiving messages
         """
         self._loop_ping()
@@ -74,9 +76,9 @@ class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
             self.factory.on_open(self)
 
     def onMessage(self, payload: bytes, isBinary: bool):
-        """ 
+        """
         This callback is triggered when a WebSocket message is received from the server
-        
+
         Parameters
         ----------
         payload: ``bytes``
@@ -88,9 +90,9 @@ class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
             self.factory.on_message(self, payload, isBinary)
 
     def onClose(self, was_clean: bool, code: int, reason: str):
-        """ 
+        """
         This callback is triggered when the WebSocket connection is closed
-        
+
         Parameters
         ----------
         was_clean: ``bool``
@@ -113,22 +115,22 @@ class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
 
         if self._next_ping:
             self._next_ping.cancel()
-            
+
         if self._next_pong_check:
             self._next_pong_check.cancel()
 
-    def onPing(self, payload:str):
-        """ 
+    def onPing(self, payload: str):
+        """
         This callback is triggered when a WebSocket ping message is received from the server.
-        This method is used to respond to the ping message with a pong message and to keep 
+        This method is used to respond to the ping message with a pong message and to keep
         the connection alive as long as the server is sending ping messages.
-        
+
         Parameters
         ----------
         payload: ``str``
             The payload of the ping message received from the server
         """
-       
+
         if self._last_ping_time and self.factory.debug:
             logger.debug(f"Last pong was received at {time.time-self._last_pong_time}")
 
@@ -138,7 +140,7 @@ class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
             logger.debug(f"Received ping {payload}")
 
     def _loop_ping(self):
-        """ 
+        """
         This method is used to send a ping message to the server at regular intervals
         to keep the connection alive.
         """
@@ -154,7 +156,7 @@ class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
         )
 
     def _loop_pong_check(self):
-        """ 
+        """
         This method is used to check if the server is sending pong messages at regular intervals
         to keep the connection alive. If the server does not send a pong message within the
         specified interval, the connection is dropped and reconnected

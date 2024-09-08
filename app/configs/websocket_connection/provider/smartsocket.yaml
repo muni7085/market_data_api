@@ -2,5 +2,3 @@ name: smartsocket
 correlation_id: smart00001
 subscription_mode: snap_quote # ltp, quote, snap_quote, depth
 debug: false
-kafka_topic: smartsocket
-kafka_broker: localhost:9092

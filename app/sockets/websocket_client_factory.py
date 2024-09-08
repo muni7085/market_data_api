@@ -1,10 +1,12 @@
-from app.sockets.websocket_client_protocol import MarketDataWebScoketClientProtocol
+import time
+from pathlib import Path
+
 from autobahn.twisted.websocket import WebSocketClientFactory
 from twisted.internet.protocol import ReconnectingClientFactory
 from twisted.internet.tcp import Connector
+
+from app.sockets.websocket_client_protocol import MarketDataWebScoketClientProtocol
 from app.utils.common.logger import get_logger
-import time
-from pathlib import Path
 
 logger = get_logger(Path(__file__).name)
 
@@ -12,11 +14,11 @@ logger = get_logger(Path(__file__).name)
 class MarketDataWebSocketClientFactory(
     WebSocketClientFactory, ReconnectingClientFactory
 ):
-    """ 
+    """
     This class is used to create a WebSocket client factory that can be used to establish a connection
     to a WebSocket server and handle the connection lifecycle events such as connection failure, connection loss,
     reconnection, etc.
-    
+
     Attributes
     ----------
     protocol: ``MarketDataWebScoketClientProtocol``
@@ -28,6 +30,7 @@ class MarketDataWebSocketClientFactory(
     _last_connection_time: ``float``
         The timestamp of the last connection attempt
     """
+
     protocol = MarketDataWebScoketClientProtocol
     maxDelay = 5
     maxRetries = 10
@@ -112,7 +115,7 @@ class MarketDataWebSocketClientFactory(
         self.send_noreconnect()
 
     def send_noreconnect(self):
-        """ 
+        """
         This method is used to check if the maximum number of retries has been reached
         and if so, it stops the connection and calls the on_noreconnect callback
         """
@@ -123,6 +126,6 @@ class MarketDataWebSocketClientFactory(
                 )
 
                 self.stop()
-                
+
             if self.on_noreconnect:
                 self.on_noreconnect()
