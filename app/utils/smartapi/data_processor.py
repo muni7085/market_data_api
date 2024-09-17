@@ -230,6 +230,32 @@ def process_smart_api_historical_stock_data(
     )
 
 
+def determine_instrument_type(row: Dict[str, str]) -> str:
+    """
+    Determine the instrument type based on the given row data.
+    This function first checks if an instrument type is already provided.
+    If not, it infers the type from the symbol using specific rules
+
+    Parameters:
+    -----------
+    row: ``Dict[str, str]``
+        The row data from which to determine the instrument type
+    
+    Returns:
+    --------
+    ``str``
+        The instrument type determined from the given row data
+    """
+    if row['instrumenttype']:
+        return row['instrumenttype']
+    
+    symbol = row['symbol']
+    
+    if symbol[0].isdigit():
+        return 'unk'
+    
+    return symbol.split('-')[1] if '-' in symbol else 'EQ'
+
 def process_token_data(tokens_data: List[Dict[str, str]]) -> List[SmartAPIToken]:
     """
     Processes the token data from the SmartAPI and returns the processed data.
@@ -246,9 +272,9 @@ def process_token_data(tokens_data: List[Dict[str, str]]) -> List[SmartAPIToken]
         The processed data from the SmartAPI as a dictionary.
     """
     df = pd.DataFrame(tokens_data)
-    df = df[~df["exch_seg"].isin(["CDS", "MCX", "NCDEX", "BFO"])]
-    df = df[~df["name"].str.match(r"^\d")]
-    df = df.drop_duplicates(subset=["symbol"])
+    df = df[~df["symbol"].str.match(r"^\d")]
+    df = df.drop_duplicates(subset=["token"])
+    df['instrumenttype'] = df.apply(determine_instrument_type, axis=1)
     tokens_dict_data = df.to_dict("records")
 
     return [
@@ -256,13 +282,12 @@ def process_token_data(tokens_data: List[Dict[str, str]]) -> List[SmartAPIToken]
             token=token["token"],
             symbol=token["symbol"],
             name=token["name"],
-            expiry=token["expiry"],
-            strike=token["strike"],
+            expiry_date=token["expiry"],
+            strike_price=token["strike"],
             lot_size=token["lotsize"],
             instrument_type=token["instrumenttype"],
-            exch_seg=token["exch_seg"],
-            tick_size=token["tick_size"],
-            symbol_type=token["symbol"][-2:],
+            exchange=token["exch_seg"],
+            tick_size=token["tick_size"]
         )
         for token in tokens_dict_data
     ]

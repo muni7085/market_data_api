@@ -12,7 +12,7 @@ Install required pacakages from poetry with the following command:
 
 Add the following in `.bashrc` file
 ```bash
-    export SMARTAPI_CREDENTIALS="path/to/smart_api_credentials.json"
+    export SMARTAPI_CREDENTIALS="path/to/smartapi_credentials.json"
     gdrive_credentials_path="path/to/gdrive_credentials_path.json"
     export GDRIVE_CREDENTIALS_DATA=$(jq -c '.' "$gdrive_credentials_path")
 ```

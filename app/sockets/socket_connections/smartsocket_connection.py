@@ -1,21 +1,20 @@
-from app.sockets.socket_connections.websocket_connection import WebsocketConnection
-from app.database.sqlite.crud.smartapi_curd import get_smartapi_tokens_by_all_conditions
-from typing import Dict, List
-from app.sockets.tiwsted_sockets.smartsocket import SmartSocket
-from app.utils.common.logger import get_logger
-from functools import partial
-from kafka import KafkaProducer
-import hydra
-from omegaconf import DictConfig
-from app.utils.smartapi.validator import validate_symbol_and_get_token
 from pathlib import Path
+from typing import Dict, List
+
+from omegaconf import DictConfig
+
+from app.database.sqlite.crud.smartapi_curd import get_smartapi_tokens_by_all_conditions
+from app.sockets.socket_connections.websocket_connection import WebsocketConnection
+from app.sockets.tiwsted_sockets.smartsocket import SmartSocket
 from app.sockets.websocket_datahandler.on_data_callbacks.base_callback import (
     BaseCallback,
 )
-from app.utils.common.types.financial_types import Exchange
-from app.utils.smartapi.smartsocket_types import ExchangeType
 from app.utils.common import init_from_cfg
 from app.utils.common.exceptions import SymbolNotFoundException
+from app.utils.common.logger import get_logger
+from app.utils.common.types.financial_types import Exchange
+from app.utils.smartapi.smartsocket_types import ExchangeType
+from app.utils.smartapi.validator import validate_symbol_and_get_token
 
 logger = get_logger(Path(__file__).name)
 
@@ -27,10 +26,10 @@ class SmartSocketConnection(WebsocketConnection):
         self.websocket = websocket
 
     def get_equity_stock_tokens(
-        exchange: str = None, smartapi_exchange_ext: str = None, **kwargs
+        exchange: str = None, instrument_type: str = None, **kwargs
     ) -> Dict[str, str]:
         smartapi_tokens = get_smartapi_tokens_by_all_conditions(
-            symbol_type=smartapi_exchange_ext, exch_seg=exchange
+            instrument_type=instrument_type, exchange=exchange
         )
         tokens = {token.token: token.symbol for token in smartapi_tokens}
         return tokens
@@ -67,17 +66,24 @@ class SmartSocketConnection(WebsocketConnection):
     @classmethod
     def from_cfg(cls, cfg):
         connection_cfg = cfg.connection
-        print(connection_cfg)
+
         tokens = cls.get_tokens(cls, connection_cfg)
         save_data_callback = init_from_cfg(connection_cfg.data_streaming, BaseCallback)
-        connection_instance_num = connection_cfg.get("connection_instance_num", 0)
+        connection_instance_num = connection_cfg.get("current_connection_number", 0)
         num_tokens_per_instance = connection_cfg.get("num_tokens_per_instance", 1000)
+        
+        token_start_idx = connection_instance_num * num_tokens_per_instance
+        token_end_idx = (connection_instance_num + 1) * num_tokens_per_instance
+        
+        if token_start_idx > len(tokens):
+            logger.info(
+                f"Connection instance {connection_instance_num} has no tokens to subscribe to"
+            )
+            return None
 
         tokens = dict(
             list(tokens.items())[
-                connection_instance_num
-                * num_tokens_per_instance : (connection_instance_num + 1)
-                * num_tokens_per_instance
+                token_start_idx : token_end_idx
             ]
         )
         smart_socket = SmartSocket.initialize_socket(cfg.connection.provider, save_data_callback)

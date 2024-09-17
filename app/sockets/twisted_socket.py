@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from autobahn.twisted.websocket import WebSocketClientProtocol, connectWS
-from twisted.internet import reactor, ssl
 from autobahn.websocket.types import ConnectionResponse
+from twisted.internet import reactor, ssl
 from twisted.python import log as twisted_log
 
 from app.sockets.websocket_client_factory import MarketDataWebSocketClientFactory

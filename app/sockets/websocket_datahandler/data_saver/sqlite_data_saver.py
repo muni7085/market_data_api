@@ -6,9 +6,9 @@ from kafka.errors import NoBrokersAvailable
 
 from app.database.sqlite.crud.websocket_crud import insert_data
 from app.database.sqlite.models.websocket_models import SocketStockPriceInfo
+from app.sockets.websocket_datahandler.data_saver import DataSaver
 from app.utils.common.logger import get_logger
 from app.utils.smartapi.smartsocket_types import ExchangeType
-from .data_saver import DataSaver
 
 logger = get_logger(Path(__file__).name)
 
@@ -22,7 +22,7 @@ class SqliteDataSaver(DataSaver):
         socket_stock_price_info = SocketStockPriceInfo(
             last_traded_timestamp=data["last_traded_timestamp"],
             token=data["token"],
-            retrival_timestamp=data["retrived_timestamp"],
+            retrieval_timestamp=data["retrived_timestamp"],
             socket_name=data["socket_name"],
             exchange_timestamp=data["exchange_timestamp"],
             name=data["name"],
@@ -38,7 +38,8 @@ class SqliteDataSaver(DataSaver):
     def save(self, data):
         decoded_data = data.decode("utf-8")
         decoded_data = json.loads(decoded_data)
-        if decoded_data["exchange_type"] == ExchangeType.NSE_FO.value:
+        
+        if decoded_data["exchange_type"] == ExchangeType.NSE_CM.name:
             self.save_stock_data(decoded_data)
         else:
             logger.error(
@@ -53,7 +54,7 @@ class SqliteDataSaver(DataSaver):
     def from_cfg(cls, cfg):
         try:
             return cls(
-                KafkaConsumer(cfg.kafka_topic, bootstrap_servers=cfg.kafka_broker)
+                KafkaConsumer(cfg.data_streaming.kafka_topic, bootstrap_servers=cfg.data_streaming.kafka_server,auto_offset_reset='earliest')
             )
         except NoBrokersAvailable:
             logger.error(

@@ -9,7 +9,7 @@ class SocketStockPriceInfo(SQLModel, table=True):
     """
 
     token: str = Field(primary_key=True)
-    retrival_timestamp: str = Field(primary_key=True)
+    retrieval_timestamp: str = Field(primary_key=True)
     last_traded_timestamp: str
     socket_name: str
     exchange_timestamp: str
@@ -31,7 +31,7 @@ class SocketStockPriceInfo(SQLModel, table=True):
             "exchange_timestamp": self.exchange_timestamp,
             "name": self.name,
             "last_traded_price": self.last_traded_price,
-            "retrival_timestamp": self.retrival_timestamp,
+            "retrieval_timestamp": self.retrieval_timestamp,
             "last_traded_quantity": self.last_traded_quantity,
             "average_traded_price": self.average_traded_price,
             "volume_trade_for_the_day": self.volume_trade_for_the_day,

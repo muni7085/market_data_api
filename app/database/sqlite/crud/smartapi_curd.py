@@ -2,16 +2,15 @@
 This script contains the CRUD operations for the SmartAPIToken table.
 """
 
+from pathlib import Path
 from typing import Dict, List, Sequence
 
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import delete, or_, select
-from app.database.sqlite.sqlite_db_connection import get_session
-from app.utils.common.logger_utils import get_logger
 
 from app.database.sqlite.models.smartapi_models import SmartAPIToken
-
-from pathlib import Path
+from app.database.sqlite.sqlite_db_connection import get_session
+from app.utils.common.logger_utils import get_logger
 
 logger = get_logger(Path(__file__).name)
 
@@ -23,6 +22,7 @@ def deleted_all_data():
     with next(get_session()) as session:
         statement = delete(SmartAPIToken)
         session.exec(statement)
+        session.commit()
 
 
 def insert_data(

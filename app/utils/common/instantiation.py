@@ -1,7 +1,8 @@
-from hydra.utils import instantiate
-from registrable import Registrable
-from omegaconf import DictConfig, OmegaConf
 from copy import deepcopy
+
+from hydra.utils import instantiate
+from omegaconf import DictConfig, OmegaConf
+from registrable import Registrable
 from registrable.exceptions import RegistrationError
 
 

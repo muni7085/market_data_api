@@ -2,61 +2,61 @@ from typing import Optional
 
 from sqlmodel import Field, MetaData, SQLModel
 
-
+""" """
 class SmartAPIToken(SQLModel, table=True):
     """
     This class holds the information about the SmartAPI tokens.
     
     Attributes
     ----------
-    symbol: ``str``
-        The symbol of the token.
-        Eg: "INFY"
     token: ``str``
-        The token value for the symbol.
+        The token value for the symbol. This is the primary key
         Eg: "256265"
+    symbol: ``str``
+        The symbol of the token
+        Eg: "INFY"
     name: ``str``
-        The name of the equity or derivative.
+        The name of the equity or derivative
         Eg: "Infosys Limited"
-    expiry: ``str``
-        The expiry date of the derivative contract.
-        Applicable only for derivative instruments.
-        Eg: "2021-09-30"
-    strike: ``float``
-        The strike price of the derivative contract.
-        Eg: 1700.0
-    lot_size: ``int``
-        The lot size of the derivative contract.
-        Eg: 100
     instrument_type: ``str``
         The type of the instrument.
-        
+        Eg: "EQ" or "OPTIDX"
+    expiry_date: ``str``
+        The expiry date of the derivative contract.
+        Applicable only for derivative instruments, means the date on which the contract expires
+        Eg: "2021-09-30"
+    strike_price: ``float``
+        The strike price of the derivative contract
+        Eg: 1700.0
+    lot_size: ``int``
+        The lot size of the derivative contract, means the number of shares in one lot
+        Eg: 100
+    tick_size: ``float``
+        The tick size of the instrument, means the minimum price movement
     """
-
-    symbol: str = Field(primary_key=True)
-    token: str
+    
+    token: str = Field(primary_key=True)
+    symbol: str
     name: str
-    expiry: str
-    strike: Optional[float] = None
-    lot_size: Optional[int] = None
     instrument_type: str
-    exch_seg: str
+    exchange: str
+    expiry_date: Optional[str] = None
+    strike_price: Optional[float] = None
+    lot_size: Optional[int] = None
     tick_size: Optional[float] = None
-    symbol_type: Optional[str] = None 
 
     def to_dict(self):
         """
         Returns the object as a dictionary.
         """
         return {
-            "symbol": self.symbol,
             "token": self.token,
+            "symbol": self.symbol,
             "name": self.name,
-            "expiry": self.expiry,
-            "strike": self.strike,
-            "lot_size": self.lot_size,
             "instrument_type": self.instrument_type,
-            "exch_seg": self.exch_seg,
+            "expiry_date": self.expiry_date,
+            "strike_price": self.strike_price,
+            "lot_size": self.lot_size,
+            "exchange": self.exchange,
             "tick_size": self.tick_size,
-            "symbol_type": self.symbol_type,
         }
