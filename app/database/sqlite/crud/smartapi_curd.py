@@ -39,7 +39,6 @@ def insert_data(
     remove_existing: ``bool``
         If True, all existing data in the table will be deleted before inserting the new data.
     """
-
     if isinstance(data, SmartAPIToken):
         data = [data]
 
@@ -64,12 +63,12 @@ def get_conditions_list(condition_attributes: Dict[str, str]) -> List[BinaryExpr
     Parameters
     ----------
     condition_attributes: ``Dict[str, str]``
-        A dictionary of attributes and their corresponding values.
+        A dictionary of attributes and their corresponding values
 
     Returns
     -------
     conditions: ``List[BinaryExpression]``
-        A list of SQLAlchemy BinaryExpression objects.
+        A list of SQLAlchemy BinaryExpression objects
     """
     conditions = []
 
@@ -94,12 +93,20 @@ def get_smartapi_tokens_by_any_condition(**kwargs) -> Sequence[SmartAPIToken]:
     ----------
     **kwargs: ``Dict[str, str]``
         The attributes and their corresponding values to filter the data.
-        The attributes should be the columns of the SmartAPIToken model.
+        The attributes should be the columns of the SmartAPIToken model
 
     Returns
     -------
     result: ``List[SmartAPIToken]``
-        A list of SmartAPIToken objects that match the any of the specified conditions.
+        A list of SmartAPIToken objects that match the any of the specified conditions
+
+    >>> Example:
+    >>> get_smartapi_tokens_by_any_condition(symbol="INFY", exchange="NSE")
+    >>> [SmartAPIToken(symbol='INFY', exchange='NSE', token='1224', ...),
+            SmartAPIToken(symbol='TCS', exchange='NSE', token='1225', ...), ...]
+    
+    The above example will return all the SmartAPIToken objects with symbol 'INFY' or
+    exchange 'NSE'.
     """
     with next(get_session()) as session:
         conditions = get_conditions_list(kwargs)
@@ -125,12 +132,19 @@ def get_smartapi_tokens_by_all_conditions(
     ----------
     **kwargs: ``Dict[str, str]``
         The attributes and their corresponding values to filter the data.
-        The attributes should be the columns of the SmartAPIToken model.
+        The attributes should be the columns of the SmartAPIToken model
 
     Returns
     -------
     result: ``List[SmartAPIToken]``
-        A list of SmartAPIToken objects that match the all of the specified conditions.
+        A list of SmartAPIToken objects that match the all of the specified conditions
+
+    >>> Example:
+    >>> get_smartapi_tokens_by_all_conditions(symbol="INFY", exchange="NSE")
+    >>> [SmartAPIToken(symbol='INFY', exchange='NSE', token='1224', ...)]
+    
+    The above example will return all the SmartAPIToken objects with symbol 'INFY' and
+    exchange 'NSE'.
     """
     with next(get_session()) as session:
         conditions = get_conditions_list(kwargs)

@@ -54,10 +54,10 @@ class SqliteDataSaver(DataSaver):
     def from_cfg(cls, cfg):
         try:
             return cls(
-                KafkaConsumer(cfg.data_streaming.kafka_topic, bootstrap_servers=cfg.data_streaming.kafka_server,auto_offset_reset='earliest')
+                KafkaConsumer(cfg.data_source.kafka_topic, bootstrap_servers=cfg.data_source.kafka_server,auto_offset_reset='earliest')
             )
         except NoBrokersAvailable:
             logger.error(
-                f"No Broker is availble at the address: {cfg.kafka_broker}. No data will be saved."
+                f"No Broker is availble at the address: {cfg.data_source.kafka_server}. No data will be saved."
             )
             return None

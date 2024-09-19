@@ -1,8 +1,11 @@
+"""
+This module contains the schema for the SmartAPIToken table.
+"""
 from typing import Optional
 
-from sqlmodel import Field, MetaData, SQLModel
+from sqlmodel import Field, SQLModel
 
-""" """
+
 class SmartAPIToken(SQLModel, table=True):
     """
     This class holds the information about the SmartAPI tokens.

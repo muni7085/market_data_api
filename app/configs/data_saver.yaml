@@ -1,6 +1,6 @@
 defaults:
   - _self_
-  - data_streaming: kafka
+  - data_pipeline: kafka
 
 name: sqlite_saver
-data_streaming: kafka
+data_source: ${data_pipeline}

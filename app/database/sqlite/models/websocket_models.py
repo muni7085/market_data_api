@@ -1,3 +1,6 @@
+"""
+This module contain the schema for the SocketStockPriceInfo table.
+"""
 from typing import Optional
 
 from sqlmodel import Field, SQLModel
