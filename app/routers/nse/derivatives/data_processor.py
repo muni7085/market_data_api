@@ -17,7 +17,7 @@ def get_option(option: dict[str, Any]) -> dict[str, float]:
     -------
     ``dict[str, float]``
         dictionary contain the option data that is required to initialize `Option` model class
-    """    
+    """
     return {
         "ltp": option["lastPrice"],
         "change": option["change"],
@@ -46,7 +46,7 @@ def filter_option_chain(
         This object contain all the strike prices data for a given expiry date
     """
     all_strike_prices: list[StrikePriceData] = []
-    
+
     for strike_price in strike_prices:
         ce, pe = None, None
         if "CE" in strike_price:
@@ -57,5 +57,5 @@ def filter_option_chain(
             strike_price=strike_price["strikePrice"], ce=ce, pe=pe
         )
         all_strike_prices.append(strike_price_data)
-        
+
     return ExpiryOptionData(strike_prices=all_strike_prices, expiry_date=expiry_date)

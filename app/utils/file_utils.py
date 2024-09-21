@@ -2,9 +2,11 @@ import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
+
 from app.utils.common.logger_utils import get_logger
 
 logger = get_logger(__name__)
+
 
 def resolve_path(file_path: str | Path) -> Path:
     """
@@ -73,7 +75,7 @@ def read_text_data(file_path: str | Path) -> Any:
     file_path = resolve_path(file_path)
     with open(file_path, "r", encoding="utf-8") as fp:
         data = fp.read().splitlines()
-        
+
     return data
 
 
@@ -94,7 +96,7 @@ def get_symbols(symbol_file: str) -> Any:
         symbols data from the file
     """
     stock_symbols_data = load_json_data(symbol_file)
-    
+
     return stock_symbols_data
 
 
@@ -109,8 +111,8 @@ def write_to_json_file(file_path: str | Path, data: dict):
     """
     with open(file_path, "w", encoding="utf-8") as fp:
         json.dump(data, fp, indent=4)
-        
-    logger.info(f"Data successfully written into the file {file_path}")
+
+    logger.info("Data successfully written into the file %s", file_path)
 
 
 def create_dir(dir_path: str | Path) -> Path:
@@ -131,5 +133,5 @@ def create_dir(dir_path: str | Path) -> Path:
         dir_path = Path(dir_path)
     if not dir_path.exists():
         dir_path.mkdir(parents=True, exist_ok=True)
-        
+
     return dir_path

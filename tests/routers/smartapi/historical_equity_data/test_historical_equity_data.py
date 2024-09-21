@@ -41,7 +41,7 @@ def validate_endpoint_io(input_stock_data: dict[str, Any]):
 
     else:
         validate_exception(endpoint_url, input_stock_data, client)
-        
+
     time.sleep(0.5)
 
 
@@ -137,7 +137,7 @@ def test_historical_stock_data_invalid_trading_time(
 
 def test_historical_stock_data_invalid_date_range(date_range_io: dict[str, Any]):
     """
-    Tests the historical stock data endpoint with invalid date range where date range 
+    Tests the historical stock data endpoint with invalid date range where date range
     can exceeds maximum or minimum limit per request.
 
     Parameters:

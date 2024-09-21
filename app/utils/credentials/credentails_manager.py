@@ -56,7 +56,7 @@ def get_credentials(data_provider: DataProvider) -> Credentials:
     Parameters
     ----------
     data_provider: ``Credentials``
-        The data provider for which the credentials are to be retrieved. 
+        The data provider for which the credentials are to be retrieved.
         This should be a DataProvider enum value
 
     Returns

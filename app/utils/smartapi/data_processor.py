@@ -1,7 +1,7 @@
 from datetime import datetime, time
 from itertools import chain
-
 from typing import Any
+
 import numpy as np
 import pandas as pd
 
@@ -50,13 +50,13 @@ def process_smart_api_stock_data(
 
 
 def process_available_stock_data(
-    historical_stock_data: tuple[list[list[Any]], str],
+    historical_stock_data: tuple[list[list[Any]], str, str],
 ) -> list[HistoricalStockPriceInfo]:
     """Processes the available data from the SmartAPI and returns the processed data.
 
     Parameters:
     -----------
-    historical_stock_data: ``tuple[list[list[Any]],str]``
+    historical_stock_data: ``tuple[list[list[Any]],str,str]``
         The data to be processed.
 
     Return:
@@ -87,8 +87,8 @@ def get_possible_timestamps_on_date(
     interval: CandlestickInterval,
 ) -> list[str]:
     """
-    Finds the list of all possible timestamps of given interval for the given current 
-    date from start time which is either 9:15 or time in given start_datetime to end 
+    Finds the list of all possible timestamps of given interval for the given current
+    date from start time which is either 9:15 or time in given start_datetime to end
     time which is either 15:29 or time in given end_datetime.
 
     Parameters:
@@ -109,7 +109,7 @@ def get_possible_timestamps_on_date(
     """
     if interval.name == "ONE_DAY":
         return [f"{current_date.strftime('%Y-%m-%d')}T00:00:00+05:30"]
-    
+
     start_time = time(9, 15)
     end_time = time(15, 29)
 
@@ -184,7 +184,7 @@ def get_missing_timestamps(
         ).tolist()
     except Exception as e:
         print(e)
-        
+
     return missing_timestamps
 
 
@@ -232,6 +232,7 @@ def process_smart_api_historical_stock_data(
         missing_timestamps=missing_timestamps,
     )
 
+
 def determine_instrument_type(row: dict[str, str]) -> str:
     """
     Determine the instrument type based on the given row data.
@@ -242,21 +243,21 @@ def determine_instrument_type(row: dict[str, str]) -> str:
     -----------
     row: ``dict[str, str]``
         The row data from which to determine the instrument type
-    
+
     Returns:
     --------
     ``str``
         The instrument type determined from the given row data
     """
-    if row['instrumenttype']:
-        return row['instrumenttype']
-    
-    symbol = row['symbol']
-    
+    if row["instrumenttype"]:
+        return row["instrumenttype"]
+
+    symbol = row["symbol"]
+
     if symbol[0].isdigit():
-        return 'unk'
-    
-    return symbol.split('-')[1] if '-' in symbol else 'EQ'
+        return "unk"
+
+    return symbol.split("-")[1] if "-" in symbol else "EQ"
 
 
 def process_token_data(tokens_data: list[dict[str, str]]) -> list[SmartAPIToken]:
@@ -277,8 +278,8 @@ def process_token_data(tokens_data: list[dict[str, str]]) -> list[SmartAPIToken]
     df = pd.DataFrame(tokens_data)
     df = df[~df["symbol"].str.match(r"^\d")]
     df = df.drop_duplicates(subset=["token"])
-    df['instrumenttype'] = df.apply(determine_instrument_type, axis=1)
-    df['symbol']=df['symbol'].apply(lambda x: x.split('-')[0])
+    df["instrumenttype"] = df.apply(determine_instrument_type, axis=1)
+    df["symbol"] = df["symbol"].apply(lambda x: x.split("-")[0])
     tokens_dict_data = df.to_dict("records")
 
     return [
@@ -291,7 +292,7 @@ def process_token_data(tokens_data: list[dict[str, str]]) -> list[SmartAPIToken]
             lot_size=token["lotsize"],
             instrument_type=token["instrumenttype"],
             exchange=token["exch_seg"],
-            tick_size=token["tick_size"]
+            tick_size=token["tick_size"],
         )
         for token in tokens_dict_data
     ]

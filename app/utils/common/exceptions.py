@@ -29,7 +29,7 @@ class CredentialsException(HTTPException):
 
 class UnkownException(HTTPException):
     """
-    UnkownException is raised when an unknown exception occurs. This class can be used to 
+    UnkownException is raised when an unknown exception occurs. This class can be used to
     raise exceptions that are not handled by the application.
     """
 
@@ -70,7 +70,7 @@ class InvalidDateTimeFormatException(HTTPException):
 
 class InvalidDateRangeBoundsException(HTTPException):
     """
-    InvalidDateRangeBoundsException is raised when the given datetime range is invalid 
+    InvalidDateRangeBoundsException is raised when the given datetime range is invalid
     for given interval.
     """
 
@@ -86,7 +86,7 @@ class InvalidDateRangeBoundsException(HTTPException):
 
 class InvalidTradingHoursException(HTTPException):
     """
-    InvalidTradingHoursException is raised for errors in the time accessed outside 
+    InvalidTradingHoursException is raised for errors in the time accessed outside
     trading hours of stock market.
     """
 

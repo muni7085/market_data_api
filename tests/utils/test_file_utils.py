@@ -13,7 +13,7 @@ def test_resolve_path_with_existing_file():
     Test function to check the resolve_path function with existing file.
 
     This function creates a temporary file and tests the resolve_path function
-    with Path object and string path. It also tests the function with an existing 
+    with Path object and string path. It also tests the function with an existing
     file, non-existing file and raises FileNotFoundError for non-existing file.
     """
     # Creating a new temporary file
@@ -40,8 +40,8 @@ def test_resolve_path_with_existing_file():
 
 def test_load_json_data_with_existing_file():
     """
-    Test function to check if the load_json_data function can load data from an existing 
-    file. It creates a temporary file, writes data to it, and then tests the function with 
+    Test function to check if the load_json_data function can load data from an existing
+    file. It creates a temporary file, writes data to it, and then tests the function with
     the file path. It also tests the function with a non-existing file path to check if it
     raises a FileNotFoundError.
     """

@@ -73,7 +73,7 @@ def filter_single_stock(symbol: str, stock_data: dict[str, Any]) -> StockPriceIn
 
 def filter_single_index(index_data: dict[str, Any]) -> StockPriceInfo:
     """
-    Filter the required data and create a pydantic model from the 
+    Filter the required data and create a pydantic model from the
     given api response for single index.
 
     Parameters:

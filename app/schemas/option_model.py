@@ -28,7 +28,7 @@ class StrikePriceData(BaseModel):
 
 class ExpiryOptionData(BaseModel):
     """
-    ExpiryOptionData represents the option chain information of a derivative 
+    ExpiryOptionData represents the option chain information of a derivative
     at particular expiry date.
     """
 

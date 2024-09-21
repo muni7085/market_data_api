@@ -59,7 +59,7 @@ def search_valid_date(
     Return:
     -------
     ``datetime``
-        searched month from where the availability of data starts for the given 
+        searched month from where the availability of data starts for the given
         stock symbol and interval.
     """
     valid_date = end_date
@@ -100,7 +100,7 @@ def dataframe_to_json_files(
     df: pd.DataFrame, dir_path: Path, interval: CandlestickInterval
 ):
     """
-    Process the given dataframe and convert it into suitable data structure 
+    Process the given dataframe and convert it into suitable data structure
     i.e dictionary which will be stored in json file.
 
     Parameters:

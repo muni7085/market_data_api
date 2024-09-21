@@ -65,7 +65,7 @@ def validate_index_symbol(index_symbol: Annotated[str, Path()]) -> str:
     """
     symbols: dict[str, str] = get_symbols(NSE_INDEX_SYMBOLS)
     index_symbol = index_symbol.upper()
-    
+
     if index_symbol not in symbols:
         raise HTTPException(
             status_code=404,
@@ -138,7 +138,7 @@ def get_date_format(date: str) -> str:
     """
     date_separator = "/" if len(date.split("/")) > 1 else "-"
     month_format = "%b" if re.search("[a-zA-Z]+", date) else "%m"
-    
+
     return f"%d{date_separator}{month_format}{date_separator}%Y"
 
 

@@ -17,7 +17,7 @@ class StockPriceInfo(BaseModel):
 
 class HistoricalStockPriceInfo(BaseModel):
     """
-    HistoricalStockPriceInfo model represents the historical stock price 
+    HistoricalStockPriceInfo model represents the historical stock price
     information of a stock at a given time
     """
 

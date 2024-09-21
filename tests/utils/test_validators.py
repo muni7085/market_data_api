@@ -41,8 +41,8 @@ def test_validate_index_symbol():
     """
     Test function to validate index symbol.
 
-    This function tests the validity of an index symbol by checking if it 
-    exists in the NSE official website. It tests both valid and invalid 
+    This function tests the validity of an index symbol by checking if it
+    exists in the NSE official website. It tests both valid and invalid
     index symbols and raises an HTTPException if the symbol is invalid.
     """
     # Test valid index symbol
@@ -121,7 +121,7 @@ def test_get_date_format():
     Test function to check the get_date_format function.
 
     This function tests the get_date_format function with different date formats.
-    It checks if the function returns the correct date format string for each 
+    It checks if the function returns the correct date format string for each
     input date format.
     """
     # Test date format with "/"
@@ -144,7 +144,7 @@ def test_validate_and_reformat_expiry_date():
     """
     Test function to validate and reformat expiry date.
 
-    This function tests the validity of the date format and reformats 
+    This function tests the validity of the date format and reformats
     it to the required format.
     """
     # Test valid date format

@@ -1,12 +1,8 @@
 # pylint: disable=missing-function-docstring
 import pytest
 
-from app.routers.nse.derivatives.data_processor import (
-    filter_option_chain,
-    get_option,
-)
+from app.routers.nse.derivatives.data_processor import filter_option_chain, get_option
 from app.schemas.option_model import ExpiryOptionData
-
 
 
 def test_get_option(get_option_io):

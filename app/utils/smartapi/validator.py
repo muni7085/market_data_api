@@ -2,7 +2,6 @@
 from bisect import bisect_left
 from datetime import datetime, time, timedelta
 
-
 from app.utils.common.exceptions import (
     AllDaysHolidayException,
     DataUnavailableException,
@@ -52,7 +51,6 @@ def validate_symbol_and_get_token(
 
     if stock_exchange == Exchange.NSE:
         symbols_path = NSE_SYMBOLS_PATH
-        
 
     all_symbols_data = get_symbols(symbols_path)
 
@@ -82,11 +80,11 @@ def find_open_market_days(
     """
     if end_datetime < start_datetime:
         raise ValueError()
-    
+
     # Read the holidays data into list
     holidays_data = read_text_data(NSE_HOLIDAYS_PATH)
     open_days = []
-    
+
     # Check for any market open day between given dates.
     # If you find any open day then definitely the data is not empty otherwise raise an error.
     for day in range((end_datetime.date() - start_datetime.date()).days + 1):
@@ -98,7 +96,7 @@ def find_open_market_days(
             and holidays_data[index] != current_datetime.strftime("%Y-%m-%d")
         ):
             open_days.append(current_datetime)
-            
+
     return open_days
 
 
@@ -109,9 +107,9 @@ def check_data_availability(
     interval: CandlestickInterval,
 ) -> datetime:
     """
-    Verifies the availability of stock data for a given stock symbol and date range 
-    through SmartAPI. Returns the earliest date from which data is available. If data 
-    is available for the requested start date, it returns that date otherwise, it 
+    Verifies the availability of stock data for a given stock symbol and date range
+    through SmartAPI. Returns the earliest date from which data is available. If data
+    is available for the requested start date, it returns that date otherwise, it
     returns the earliest available date with data.
 
 
@@ -140,7 +138,7 @@ def check_data_availability(
     # If end date is less than the date from where the data availability starts, then
     # no data can be retrieved; therefore, an error should be raised.
     data_starting_dates = load_json_data(DATA_STARTING_DATES_PATH)
-    
+
     if stock_symbol in data_starting_dates:
         data_starting_date = data_starting_dates.get(stock_symbol).get(interval.name)
         if not data_starting_date:
@@ -150,7 +148,7 @@ def check_data_availability(
             raise DataUnavailableException(data_starting_date, stock_symbol)
     else:
         data_starting_date = start_datetime
-        
+
     return max(start_datetime, data_starting_date)
 
 
@@ -212,12 +210,12 @@ def validate_dates(
     # check given timings are market active trading hours.
     start_time = time(9, 15)
     end_time = time(15, 29)
-    
+
     if (
         interval.name != "ONE_DAY"
         and open_dates[0].date() == end_datetime.date()
         and (end_datetime.time() < start_time or start_datetime.time() > end_time)
     ):
         raise InvalidTradingHoursException()
-    
+
     return start_datetime, end_datetime

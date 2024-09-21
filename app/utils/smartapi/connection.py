@@ -102,7 +102,7 @@ def get_endpoint_connection(
     payload: str | dict, request_method_type: RequestType, url: str
 ) -> HTTPConnection:
     """
-    Get the HTTP connection object for making API requests to a specific endpoint 
+    Get the HTTP connection object for making API requests to a specific endpoint
     to the SmartAPI with the given payload.
 
     Parameters:
@@ -114,12 +114,12 @@ def get_endpoint_connection(
         eg: RequestType.GET, RequestType.POST
     url: ``str``
         The URL of the endpoint to connect to
-    
+
     Returns:
     --------
     ``HTTPConnection``
         The HTTP connection object for the given endpoint
-    
+
 
     """
     api_connection = SmartApiConnection.get_connection()

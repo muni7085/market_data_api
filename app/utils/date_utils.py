@@ -23,7 +23,7 @@ def last_date_of_weekday(year: int, month: int, weekday: int):
     Returns
     -------
     ``datetime.date``
-        The date object representing the last occurrence of the input weekday 
+        The date object representing the last occurrence of the input weekday
         in the input month and year
 
     Examples
@@ -79,10 +79,10 @@ def get_date(weekday: str, monthly: bool = False):
         or last week in the month.
 
         If True, the function will return the last date of the weekday in the current month
-        if it is not before today, otherwise it will return the last date of the weekday in 
+        if it is not before today, otherwise it will return the last date of the weekday in
         the next month.
 
-        If False, the function will return the date of the next occurrence of the weekday 
+        If False, the function will return the date of the next occurrence of the weekday
         from today.
 
     Returns
@@ -183,7 +183,7 @@ def get_expiry_dates(
 
 def validate_datetime_format(date_time: str) -> datetime:
     """
-    Validates given string is in a valid datetime format or not. Datetime must be in the 
+    Validates given string is in a valid datetime format or not. Datetime must be in the
     form of 'year-month-day hour:minute'.
 
     Parameters:

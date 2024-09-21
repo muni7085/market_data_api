@@ -16,7 +16,7 @@ class CandlestickInterval(Enum):
     Enumeration class representing possible candlestick intervals.
 
     Each member except the last one corresponds to a specific time interval
-    and its associated value which is a tuple of numerical value of interval 
+    and its associated value which is a tuple of numerical value of interval
     in minutes and max days possible per request. The last member corresponds
     to the possible input intervals given by the users
     """
@@ -64,15 +64,15 @@ class CandlestickInterval(Enum):
         normalized_interval = (
             interval.lower().replace(" ", "").replace("-", "").replace("_", "")
         )
-        
+
         # Remove last s in the interval if exist.
         if normalized_interval.endswith("s"):
             normalized_interval = normalized_interval[:-1]
-            
+
         for (
             possible_input_interval
         ) in CandlestickInterval.POSSIBLE_INPUT_INTERVALS.value:
             if normalized_interval in possible_input_interval:
                 return CandlestickInterval(possible_input_interval[3])
-            
+
         raise IntervalNotFoundException(interval)

@@ -45,10 +45,10 @@ class SmartAPIToken(SQLModel, table=True):  # type: ignore
     name: str
     instrument_type: str
     exchange: str
-    expiry_date: str|None = None
-    strike_price: float|None = None
-    lot_size: int|None = None
-    tick_size: float|None = None
+    expiry_date: str | None = None
+    strike_price: float | None = None
+    lot_size: int | None = None
+    tick_size: float | None = None
 
     def to_dict(self):
         """

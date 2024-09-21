@@ -55,7 +55,7 @@ def get_stock_io_data(
         change=change,
         percent_change=percent_change,
     )
-    
+
     return stock_input_data, expected_output_data
 
 

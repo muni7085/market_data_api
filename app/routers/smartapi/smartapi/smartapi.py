@@ -103,7 +103,7 @@ async def historical_stock_data(
 ):
     """
     Get the historical stock data for a given symbol. This endpoint provides
-    the historical candle data of the  given stock symbol and candlestick 
+    the historical candle data of the  given stock symbol and candlestick
     interval for a particular time period from an External API in realtime.
 
     Parameters:

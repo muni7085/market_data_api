@@ -77,7 +77,9 @@ def get_conditions_list(condition_attributes: dict[str, str]) -> list[BinaryExpr
             try:
                 conditions.append(getattr(SmartAPIToken, key) == value)
             except AttributeError:
-                logger.exception(f"Attribute {key} not found in SmartAPIToken model, skipping...")
+                logger.exception(
+                    "Attribute %s not found in SmartAPIToken model, skipping...", key
+                )
 
     return conditions
 

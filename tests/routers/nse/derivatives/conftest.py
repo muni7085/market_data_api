@@ -127,7 +127,6 @@ def get_option_chain_io():
     ]
 
 
-
 @pytest.fixture
 def get_option_io():
     return [

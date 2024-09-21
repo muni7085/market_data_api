@@ -50,7 +50,7 @@ async def nifty_index_stocks(
         eg: `NIFTY 50`, `NIFTY BANK`
     """
     index_url = f"{NIFTY_INDEX_BASE}{index_symbol}"
-    
+
     return get_nifty_index_stocks(index_url)
 
 
@@ -66,7 +66,7 @@ async def nse_index_data(index_symbol: Annotated[str, Path()]):
         eg: `NIFTY 50`
     """
     validate_index_symbol(index_symbol)
-    
+
     return get_index_data(index_symbol)
 
 

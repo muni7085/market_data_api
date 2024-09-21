@@ -17,7 +17,7 @@ def fetch_data(url: str, max_tries: int = 1000) -> Any:
     url: ``str``
         Url from nse to fetch the data
     max_tries: ``int`` (defaults = 1000)
-        Maximum number of times the request has to send to get response. Requests 
+        Maximum number of times the request has to send to get response. Requests
         are made until either get the status code `200` or exceed max_tries
 
     Raises:
@@ -48,7 +48,7 @@ def fetch_data(url: str, max_tries: int = 1000) -> Any:
                     status_code=404,
                     detail={"Error": "Resource not found or invalid Url"},
                 )
-                
+
         raise HTTPException(
             status_code=503,
             detail={"Error": "Service Unavailable"},
