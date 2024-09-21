@@ -1,9 +1,9 @@
+# pylint: disable=too-many-arguments
 """ 
 This module contains the SmartapiCredentials class to store the credentials
 required to authenticate the SmartAPI connection. 
 """
 
-# pylint: disable=too-many-arguments
 import os
 
 from app.utils.common.exceptions import CredentialsException
