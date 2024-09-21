@@ -52,8 +52,8 @@ async def option_chain_data(
 
     """
     validate_derivative_symbol_with_type(derivative_symbol, derivative_type)
-
     formatted_expiry_date, is_date_valid = validate_and_reformat_date(expiry_date)
+    
     if not is_date_valid:
         raise HTTPException(
             status_code=400,

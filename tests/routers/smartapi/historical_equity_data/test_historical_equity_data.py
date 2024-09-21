@@ -11,11 +11,11 @@ client = TestClient(router)
 
 
 def validate_endpoint_io(input_stock_data: dict[str, Any]):
-    """Validates data received from the historical stock data endpoint.
+    """
+    Validates data received from the historical stock data endpoint.
 
     The function takes input and expected output; it invokes the historical stock data endpoint
     with the input and then compares the endpoint's result to the provided output.
-
     """
     endpoint_url = (
         f"/smart-api/equity/history/{input_stock_data['input_stock_symbol']}?interval={input_stock_data['input_interval']}"
@@ -41,6 +41,7 @@ def validate_endpoint_io(input_stock_data: dict[str, Any]):
 
     else:
         validate_exception(endpoint_url, input_stock_data, client)
+        
     time.sleep(0.5)
 
 
@@ -53,7 +54,7 @@ def test_historical_stock_data_with_different_stock_symbols(
     Parameters:
     -----------
     stock_symbol_io: ``list[dict[str, Any]]``
-        Input stock data with different stock symbols.
+        Input stock data with different stock symbols
     """
 
     for stock_symbol_data in stock_symbol_io:
@@ -63,13 +64,14 @@ def test_historical_stock_data_with_different_stock_symbols(
 def test_historical_stock_data_with_different_intervals(
     candlestick_interval_io: list[dict[str, Any]]
 ):
-    """Tests the historical stock data endpoint with various possible candlestick intervals
+    """
+    Tests the historical stock data endpoint with various possible candlestick intervals
     that are either valid or invalid.
 
     Parameters:
     -----------
     candlestick_interval_io: ``list[dict[str, Any]]``
-        Input stock data with different candlestick intervals.
+        Input stock data with different candlestick intervals
     """
     for interval_data in candlestick_interval_io:
         validate_endpoint_io(interval_data)
@@ -78,25 +80,27 @@ def test_historical_stock_data_with_different_intervals(
 def test_historical_stock_data_with_datetime_formats(
     different_datetime_formats_io: list[dict[str, Any]]
 ):
-    """Tests the historical stock data endpoint with various possible datetime formats
+    """
+    Tests the historical stock data endpoint with various possible datetime formats
     that are either valid or invalid.
 
     Parameters:
     -----------
     different_datetime_formats_io: ``list[dict[str, Any]]``
-        Input stock data with different datetime formats.
+        Input stock data with different datetime formats
     """
     for datetime_format_data in different_datetime_formats_io:
         validate_endpoint_io(datetime_format_data)
 
 
 def test_historical_stock_data_on_holidays(holiday_dates_io: list[dict[str, Any]]):
-    """Tests the historical stock data endpoint on market holidays.
+    """
+    Tests the historical stock data endpoint on market holidays.
 
     Parameters:
     -----------
     holiday_dates_io: ``list[dict[str, Any]]``
-        Input stock data on market holidays.
+        Input stock data on market holidays
     """
     for holiday_date_data in holiday_dates_io:
         validate_endpoint_io(holiday_date_data)
@@ -105,12 +109,13 @@ def test_historical_stock_data_on_holidays(holiday_dates_io: list[dict[str, Any]
 def test_historical_stock_data_on_data_unavailable_dates(
     data_unavailable_dates_io: list[dict[str, Any]]
 ):
-    """Tests the historical stock data endpoint on data unavailable time periods or dates.
+    """
+    Tests the historical stock data endpoint on data unavailable time periods or dates.
 
     Parameters:
     -----------
     data_unavailable_dates_io: ``list[dict[str, Any]]``
-        Input stock data on data unavailable time periods.
+        Input stock data on data unavailable time periods
     """
     for data_unavailable_date_data in data_unavailable_dates_io:
         validate_endpoint_io(data_unavailable_date_data)
@@ -119,23 +124,25 @@ def test_historical_stock_data_on_data_unavailable_dates(
 def test_historical_stock_data_invalid_trading_time(
     invalid_trading_time_io: dict[str, Any]
 ):
-    """Tests the historical stock data endpoint with invalid trading time.
+    """
+    Tests the historical stock data endpoint with invalid trading time.
 
     Parameters:
     -----------
     invalid_trading_time_io: ``dict[str, Any]``
-        Input stock data with invalid trading time.
+        Input stock data with invalid trading time
     """
     validate_endpoint_io(invalid_trading_time_io)
 
 
 def test_historical_stock_data_invalid_date_range(date_range_io: dict[str, Any]):
-    """Tests the historical stock data endpoint with invalid date range where date range can exceeds
-    maximum or minimum limit per request.
+    """
+    Tests the historical stock data endpoint with invalid date range where date range 
+    can exceeds maximum or minimum limit per request.
 
     Parameters:
     -----------
     date_range_io: ``dict[str, Any]``
-        Input stock data with invalid date range.
+        Input stock data with invalid date range
     """
     validate_endpoint_io(date_range_io)

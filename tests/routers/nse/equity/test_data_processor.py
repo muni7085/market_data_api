@@ -18,24 +18,24 @@ def get_stock_io_data(
     Parameters:
     -----------
     symbol: ``str``
-        The stock symbol.
+        The stock symbol
     last_traded_price:``float``
-        The last traded price of the stock.
+        The last traded price of the stock
     day_open:``float``
-        The opening price of the stock for the day.
+        The opening price of the stock for the day
     day_low:``float``
-        The lowest price of the stock for the day.
+        The lowest price of the stock for the day
     day_high:``float``
-        The highest price of the stock for the day.
+        The highest price of the stock for the day
     change:``float``
-        The change in the stock price.
+        The change in the stock price
     percent_change:``float``
-        The percentage change in the stock price.
+        The percentage change in the stock price
 
     Returns:
     --------
     ``tuple``
-        A tuple containing the input data and expected output data for the stock.
+        A tuple containing the input data and expected output data for the stock
     """
     stock_input_data = {
         "symbol": symbol,
@@ -55,6 +55,7 @@ def get_stock_io_data(
         change=change,
         percent_change=percent_change,
     )
+    
     return stock_input_data, expected_output_data
 
 

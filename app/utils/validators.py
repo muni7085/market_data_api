@@ -1,6 +1,6 @@
 import re
 from datetime import datetime
-from typing import Annotated, Tuple
+from typing import Annotated
 
 from fastapi import HTTPException, Path
 
@@ -65,6 +65,7 @@ def validate_index_symbol(index_symbol: Annotated[str, Path()]) -> str:
     """
     symbols: dict[str, str] = get_symbols(NSE_INDEX_SYMBOLS)
     index_symbol = index_symbol.upper()
+    
     if index_symbol not in symbols:
         raise HTTPException(
             status_code=404,
@@ -137,10 +138,11 @@ def get_date_format(date: str) -> str:
     """
     date_separator = "/" if len(date.split("/")) > 1 else "-"
     month_format = "%b" if re.search("[a-zA-Z]+", date) else "%m"
+    
     return f"%d{date_separator}{month_format}{date_separator}%Y"
 
 
-def validate_and_reformat_date(data: str) -> Tuple[str, bool]:
+def validate_and_reformat_date(data: str) -> tuple[str, bool]:
     """
     Validate the given expiry date to ensure that the given date is in "dd-MM-yyyy" format.
 
@@ -151,7 +153,7 @@ def validate_and_reformat_date(data: str) -> Tuple[str, bool]:
 
     Return:
     -------
-    ``Tuple[str,bool]``
+    ``tuple[str,bool]``
         Reformated expiry date is date is valid else input date and validation status of expiry date.
     """
     required_date_format = "%d-%b-%Y"

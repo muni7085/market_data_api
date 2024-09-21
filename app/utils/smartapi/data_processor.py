@@ -1,11 +1,11 @@
 from datetime import datetime, time
 from itertools import chain
-from typing import Any, Dict, List
 
+from typing import Any
 import numpy as np
 import pandas as pd
 
-from app.database.sqlite.models.smartapi_models import SmartAPIToken
+from app.data_layer.database.sqlite.models.smartapi_models import SmartAPIToken
 from app.schemas.stock_model import (
     HistoricalStockDataBundle,
     HistoricalStockPriceInfo,
@@ -16,14 +16,14 @@ from app.utils.smartapi.validator import check_data_availability, find_open_mark
 
 
 def process_smart_api_stock_data(
-    stock_price_data: Dict[str, Any]
+    stock_price_data: dict[str, Any]
 ) -> SmartAPIStockPriceInfo:
     """
     Processes the data from the SmartAPI and returns the processed data.
 
     Parameters:
     -----------
-    stock_price_data: ``Dict[str, Any]``
+    stock_price_data: ``dict[str, Any]``
         The data from the SmartAPI to be processed.
 
     Returns:
@@ -50,8 +50,8 @@ def process_smart_api_stock_data(
 
 
 def process_available_stock_data(
-    historical_stock_data: tuple[List[List[Any]], str, str],
-) -> List[HistoricalStockPriceInfo]:
+    historical_stock_data: tuple[list[list[Any]], str],
+) -> list[HistoricalStockPriceInfo]:
     """Processes the available data from the SmartAPI and returns the processed data.
 
     Parameters:
@@ -61,7 +61,7 @@ def process_available_stock_data(
 
     Return:
     -------
-    ``List[HistoricalStockPriceInfo]``
+    ``list[HistoricalStockPriceInfo]``
         Processed data as a HistoricalStockPriceInfo object.
     """
     return [
@@ -85,28 +85,31 @@ def get_possible_timestamps_on_date(
     start_datetime: datetime,
     end_datetime: datetime,
     interval: CandlestickInterval,
-) -> List[str]:
-    """Finds the list of all possible timestamps of given interval for the given current date from start time
-    which is either 9:15 or time in given start_datetime to end time which is either 15:29 or time in given end_datetime.
+) -> list[str]:
+    """
+    Finds the list of all possible timestamps of given interval for the given current 
+    date from start time which is either 9:15 or time in given start_datetime to end 
+    time which is either 15:29 or time in given end_datetime.
 
     Parameters:
     -----------
     current_date: ``datetime``
-        The date for which to find the range of timestamps.
+        The date for which to find the range of timestamps
     start_datetime: ``str``
-        The initial datetime from which historical stock data should be retrieved.
+        The initial datetime from which historical stock data should be retrieved
     end_datetime: ``str``
-        The final datetime up to which historical stock data should be retrieved.
+        The final datetime up to which historical stock data should be retrieved
     interval: ``CandlestickInterval``
         The interval of the candlestick
 
     Return:
     -------
-    ``List[str]``
-        The possible timestamps for given current date.
+    ``list[str]``
+        The possible timestamps for given current date
     """
     if interval.name == "ONE_DAY":
         return [f"{current_date.strftime('%Y-%m-%d')}T00:00:00+05:30"]
+    
     start_time = time(9, 15)
     end_time = time(15, 29)
 
@@ -131,17 +134,17 @@ def get_possible_timestamps_on_date(
 
 
 def get_missing_timestamps(
-    historical_stock_data: List[List[str]],
+    historical_stock_data: list[list[str]],
     stock_symbol: str,
     interval: CandlestickInterval,
     start_datetime: datetime,
     end_datetime: datetime,
-) -> List[str]:
+) -> list[str]:
     """Finds the missing timestamps of given candlestick interval in the historical stock data
     of a stock between start_datetime and end_datetime.
     Parameters:
     -----------
-    historical_stock_data: ``List[List[str]]``
+    historical_stock_data: ``list[list[str]]``
         Available historical stock data points.
     stock_symbol: ``str``
         The symbol of the stock.
@@ -154,8 +157,8 @@ def get_missing_timestamps(
 
     Return:
     -------
-    ``List[str]``
-        List of missing timestamps in given historical stock data.
+    ``list[str]``
+        list of missing timestamps in given historical stock data.
     """
     available_timestamps = pd.DataFrame(historical_stock_data)[0]
     all_possible_timestamps = []
@@ -181,11 +184,12 @@ def get_missing_timestamps(
         ).tolist()
     except Exception as e:
         print(e)
+        
     return missing_timestamps
 
 
 def process_smart_api_historical_stock_data(
-    historical_stock_data: List[List[Any]],
+    historical_stock_data: list[list[Any]],
     stock_symbol: str,
     interval: CandlestickInterval,
     start_datetime: datetime,
@@ -196,7 +200,7 @@ def process_smart_api_historical_stock_data(
 
     Parameters:
     -----------
-    historical_stock_data: ``List[List[Any]]``
+    historical_stock_data: ``list[list[Any]]``
         Available historical stock data points.
     stock_symbol: ``str``
         The symbol of the stock.
@@ -228,26 +232,53 @@ def process_smart_api_historical_stock_data(
         missing_timestamps=missing_timestamps,
     )
 
+def determine_instrument_type(row: dict[str, str]) -> str:
+    """
+    Determine the instrument type based on the given row data.
+    This function first checks if an instrument type is already provided.
+    If not, it infers the type from the symbol using specific rules
 
-def process_token_data(tokens_data: List[Dict[str, str]]) -> List[SmartAPIToken]:
+    Parameters:
+    -----------
+    row: ``dict[str, str]``
+        The row data from which to determine the instrument type
+    
+    Returns:
+    --------
+    ``str``
+        The instrument type determined from the given row data
+    """
+    if row['instrumenttype']:
+        return row['instrumenttype']
+    
+    symbol = row['symbol']
+    
+    if symbol[0].isdigit():
+        return 'unk'
+    
+    return symbol.split('-')[1] if '-' in symbol else 'EQ'
+
+
+def process_token_data(tokens_data: list[dict[str, str]]) -> list[SmartAPIToken]:
     """
     Processes the token data from the SmartAPI and returns the processed data.
 
     Parameters:
     -----------
-    tokens_data: ``List[Dict[str, Any]]``
+    tokens_data: ``list[dict[str, Any]]``
         This tokens data contain the `token`, `symbol`, `name`, `expiry`, `strike`, `lotsize`, `instrumenttype`, `exch_seg` and
         `tick_size` for each of the token in the list.
 
     Returns:
     --------
-    ``Dict[str, int]``
+    ``dict[str, int]``
         The processed data from the SmartAPI as a dictionary.
     """
     df = pd.DataFrame(tokens_data)
-    df = df[~df["exch_seg"].isin(["CDS", "MCX", "NCDEX", "BFO"])]
-    df = df[~df["name"].str.match(r"^\d")]
-    df.drop_duplicates(subset=["symbol"], keep="first", inplace=True)
+    df = df[~df["symbol"].str.match(r"^\d")]
+    df = df.drop_duplicates(subset=["token"])
+    df['instrumenttype'] = df.apply(determine_instrument_type, axis=1)
+    df['symbol']=df['symbol'].apply(lambda x: x.split('-')[0])
     tokens_dict_data = df.to_dict("records")
 
     return [
@@ -255,12 +286,12 @@ def process_token_data(tokens_data: List[Dict[str, str]]) -> List[SmartAPIToken]
             token=token["token"],
             symbol=token["symbol"],
             name=token["name"],
-            expiry=token["expiry"],
-            strike=token["strike"],
+            expiry_date=token["expiry"],
+            strike_price=token["strike"],
             lot_size=token["lotsize"],
             instrument_type=token["instrumenttype"],
-            exch_seg=token["exch_seg"],
-            tick_size=token["tick_size"],
+            exchange=token["exch_seg"],
+            tick_size=token["tick_size"]
         )
         for token in tokens_dict_data
     ]

@@ -17,7 +17,8 @@ class StockPriceInfo(BaseModel):
 
 class HistoricalStockPriceInfo(BaseModel):
     """
-    HistoricalStockPriceInfo model represents the historical stock price information of a stock at a given time
+    HistoricalStockPriceInfo model represents the historical stock price 
+    information of a stock at a given time
     """
 
     timestamp: str
@@ -32,7 +33,7 @@ class HistoricalStockPriceInfo(BaseModel):
 
 class SmartAPIStockPriceInfo(StockPriceInfo):
     """
-    SmartAPIStockPriceInfo model represents the stock price information of a stock.
+    SmartAPIStockPriceInfo model represents the stock price information of a stock
     """
 
     symbol_token: str
@@ -41,8 +42,8 @@ class SmartAPIStockPriceInfo(StockPriceInfo):
 
 class HistoricalStockDataBundle(BaseModel):
     """
-    HistoricalStockDataBundle model represents the available historical stock price information
-    and timestamps of missing data points of a stock at a given time .
+    HistoricalStockDataBundle model represents the available historical stock price
+    information and timestamps of missing data points of a stock at a given time
     """
 
     available_stock_data: list[HistoricalStockPriceInfo]

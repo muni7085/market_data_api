@@ -36,6 +36,5 @@ def test_latest_price_quotes(stock_symbol_io):
                 == stock_symbol_data["symbol_token"]
             )
             assert smart_api_stock_price_info.symbol == stock_symbol_data["symbol"]
-
         else:
             validate_exception(endpoint_url, stock_symbol_data, client)

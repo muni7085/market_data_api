@@ -1,5 +1,6 @@
 """ 
-This module contains the SmartapiCredentials class to store the credentials required to authenticate the SmartAPI connection. 
+This module contains the SmartapiCredentials class to store the credentials
+required to authenticate the SmartAPI connection. 
 """
 
 # pylint: disable=too-many-arguments
@@ -19,16 +20,15 @@ class SmartapiCredentials(Credentials):
     Attributes:
     -----------
     api_key: ``str``
-        The API key that is generated from the SmartAPI website.
+        The API key that is generated from the SmartAPI website
     client_id: ``str``
-        The client id is the Angel Broking client id.
+        The client id is the Angel Broking client id
     pwd: ``str``
-        The password is the Angel Broking login password or pin.
+        The password is the Angel Broking login password or pin
     token: ``str``
-        The token is the client secret token generated from the SmartAPI website.
+        The token is the client secret token generated from the SmartAPI website
     correlation_id: ``str``
-        The correlation id is the unique id to identify the request.
-
+        The correlation id is the unique id to identify the request
     """
 
     def __init__(
@@ -49,12 +49,12 @@ class SmartapiCredentials(Credentials):
         Raises:
         -------
         ``CredentialsException``
-            If the credentials file path is not set in the environment variable.
+            If the credentials file path is not set in the environment variable
 
         Returns:
         --------
         ``Credentials``
-            The credentials object with the API key, client id, password, token and correlation id.
+            The credentials object with the API key, client id, password, token and correlation id
         """
         credentials_path = os.environ.get(SMART_API_CREDENTIALS)
 

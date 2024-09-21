@@ -21,8 +21,8 @@ router = APIRouter(prefix="/nse/equity", tags=["equity"])
 )
 async def get_stock_data(stock_symbol: Annotated[str, Path()]):
     """
-    Get the stock data for a given symbol.
-    This endpoint provides the latest trade information for the stock symbol from an external API.
+    Get the stock data for a given symbol. This endpoint provides
+    the latest trade information for the stock symbol from an external API.
 
     Parameters:
     -----------
@@ -46,11 +46,11 @@ async def nifty_index_stocks(
     Parameters:
     -----------
     - **index_symbol**:
-        It must be a valid index symbol that is registered in the NSE website.
+        It must be a valid index symbol that is registered in the NSE website
         eg: `NIFTY 50`, `NIFTY BANK`
     """
-
     index_url = f"{NIFTY_INDEX_BASE}{index_symbol}"
+    
     return get_nifty_index_stocks(index_url)
 
 
@@ -62,10 +62,11 @@ async def nse_index_data(index_symbol: Annotated[str, Path()]):
     Parameters:
     -----------
      - **index_symbol**:
-        It must be a valid index symbol that is registered in the NSE website.
+        It must be a valid index symbol that is registered in the NSE website
         eg: `NIFTY 50`
     """
     validate_index_symbol(index_symbol)
+    
     return get_index_data(index_symbol)
 
 
@@ -77,7 +78,7 @@ async def stock_listing_date_nse(stock_symbol: Annotated[str, Path()]):
     Parameters:
     -----------
     - **stock_symbol**:
-        It must be a valid stock symbol that is registered in the NSE website.
+        It must be a valid stock symbol that is registered in the NSE website
         eg: `tcs` or `TCS`
     """
     formatted_stock_symbol = validate_and_format_stock_symbol(stock_symbol)
