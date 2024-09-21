@@ -23,9 +23,7 @@ jobs:
         with:
           python-version: "3.12.3"
       - name: install dependencies
-        run: |
-         pip install --upgrade pip
-         pip install black isort mypy pylint
+        run: pip install black isort mypy pylint
       - name: black check
         run: black --diff --check $(git ls-files '*.py')
       - name: isort check
