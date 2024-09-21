@@ -19,6 +19,45 @@ logger = get_logger(Path(__file__).name, logging.DEBUG)
 
 
 class SmartSocket(MarketDatasetTwistedSocket):
+    """
+    SmartSocket is a class that connects to the SmartAPI WebSocket server and subscribes
+    to the specified tokens. It receives the data for the subscribed tokens and parses 
+    the data to extract the required information for the subscribed tokens. The parsed 
+    data is then sent to the callback function for further processing or saving.
+
+    Attributes
+    ----------
+    WEBSOCKET_URL: ``str``
+        The URL of the SmartAPI WebSocket server
+    LITTLE_ENDIAN_BYTE_ORDER: ``str``
+        The byte order for the binary data received from the WebSocket server
+    TOKEN_MAP: ``Dict[str, Tuple[str, ExchangeType]]``
+        A dictionary that maps the token to the name and exchange type of the token
+    auth_token: ``str``
+        The authorization token for the SmartAPI WebSocket server
+    api_key: ``str``
+        The API key for the SmartAPI WebSocket server connection
+    client_code: ``str``
+        The client code is the angel broking client id which is used to
+        login to the angel broking account
+    feed_token: ``str``
+        The feed token is used to authenticate the user to the SmartAPI WebSocket server
+    correlation_id: ``str``
+        The correlation id is used to uniquely identify the WebSocket connection which
+        is useful for debugging and logging purposes in multi-connection scenarios
+    subscription_mode: ``SubscriptionMode``
+        The subscription mode is used to specify the type of data to receive from 
+        the WebSocket server. The subscription mode can be either "quote", "snap_quote",
+        or "full"
+    on_data_save_callback: ``Callable[[str], None]``, ( default = None )
+        The callback function that is called when the data is received from the 
+        WebSocket server
+    debug: ``bool``, ( default = False )
+        A flag to enable or disable the debug mode for the WebSocket connection. 
+        Enable this flag in development mode to get detailed logs for debugging 
+        purposes
+    """
+
     WEBSOCKET_URL = "wss://smartapisocket.angelone.in/smart-stream"
     LITTLE_ENDIAN_BYTE_ORDER = "<"
     TOKEN_MAP = {}
@@ -53,8 +92,9 @@ class SmartSocket(MarketDatasetTwistedSocket):
         super().__init__(debug=debug)
 
     def sanity_check(self):
-        """ 
-        Check if the headers are set correctly and raise an exception if any of the headers are empty
+        """
+        Check if the headers are set correctly and raise an exception if 
+        any of the headers are empty
         """
         for key, value in self.headers.items():
             assert value, f"{key} is empty"
@@ -87,12 +127,13 @@ class SmartSocket(MarketDatasetTwistedSocket):
             self.TOKEN_MAP.update(
                 {k: (v, exchange_type) for k, v in token["tokens"].items()}
             )
-            
+
     def subscribe(self, tokens: List[Dict[str, int | List[str]]]):
         """
         Subscribe to the specified tokens on the WebSocket connection.
-        After subscribing, the WebSocket connection will receive data for the specified tokens.
-        Based on the subscription mode, the received data will be different.
+        After subscribing, the WebSocket connection will receive data 
+        for the specified tokens. Based on the subscription mode, the
+        received data will be different.
         Ref: https://smartapi.angelbroking.com/docs/WebSocket2
 
         Parameters
@@ -128,8 +169,9 @@ class SmartSocket(MarketDatasetTwistedSocket):
     def unsubscribe(self, tokens=None):
         """
         Unsubscribe from the specified tokens on the WebSocket connection.
-        After unsubscribing, the WebSocket connection will no longer receive data for the specified tokens.
-        
+        After unsubscribing, the WebSocket connection will no longer receive
+        data for the specified tokens.
+
         Parameters
         ----------
         tokens: ``List[str]``
@@ -181,7 +223,8 @@ class SmartSocket(MarketDatasetTwistedSocket):
 
     def decode_data(self, binary_data):
         """
-        Parses binary data received from the websocket and returns a dictionary containing the parsed data.
+        Parses binary data received from the websocket and returns a dictionary 
+        containing the parsed data.
 
         Parameters
         -----------
@@ -269,9 +312,9 @@ class SmartSocket(MarketDatasetTwistedSocket):
         """
         Process incoming WebSocket messages and prepare data for callback.
 
-        This method is called whenever a message is received on the WebSocket connection.
-        It decodes the payload, enriches the data with additional information, and triggers
-        the data save callback if one is set
+        This method is called whenever a message is received on the WebSocket
+        connection. It decodes the payload, enriches the data with additional 
+        information, and triggers the data save callback if one is set
 
         Parameters
         ----------
@@ -299,7 +342,6 @@ class SmartSocket(MarketDatasetTwistedSocket):
         feed_token = smartapi_connection.api.getfeedToken()
         api_key = smartapi_connection.credentials.api_key
         client_code = smartapi_connection.credentials.client_id
-        print(cfg)
 
         return SmartSocket(
             auth_token,

@@ -105,7 +105,7 @@ class SmartSocketConnection(WebsocketConnection):
             )
 
         return valid_symbol_tokens
-
+    
     def get_tokens(self, cfg: DictConfig) -> dict[str, str] | None:
         """
         This is base method to get the tokens for the connection. Currently, it
