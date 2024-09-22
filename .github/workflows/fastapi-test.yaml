@@ -2,7 +2,9 @@
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
 name: Quality Checks
- 
+env:
+  PYTHON_VERSION: 3.12.3
+  POETRY_VERSION: 1.8.2
 on:
   pull_request:
     branches: [ "master" ]
@@ -16,16 +18,23 @@ jobs:
   static:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.12.3
-        uses: actions/setup-python@v3
+
+      - name: Install miniconda and create environment
+        uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: "3.12.3"
-      - name: install dependencies
+          python-version: ${{ env.PYTHON_VERSION }}
+          activate-environment: app
+
+      # Install poetry and all the packages in pyproject.toml file
+      - name: Install poetry and dependencies
         run: |
-         pip install --upgrade pip
-         pip install black isort mypy pylint
+          curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
+          poetry install
       - name: black check
         run: black --diff --check $(git ls-files '*.py')
       - name: isort check
@@ -62,15 +71,15 @@ jobs:
       - name: Install miniconda and create environment
         uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: "3.12.3"
+          python-version: ${{ env.PYTHON_VERSION }}
           activate-environment: ${{ env.APP }}
 
       # Install poetry and all the packages in pyproject.toml file
       - name: Install poetry and dependencies
         run: |
-          curl -sSL https://install.python-poetry.org | python3 - --version 1.8.2 -y
+          curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
           poetry install
   
       - name: testing
-        run: pytest . -vv
+        run: pytest . -vvv
     

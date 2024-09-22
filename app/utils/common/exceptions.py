@@ -29,8 +29,8 @@ class CredentialsException(HTTPException):
 
 class UnkownException(HTTPException):
     """
-    UnkownException is raised when an unknown exception occurs.
-    This class can be used to raise exceptions that are not handled by the application.
+    UnkownException is raised when an unknown exception occurs. This class can be used to
+    raise exceptions that are not handled by the application.
     """
 
     def __init__(self, error_message: str, status_code: int):
@@ -70,7 +70,8 @@ class InvalidDateTimeFormatException(HTTPException):
 
 class InvalidDateRangeBoundsException(HTTPException):
     """
-    InvalidDateRangeBoundsException is raised when the given datetime range is invalid for given interval.
+    InvalidDateRangeBoundsException is raised when the given datetime range is invalid
+    for given interval.
     """
 
     def __init__(self, start_date: str, end_date: str, max_days: int, interval: str):
@@ -85,7 +86,8 @@ class InvalidDateRangeBoundsException(HTTPException):
 
 class InvalidTradingHoursException(HTTPException):
     """
-    InvalidTradingHoursException is raised for errors in the time accessed outside trading hours of stock market.
+    InvalidTradingHoursException is raised for errors in the time accessed outside
+    trading hours of stock market.
     """
 
     def __init__(self):
@@ -125,9 +127,9 @@ class DataUnavailableException(HTTPException):
         Parameters:
         -----------
         stock_symbol: ``str``
-            The symbol of the stock.
+            The symbol of the stock
         start_date: ``datetime``
-            The date from where available of data starts.
+            The date from where available of data starts
 
         Return:
         -------

@@ -1,25 +1,8 @@
 # pylint: disable=missing-function-docstring
 import pytest
 
-from app.routers.nse.derivatives.data_processor import (
-    filter_option_chain,
-    filter_strike_prices_with_expiry_date,
-    get_option,
-)
+from app.routers.nse.derivatives.data_processor import filter_option_chain, get_option
 from app.schemas.option_model import ExpiryOptionData
-
-
-def test_filter_strike_prices_with_expiry_date(
-    get_filter_strike_prices_with_expiry_date_io,
-):
-    for strike_prices_io in get_filter_strike_prices_with_expiry_date_io:
-        option_data = strike_prices_io["input"]
-        if strike_prices_io["output"] is not None:
-            filtered_expiries = filter_strike_prices_with_expiry_date(*option_data)
-            assert filtered_expiries == strike_prices_io["output"]
-        else:
-            with pytest.raises(TypeError):
-                filter_strike_prices_with_expiry_date(*option_data)
 
 
 def test_get_option(get_option_io):

@@ -26,5 +26,6 @@ def validate_exception(
     except HTTPException as http_exc:
         # Check if the status code of the exception matches the expected error status code
         assert http_exc.status_code == expected_error["status_code"]
+
         # Check if the detail message of the exception matches the expected error detail
         assert http_exc.detail == expected_error["error"]

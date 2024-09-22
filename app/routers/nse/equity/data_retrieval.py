@@ -19,15 +19,15 @@ def get_nifty_index_stocks(url: str, max_tries: int = 1000) -> list[StockPriceIn
     Parameters:
     -----------
     url: ``str``
-        Url for fetching the nse index stocks data.
-    max_tries: ``int`` (defaults = 1000)
-        Maximum number of times the request has to send to get response.
-        Requests are made until either get the status code `200` or exceed max_tries.
+        Url for fetching the nse index stocks data
+    max_tries: ``int``, (defaults = 1000)
+        Maximum number of times the request has to send to get response. Requests
+        are made until either get the status code `200` or exceed max_tries
 
     Return:
     -------
     ``list[StockData]``
-        List of StockData models that contain the price information about the stocks.
+        List of StockData models that contain the price information about the stocks
     """
     if url == "":
         raise ValueError("Url can't be empty")
@@ -50,8 +50,8 @@ def get_stock_url(stock_symbol: str) -> str:
     Parameters:
     -----------
     stock_symbol: ``str``
-        Nse stock symbol, can be obtained from the nse official website.
-            eg: "SBIN","TCS" etc.
+        Nse stock symbol, can be obtained from the nse official website
+        eg: "SBIN","TCS" etc.
 
     Raises:
     ------
@@ -74,18 +74,18 @@ def get_stock_url(stock_symbol: str) -> str:
 
 def get_stock_trade_info(symbol: str) -> StockPriceInfo:
     """
-    Provide the price information about given stock symbol.
+    Provide the price information about given stock symbol
 
     Parameters:
     -----------
     symbol: ``str``
-        Nse stock symbol, can be obtained from the nse official website.
-            eg: "SBIN","TCS" etc.
+        Nse stock symbol, can be obtained from the nse official website
+        eg: "SBIN","TCS" etc.
 
     Return:
     -------
     ``StockData``
-        StockData model contain the information about the stock.
+        StockData model contain the information about the stock
     """
     stock_url = get_stock_url(symbol)
     stock_data = fetch_data(stock_url)
@@ -109,12 +109,12 @@ def get_stock_listing_date(stock_symbol: str) -> str:
     -----------
     stock_symbol: ``str``
         Nse index symbol, can be obtained from the nse official website
-            eg: "NIFTY 50","NIFTY NEXT 50" etc.
+        eg: "NIFTY 50","NIFTY NEXT 50" etc.
 
     Returns:
     --------
     listing_date: ``str``
-        Listing date of the given stock symbol.
+        Listing date of the given stock symbol
 
     """
     stock_url = get_stock_url(stock_symbol)
@@ -139,7 +139,7 @@ def get_index_data(symbol: str) -> StockPriceInfo:
     -----------
     symbol: ``str``
         Nse index symbol, can be obtained from the nse official website
-            eg: "NIFTY 50","NIFTY NEXT 50" etc.
+        eg: "NIFTY 50","NIFTY NEXT 50" etc.
 
     Return:
     -------

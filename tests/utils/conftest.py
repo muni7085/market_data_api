@@ -11,7 +11,7 @@ def valid_datetime_formats_io() -> list[tuple[str, datetime]]:
     Return:
     -------
     ``list[tuple[str, datetime]]``
-        List of valid datetime format of input string and their expected datetime object.
+        List of valid datetime format of input string and their expected datetime object
     """
     return [
         ("2024-04-30 21:10", datetime(2024, 4, 30, 21, 10)),
@@ -29,7 +29,7 @@ def invalid_datetime_formats_io() -> list[str]:
     Return:
     -------
     ``list[str]``
-        List of invalid datetime format of input strings.
+        List of invalid datetime format of input strings
     """
     return [
         "30-04-2024 21:10",
@@ -50,7 +50,7 @@ def invalid_datetime_value_io() -> list[str]:
     Return:
     -------
     ``list[str]``
-        List of invalid datetime value of input string.
+        List of invalid datetime value of input string
     """
     return [
         "2024-04-31 21:10",  # Invalid day

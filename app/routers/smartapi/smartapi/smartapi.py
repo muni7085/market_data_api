@@ -21,13 +21,13 @@ router = APIRouter(prefix="/smart-api/equity", tags=["equity"])
 @router.get("/price/{stock_symbol}", response_model=SmartAPIStockPriceInfo)
 async def latest_price_quote(stock_symbol: Annotated[str, Path()]):
     """
-    Get the stock data for a given symbol.
-    This endpoint provides the latest trade information for the stock symbol from an External API in realtime.
+    Get the stock data for a given symbol. This endpoint provides the latest
+    trade information for the stock symbol from an External API in realtime.
 
     Parameters:
     -----------
     - **stock_symbol**:
-        It must be a valid stock symbol that is registered in the NSE website.
+        It must be a valid stock symbol that is registered in the NSE website
         eg: `TCS`, `RELIANCE`
 
     """
@@ -102,14 +102,14 @@ async def historical_stock_data(
     end_date: Annotated[str, Query(example="2023-09-09 12:00")],
 ):
     """
-    Get the historical stock data for a given symbol.
-    This endpoint provides the historical candle data of the  given stock symbol and candlestick interval for
-    a particular time period from an External API in realtime.
+    Get the historical stock data for a given symbol. This endpoint provides
+    the historical candle data of the  given stock symbol and candlestick
+    interval for a particular time period from an External API in realtime.
 
     Parameters:
     -----------
     - **stock_symbol**:
-        It must be a valid stock symbol that is registered in the NSE website.
+        It must be a valid stock symbol that is registered in the NSE website
         eg: `TCS`, `RELIANCE`
 
     """

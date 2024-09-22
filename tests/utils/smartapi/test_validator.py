@@ -55,8 +55,8 @@ def test_open_market_days_only_weekends_and_holidays():
 def test_open_market_days_edge_cases():
     """
     Test open_market_days function for edge cases like:
-    - Start date is after the end date.
-    - Start date and end date are the same and it's a holiday.
+    - Start date is after the end date
+    - Start date and end date are the same and it's a holiday
     - Start date and end date are the same and it's not a holiday
     """
     # Start date is after the end date
@@ -112,8 +112,10 @@ def test_end_date_before_data_availability_start_date():
     stock_symbol = "APLAPOLLO"
     interval = CandlestickInterval.TEN_MINUTE
     data_start_date = "2016-10-03"
+
     with pytest.raises(DataUnavailableException) as excinfo:
         check_data_availability(start_datetime, end_datetime, stock_symbol, interval)
+
     assert excinfo.value.status_code == 404
     assert (
         "Data for the provided dates is unavailable; please use a date range "
@@ -130,8 +132,10 @@ def test_data_unavailable_for_stock():
     end_datetime = datetime(2020, 1, 1)
     stock_symbol = "DOMS"
     interval = CandlestickInterval.ONE_DAY
+
     with pytest.raises(DataUnavailableException) as excinfo:
         check_data_availability(start_datetime, end_datetime, stock_symbol, interval)
+
     assert excinfo.value.status_code == 404
     assert f"No data available for this stock {stock_symbol}" in str(
         excinfo.value.detail
@@ -149,6 +153,7 @@ def test_validate_dates_valid():
     start_datetime, end_datetime = validate_dates(
         from_date, to_date, interval, stock_symbol
     )
+
     assert start_datetime == datetime(2024, 1, 2, 9, 30)
     assert end_datetime == datetime(2024, 1, 3, 15, 0)
 
@@ -162,8 +167,10 @@ def test_validate_dates_invalid_date_range_bounds():
     to_date = "2024-03-10 15:00"  # Exceeds the allowed range for ONE_MINUTE interval
     interval = CandlestickInterval.ONE_MINUTE
     stock_symbol = "ACC"
+
     with pytest.raises(InvalidDateRangeBoundsException) as excinfo:
         validate_dates(from_date, to_date, interval, stock_symbol)
+
     assert excinfo.value.status_code == 416
     assert (
         f"The date range from {from_date} to {to_date} is invalid. Please ensure that the end date is greater than or "
@@ -180,9 +187,11 @@ def test_validate_dates_all_days_holidays():
     to_date = "2024-01-28 15:00"
     interval = CandlestickInterval.ONE_MINUTE
     stock_symbol = "ABB"
+
     # All days are holidays
     with pytest.raises(AllDaysHolidayException) as excinfo:
         validate_dates(from_date, to_date, interval, stock_symbol)
+
     assert excinfo.value.status_code == 400
     assert f"All days from {from_date} to {to_date} are market holidays."
 
@@ -196,8 +205,10 @@ def test_validate_dates_invalid_trading_hours():
     to_date = "2024-01-02 9:00"
     interval = CandlestickInterval.ONE_MINUTE
     stock_symbol = "TCS"
+
     with pytest.raises(InvalidTradingHoursException) as excinfo:
         validate_dates(from_date, to_date, interval, stock_symbol)
+
     assert excinfo.value.status_code == 400
     assert (
         "Attempted to access trading system outside of trading hours."

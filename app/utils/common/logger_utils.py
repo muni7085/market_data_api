@@ -1,8 +1,9 @@
 """
 This module provides utility functions for logging.
 
-This module contains a function `get_logger` that returns a logger object configured with a stream handler and a file handler.
-The logger can be used to log messages with different log levels.
+This module contains a function `get_logger` that returns a logger
+object configured with a stream handler and a file handler. The logger
+can be used to log messages with different log levels.
 
 Example usage:
     logger = get_logger(__name__)
@@ -20,12 +21,12 @@ def get_logger(name: str) -> logging.Logger:
     Parameters
     ----------
     name: ``str``
-        The name of the logger, this is usually the name of the module.
+        The name of the logger, this is usually the name of the module
 
     Returns
     -------
     logger: ``Logger``
-        The logger object configured with a stream handler and a file handler.
+        The logger object configured with a stream handler and a file handler
 
     """
     logger = logging.getLogger(name)

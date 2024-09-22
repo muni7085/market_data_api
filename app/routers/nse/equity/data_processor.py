@@ -16,7 +16,7 @@ def filter_nifty_stocks(stocks_data: list[dict[str, Any]]) -> list[StockPriceInf
     Return:
     -------
     ``list[StockData]``
-        List of StockData models that contain the price information about the stocks.
+        List of StockData models that contain the price information about the stocks
     """
     if len(stocks_data) == 0:
         raise ValueError("Stocks data is empty")
@@ -41,12 +41,13 @@ def filter_nifty_stocks(stocks_data: list[dict[str, Any]]) -> list[StockPriceInf
 
 def filter_single_stock(symbol: str, stock_data: dict[str, Any]) -> StockPriceInfo:
     """
-    Filter the required data and create a pydantic model from the given api response for single stock.
+    Filter the required data and create a pydantic model from the
+    given api response for single stock.
 
     Parameters:
     -----------
     symbol: ``str``
-        Nse stock symbol, can be obtained from the nse official website.
+        Nse stock symbol, can be obtained from the nse official website
             eg: "SBIN","TCS" etc.
     raw_stock_data: ``dict[str,Any]``
         Json parsed response of s stock from the Nse api
@@ -54,7 +55,7 @@ def filter_single_stock(symbol: str, stock_data: dict[str, Any]) -> StockPriceIn
     Return:
     -------
     ``StockData``
-        StockData model contain the information about the stock.
+        StockData model contain the information about the stock
     """
     if len(stock_data) == 0:
         raise ValueError("Stock data is empty")
@@ -72,7 +73,8 @@ def filter_single_stock(symbol: str, stock_data: dict[str, Any]) -> StockPriceIn
 
 def filter_single_index(index_data: dict[str, Any]) -> StockPriceInfo:
     """
-    Filter the required data and create a pydantic model from the given api response for single index.
+    Filter the required data and create a pydantic model from the
+    given api response for single index.
 
     Parameters:
     -----------
@@ -82,7 +84,7 @@ def filter_single_index(index_data: dict[str, Any]) -> StockPriceInfo:
     Return:
     -------
     ``StockData``
-        StockData model contains the price information about the index.
+        StockData model contains the price information about the index
     """
     if len(index_data) == 0:
         raise ValueError("Index data is empty")

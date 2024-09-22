@@ -19,13 +19,13 @@ def get_historical_stock_data_url(
     Parameters:
     -----------
     stock_symbol: ``str``
-        The symbol of the stock.
+        The symbol of the stock
     interval: ``str``
-        The interval of the candlestick.
+        The interval of the candlestick
     start_date: ``str``
-        The initial datetime from which historical stock data should be retrieved.
+        The initial datetime from which historical stock data should be retrieved
     end_date: ``str``
-        The final datetime up to which historical stock data should be retrieved.
+        The final datetime up to which historical stock data should be retrieved
 
     Return:
     -------
@@ -50,16 +50,17 @@ def search_valid_date(
     Parameters:
     -----------
     start_date: ``datetime``
-        Start date to search.
+        Start date to search
     end_date: ``datetime``
-        End date to search.
+        End date to search
     stock_symbol: ``str``
-        The symbol of the stock.
+        The symbol of the stock
 
     Return:
     -------
     ``datetime``
-        searched month from where the availability of data starts for the given stock symbol and interval.
+        searched month from where the availability of data starts for the given
+        stock symbol and interval.
     """
     valid_date = end_date
 
@@ -98,14 +99,16 @@ def search_valid_date(
 def dataframe_to_json_files(
     df: pd.DataFrame, dir_path: Path, interval: CandlestickInterval
 ):
-    """Process the given dataframe and convert it into suitable data structure i.e dictionary which will be stored in json file.
+    """
+    Process the given dataframe and convert it into suitable data structure
+    i.e dictionary which will be stored in json file.
 
     Parameters:
     -----------
     df: ``pd.DataFrame``
-        pandas DataFrame to store into json files.
+        pandas DataFrame to store into json files
     dir_path: ``str``
-        Path of the destination directory to store json files.
+        Path of the destination directory to store json files
     """
     # Convert timestamp to datetime and extract year and day
     df["timestamp"] = pd.to_datetime(df["timestamp"])
