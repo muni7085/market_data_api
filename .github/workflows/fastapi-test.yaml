@@ -34,7 +34,7 @@ jobs:
       - name: Install poetry and dependencies
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
-          poetry instal
+          poetry install
       - name: black check
         run: black --diff --check $(git ls-files '*.py')
       - name: isort check
@@ -81,5 +81,5 @@ jobs:
           poetry install
   
       - name: testing
-        run: pytest . -vv
+        run: pytest . -vvv
     
