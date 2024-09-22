@@ -11,7 +11,7 @@ def valid_intervals_io() -> list[tuple[str, CandlestickInterval]]:
     Return:
     -------
     ``list[tuple[str, CandlestickInterval]]``
-        List of input intervals and their expected CandlestickInterval member.
+        List of input intervals and their expected CandlestickInterval member
     """
     return [
         ("1minute", CandlestickInterval.ONE_MINUTE),
@@ -33,12 +33,13 @@ def valid_intervals_io() -> list[tuple[str, CandlestickInterval]]:
 
 @pytest.fixture
 def invalid_intervals_io() -> list[str]:
-    """Test cases for invalid intervals.
+    """
+    Test cases for invalid intervals.
 
     Return:
     -------
     ``list[str]``
-        List of invalid input intervals.
+        List of invalid input intervals
     """
     return [
         "2min",

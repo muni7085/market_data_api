@@ -17,7 +17,8 @@ class Option(BaseModel):
 
 class StrikePriceData(BaseModel):
     """
-    StrikePriceData model represents the PE and CE information of a derivative at a particular strike price
+    StrikePriceData model represents the PE and CE information of a derivative
+    at a particular strike price
     """
 
     strike_price: float
@@ -27,7 +28,8 @@ class StrikePriceData(BaseModel):
 
 class ExpiryOptionData(BaseModel):
     """
-    ExpiryOptionData represents the option chain information of a derivative at particular expiry date.
+    ExpiryOptionData represents the option chain information of a derivative
+    at particular expiry date.
     """
 
     strike_prices: list[StrikePriceData]

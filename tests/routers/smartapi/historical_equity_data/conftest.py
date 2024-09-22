@@ -11,8 +11,8 @@ def stock_symbol_io() -> list[dict[str, Any]]:
 
     Return:
     -------
-    ``List[dict]``
-        List of inputs and respective expected outputs.
+    ``list[dict]``
+        list of inputs and respective expected outputs
     """
     return [
         {
@@ -55,8 +55,8 @@ def candlestick_interval_io() -> list[dict[str, Any]]:
 
     Return:
     -------
-    ``List[dict]``
-        List of inputs and respective expected outputs.
+    ``list[dict]``
+        list of inputs and respective expected outputs
     """
     return [
         {
@@ -103,12 +103,13 @@ def candlestick_interval_io() -> list[dict[str, Any]]:
 @pytest.fixture
 def different_datetime_formats_io() -> list[dict[str, Any]]:
     """
-    Test cases for different valid or invalid datetime formats and their respective expected outputs.
+    Test cases for different valid or invalid datetime formats and their respective
+    expected outputs.
 
     Return:
     -------
-    ``List[dict]``
-        List of inputs and respective expected outputs.
+    ``list[dict]``
+        list of inputs and respective expected outputs
     """
     return [
         {
@@ -167,8 +168,8 @@ def holiday_dates_io() -> list[dict[str, Any]]:
 
     Return:
     -------
-    ``List[dict]``
-        List of inputs and respective expected outputs.
+    ``list[dict]``
+        list of inputs and respective expected outputs
     """
     return [
         {
@@ -197,8 +198,8 @@ def data_unavailable_dates_io() -> list[dict[str, Any]]:
 
     Return:
     -------
-    ``List[dict]``
-        List of inputs and respective expected outputs.
+    ``list[dict]``
+        list of inputs and respective expected outputs
     """
     return [
         {
@@ -228,7 +229,7 @@ def invalid_trading_time_io() -> dict[str, Any]:
     Return:
     -------
     ``dict[str,Any]``
-        List of inputs and respective expected outputs.
+        list of inputs and respective expected outputs
     """
     return {
         "input_stock_symbol": "TITAN",
@@ -248,7 +249,7 @@ def date_range_io() -> dict[str, Any]:
     Return:
     -------
     ``dict[str,Any]``
-        List of inputs and respective expected outputs.
+        list of inputs and respective expected outputs
     """
     return {
         "input_stock_symbol": "TVSMOTOR",

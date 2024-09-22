@@ -128,16 +128,6 @@ def get_option_chain_io():
 
 
 @pytest.fixture
-def get_filter_strike_prices_with_expiry_date_io():
-    return [
-        {"input": [option_chain_data, "28-Dec-2023"], "output": [option_chain_data[0]]},
-        {"input": [option_chain_data, "22-Dec-2023"], "output": []},
-        {"input": [[], ""], "output": []},
-        {"input": [None, None], "output": None},
-    ]
-
-
-@pytest.fixture
 def get_option_io():
     return [
         {

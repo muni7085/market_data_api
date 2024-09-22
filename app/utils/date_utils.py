@@ -1,6 +1,5 @@
 import calendar
 from datetime import date, datetime, timedelta
-from typing import List
 
 from app.utils.common.exceptions import InvalidDateTimeFormatException
 from app.utils.fetch_data import fetch_data
@@ -14,17 +13,18 @@ def last_date_of_weekday(year: int, month: int, weekday: int):
 
     Parameters
     ----------
-    year : ``int``
-    The year as a four-digit number, such as 2023.
-    month : ``int``
-    The month as a number from 1 to 12, where 1 is January and 12 is December.
-    weekday : ``int``
-    The weekday as a number from 0 to 6, where 0 is Monday and 6 is Sunday.
+    year: ``int``
+        The year as a four-digit number, such as 2023
+    month: ``int``
+        The month as a number from 1 to 12, where 1 is January and 12 is December
+    weekday: ``int``
+        The weekday as a number from 0 to 6, where 0 is Monday and 6 is Sunday
 
     Returns
     -------
     ``datetime.date``
-    The date object representing the last occurrence of the input weekday in the input month and year.
+        The date object representing the last occurrence of the input weekday
+        in the input month and year
 
     Examples
     --------
@@ -34,11 +34,10 @@ def last_date_of_weekday(year: int, month: int, weekday: int):
     >>> last_date_of_weekday(2023, 2, 0)
     datetime.date(2023, 2, 27)
 
-
     Raises
     ------
     ``ValueError``
-        If the input year, month or weekday is out of range.
+        If the input year, month or weekday is out of range
 
     """
     try:
@@ -65,34 +64,36 @@ def last_date_of_weekday(year: int, month: int, weekday: int):
 
 def get_date(weekday: str, monthly: bool = False):
     """
-    Returns the date of a given weekday in the next week of last week in the month based on monthly flag.
-    If the weekday and today is same then returns today date.
+    Returns the date of a given weekday in the next week of last week in the
+    month based on monthly flag. If the weekday and today is same then returns
+    today date.
 
     Parameters
     ----------
     weekday : ``str``
         The name or abbreviation of the weekday, such as "monday" or "mon".
-        The input is case-insensitive and must be a valid weekday.
+        The input is case-insensitive and must be a valid weekday
 
     monthly : ``bool``, (default = False)
         A flag indicating whether to return the date of the given weekday in the next week
         or last week in the month.
 
         If True, the function will return the last date of the weekday in the current month
-        if it is not before today, otherwise it will return the last date of the weekday in the next month.
+        if it is not before today, otherwise it will return the last date of the weekday in
+        the next month.
 
-        If False, the function will return the date of the next occurrence of the weekday from today.
+        If False, the function will return the date of the next occurrence of the weekday
+        from today.
 
     Returns
     -------
     ``str``
-        The date of the weekday in the format "%d-%b-%Y", such as "08-Oct-2023".
-
+        The date of the weekday in the format "%d-%b-%Y", such as "08-Oct-2023"
 
     Raises
     ------
     ``ValueError``
-        If the input weekday is invalid.
+        If the input weekday is invalid
 
     Examples
     --------
@@ -108,7 +109,6 @@ def get_date(weekday: str, monthly: bool = False):
 
     >>> get_date("abc")
     ValueError: abc is not a valid day
-
     """
 
     weekday = weekday.lower()
@@ -153,20 +153,20 @@ def get_date(weekday: str, monthly: bool = False):
 
 def get_expiry_dates(
     symbol: str, symbol_type: SymbolType = SymbolType.EQUITY
-) -> List[str]:
+) -> list[str]:
     """
     Returns the expiry dates list for the given stock or index symbol.
 
     Parameters:
     -----------
     symbol: ``str``
-        The symbol that represents stock or index to which expiry dates are required.
+        The symbol that represents stock or index to which expiry dates are required
     symbol_type: ``SymbolType``
         The type of symbol it is, means either `equity` or `derivative`
 
     Returns:
     --------
-    ``List[str]``
+    ``list[str]``
         The list of expiry dates for the given symbol
     """
 
@@ -183,21 +183,23 @@ def get_expiry_dates(
 
 def validate_datetime_format(date_time: str) -> datetime:
     """
-    Validates given string is in a valid datetime format or not. Datetime must be in the form of 'year-month-day hour:minute'.
+    Validates given string is in a valid datetime format or not. Datetime must be in the
+    form of 'year-month-day hour:minute'.
 
     Parameters:
     -----------
     date_time: ``str``
-        date and time to be validated.
+        date and time to be validated
 
     Exceptions:
     -----------
     ``InvalidDateTimeFormatException``
-        If the date and time is in wrong format.
+        If the date and time is in wrong format
+
     Return:
     -------
     ``datetime``
-        validated given date and time and returns valid datetime object.
+        validated given date and time and returns valid datetime object
     """
     date_separator = "/" if len(date_time.split("/")) > 1 else "-"
     month_format_codes = ["m", "b", "B"]

@@ -15,9 +15,10 @@ class CandlestickInterval(Enum):
     """
     Enumeration class representing possible candlestick intervals.
 
-    Each member except the last one corresponds to a specific time interval and its associated value which is a tuple of
-    numerical value of interval in minutes and max days possible per request. The last member corresponds to the possible input
-    intervals given by the users.
+    Each member except the last one corresponds to a specific time interval
+    and its associated value which is a tuple of numerical value of interval
+    in minutes and max days possible per request. The last member corresponds
+    to the possible input intervals given by the users
     """
 
     ONE_MINUTE = (1, 30)
@@ -41,34 +42,37 @@ class CandlestickInterval(Enum):
 
     @staticmethod
     def validate_interval(interval: str) -> "CandlestickInterval":
-        """Validates an interval string and returns the corresponding enum member.
+        """
+        Validates an interval string and returns the corresponding enum member.
 
         Parameters:
         -----------
         interval: ``str``
-            The interval string to validate (e.g., "one minute", "15m").
+            The interval string to validate (e.g., "one minute", "15m")
 
         Exceptions:
         -----------
         ``IntervalNotFoundException``
-            If the interval is not a valid enum member.
+            If the interval is not a valid enum member
 
         Return:
         -------
         ``CandlestickInterval``
-            The enum member corresponding to the validated interval.
+            The enum member corresponding to the validated interval
         """
-
         # Normalize the interval string by removing spaces, -, _, and converting all characters to lower case.
         normalized_interval = (
             interval.lower().replace(" ", "").replace("-", "").replace("_", "")
         )
+
         # Remove last s in the interval if exist.
         if normalized_interval.endswith("s"):
             normalized_interval = normalized_interval[:-1]
+
         for (
             possible_input_interval
         ) in CandlestickInterval.POSSIBLE_INPUT_INTERVALS.value:
             if normalized_interval in possible_input_interval:
                 return CandlestickInterval(possible_input_interval[3])
+
         raise IntervalNotFoundException(interval)

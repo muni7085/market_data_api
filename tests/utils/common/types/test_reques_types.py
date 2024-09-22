@@ -14,7 +14,7 @@ def test_validate_interval_valid(
     Parameters:
     -----------
     valid_intervals_io: ``list[tuple[str, CandlestickInterval]]``
-        List of input intervals and their expected CandlestickInterval member.
+        List of input intervals and their expected CandlestickInterval member
     """
     for valid_interval in valid_intervals_io:
         assert (
@@ -31,7 +31,7 @@ def test_validate_interval_invalid(invalid_intervals_io: list[str]):
     Parameters:
     -----------
     invalid_intervals_io: ``list[str]``
-        List of invalid input intervals.
+        List of invalid input intervals
     """
     for invalid_interval in invalid_intervals_io:
         with pytest.raises(IntervalNotFoundException) as excinfo:

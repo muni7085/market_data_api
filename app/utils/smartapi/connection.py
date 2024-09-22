@@ -1,6 +1,5 @@
 import http.client
 from http.client import HTTPConnection
-from typing import Dict, Optional, Union
 
 import pyotp
 from SmartApi import SmartConnect
@@ -31,11 +30,11 @@ class SmartApiConnection(metaclass=Singleton):
     Attributes:
     -----------
     credentials: ``Credentials``
-        The credentials object to authenticate the connection.
+        The credentials object to authenticate the connection
     api: ``SmartConnect``
-        The SmartConnect object to connect to the SmartAPI.
+        The SmartConnect object to connect to the SmartAPI
     data: ``dict``
-        The data object to store the session data like jwtToken.
+        The data object to store the session data like jwtToken
     """
 
     def __init__(self, credentials: Credentials):
@@ -47,14 +46,14 @@ class SmartApiConnection(metaclass=Singleton):
             self.credentials.client_id, self.credentials.pwd, totp
         )
 
-    def get_auth_token(self) -> Optional[str]:
+    def get_auth_token(self) -> str | None:
         """
         The method to get the authentication token from the session data.
 
         Returns:
         --------
-        ``Optional[str]``
-            The authentication token if present, else None.
+        ``str | None``
+            The authentication token if present, else None
         """
         if "data" in self.data:
             client_data = self.data["data"]
@@ -64,14 +63,14 @@ class SmartApiConnection(metaclass=Singleton):
 
         return None
 
-    def get_headers(self) -> Dict[str, Optional[str]]:
+    def get_headers(self) -> dict[str, str | None]:
         """
         The method to get the headers for the API request.
 
         Returns:
         --------
-        ``dict``
-            The headers for the API request for the SmartAPI.
+        ``dict[str, str | None]``
+            The headers for the API request for the SmartAPI
         """
         auth_token = self.get_auth_token()
         headers = {
@@ -100,26 +99,27 @@ class SmartApiConnection(metaclass=Singleton):
 
 
 def get_endpoint_connection(
-    payload: Union[str, dict], request_method_type: RequestType, url: str
+    payload: str | dict, request_method_type: RequestType, url: str
 ) -> HTTPConnection:
     """
-    Get the HTTP connection object for making API requests to a specific endpoint to the SmartAPI with the given payload.
+    Get the HTTP connection object for making API requests to a specific endpoint
+    to the SmartAPI with the given payload.
 
     Parameters:
     -----------
-    payload: ``Union[str, dict]``
-        The payload to be sent in the API request.
+    payload: ``str | dict``
+        The payload to be sent in the API request
     method_type: ``RequestType``
-        The request method type like GET, POST, PUT, DELETE from the RequestType enum.\
+        The request method type like GET, POST, PUT, DELETE from the RequestType enum
         eg: RequestType.GET, RequestType.POST
     url: ``str``
-        The URL of the endpoint to connect to.
-    
+        The URL of the endpoint to connect to
+
     Returns:
     --------
     ``HTTPConnection``
-        The HTTP connection object for the given endpoint.
-    
+        The HTTP connection object for the given endpoint
+
 
     """
     api_connection = SmartApiConnection.get_connection()
