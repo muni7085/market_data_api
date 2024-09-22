@@ -1,15 +1,21 @@
-name: Quality Checks
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
+name: Quality Checks
+PYTHON_VERSION: 3.12.3
+POETRY_VERSION: 1.8.2
 on:
   pull_request:
     branches: [ "master" ]
+
 
 permissions:
   contents: read
 
 jobs:
-  # 1. Setup Stage: Create Conda environment and install dependencies
-  setup:
+  # This job sets up the Python environment
+  static:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -17,70 +23,40 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Install Miniconda
-      - name: Install Miniconda
+      - name: Install miniconda and create environment
         uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: "3.12.3"
-          activate-environment: app
-          auto-update-conda: true
+          python-version: ${{ env.PYTHON_VERSION }}
+          activate-environment: ${{ env.APP }}
 
-      # Cache the Conda environment
-      - name: Cache Conda Environment
-        uses: actions/cache@v3
-        with:
-          path: ~/conda/envs/app
-          key: ${{ runner.os }}-conda-${{ hashFiles('**/environment.yml', '**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-conda-
-
-      # Install Poetry and dependencies inside the Conda environment
-      - name: Install Poetry and Dependencies
+      # Install poetry and all the packages in pyproject.toml file
+      - name: Install poetry and dependencies
         run: |
-          curl -sSL https://install.python-poetry.org | python3 - --version 1.8.2 -y
-          source ~/conda/bin/activate app
-          poetry install
-        shell: bash -l {0} 
-
-  # 2. Static Stage: Run static analysis without installing anything new
-  static:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash -l {0}
-    
-    needs: setup  # Ensure static job waits for setup to complete
-    steps:
-      - uses: actions/checkout@v3
-
-      # Reuse the conda environment set up in the previous job
-      - name: Activate Conda Environment
-        run: |
-          source ~/conda/bin/activate app
-          
-
-      # Perform static checks
+          curl -sSL https://install.python-poetry.org | python3 - --version ${{ POETRY_VERSION }} -y
+          poetry instal
       - name: black check
         run: black --diff --check $(git ls-files '*.py')
-
       - name: isort check
         run: isort --diff --check --profile black $(git ls-files '*.py')
-
       - name: mypy check
         run: mypy $(git ls-files '*.py')
-
       - name: pylint check
         run: pylint $(git ls-files '*.py')
 
-  # 3. Test Stage: Run tests without installing anything new
+        
   test:
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -l {0}
-    needs: setup  # Ensure tests wait for setup to complete
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
+
+
+
       - name: Decode json credentials
         run: echo ${{ secrets.SMARTAPI_CREDENTIALS }} | jq > smartapi_credentials.json
 
@@ -89,12 +65,20 @@ jobs:
         run: |
          echo "APP=app" >> $GITHUB_ENV
          echo "SMARTAPI_CREDENTIALS=smartapi_credentials.json" >>$GITHUB_ENV
-      # Reuse the conda environment set up in the previous job
-      - name: Reuse conda environment
+
+      # Install miniconda and create a new environment with python 3.10
+      - name: Install miniconda and create environment
         uses: conda-incubator/setup-miniconda@v2
         with:
-          activate-environment: app
+          python-version: ${{ env.PYTHON_VERSION }}
+          activate-environment: ${{ env.APP }}
 
-      # Run pytest for tests
+      # Install poetry and all the packages in pyproject.toml file
+      - name: Install poetry and dependencies
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 - --version ${{ POETRY_VERSION }} -y
+          poetry install
+  
       - name: testing
-        run: pytest tests/ -vv
+        run: pytest . -vv
+    
