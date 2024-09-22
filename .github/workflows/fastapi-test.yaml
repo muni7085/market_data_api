@@ -17,42 +17,47 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Install Miniconda and create a new environment with Python 3.12
-      - name: Install miniconda and create environment
+      # Install Miniconda
+      - name: Install Miniconda
         uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: "3.12.3"  # Ensure Python 3.12 is used in Conda
+          python-version: "3.12.3"
           activate-environment: app
+          auto-update-conda: true
 
-
-      # Cache the Poetry environment
-      - name: Cache poetry environment
+      # Cache the Conda environment
+      - name: Cache Conda Environment
         uses: actions/cache@v3
         with:
-          path: ~/.cache/pypoetry
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          path: ~/conda/envs/app
+          key: ${{ runner.os }}-conda-${{ hashFiles('**/environment.yml', '**/poetry.lock') }}
           restore-keys: |
-            ${{ runner.os }}-poetry-
+            ${{ runner.os }}-conda-
 
-      # Install Poetry but make sure to use the Python from Conda
-      - name: Install poetry and dependencies
+      # Install Poetry and dependencies inside the Conda environment
+      - name: Install Poetry and Dependencies
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version 1.8.2 -y
+          source ~/conda/bin/activate app
           poetry install
+        shell: bash -l {0} 
 
   # 2. Static Stage: Run static analysis without installing anything new
   static:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     
     needs: setup  # Ensure static job waits for setup to complete
     steps:
       - uses: actions/checkout@v3
 
       # Reuse the conda environment set up in the previous job
-      - name: Reuse conda environment
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          activate-environment: app
+      - name: Activate Conda Environment
+        run: |
+          source ~/conda/bin/activate app
+          
 
       # Perform static checks
       - name: black check
