@@ -14,12 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      # Install Miniconda and create a new environment
+      # Install Miniconda and create a new environment with Python 3.12
       - name: Install miniconda and create environment
         uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: "3.12.3"
+          python-version: "3.12.3"  # Ensure Python 3.12 is used in Conda
           activate-environment: app
+
 
       # Cache the Poetry environment
       - name: Cache poetry environment
@@ -30,10 +31,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-poetry-
 
-      # Install Poetry and dependencies from pyproject.toml & poetry.lock
+      # Install Poetry but make sure to use the Python from Conda
       - name: Install poetry and dependencies
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version 1.8.2 -y
+          poetry config virtualenvs.create false  # Disable virtualenv creation in Poetry, use Conda's env
           poetry install
 
   # 2. Static Stage: Run static analysis without installing anything new
