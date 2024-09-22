@@ -11,6 +11,9 @@ jobs:
   # 1. Setup Stage: Create Conda environment and install dependencies
   setup:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
 
@@ -35,7 +38,6 @@ jobs:
       - name: Install poetry and dependencies
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version 1.8.2 -y
-          poetry config virtualenvs.create false  # Disable virtualenv creation in Poetry, use Conda's env
           poetry install
 
   # 2. Static Stage: Run static analysis without installing anything new
