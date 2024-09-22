@@ -2,8 +2,9 @@
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
 name: Quality Checks
-PYTHON_VERSION: 3.12.3
-POETRY_VERSION: 1.8.2
+env:
+  PYTHON_VERSION: 3.12.3
+  POETRY_VERSION: 1.8.2
 on:
   pull_request:
     branches: [ "master" ]
@@ -27,12 +28,12 @@ jobs:
         uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-          activate-environment: ${{ env.APP }}
+          activate-environment: app
 
       # Install poetry and all the packages in pyproject.toml file
       - name: Install poetry and dependencies
         run: |
-          curl -sSL https://install.python-poetry.org | python3 - --version ${{ POETRY_VERSION }} -y
+          curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
           poetry instal
       - name: black check
         run: black --diff --check $(git ls-files '*.py')
@@ -76,7 +77,7 @@ jobs:
       # Install poetry and all the packages in pyproject.toml file
       - name: Install poetry and dependencies
         run: |
-          curl -sSL https://install.python-poetry.org | python3 - --version ${{ POETRY_VERSION }} -y
+          curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
           poetry install
   
       - name: testing
