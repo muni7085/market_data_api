@@ -26,8 +26,8 @@ pandas = "^2.2.2"
 sqlmodel = "^0.0.19"
 aiosqlite = "^0.20.0"
 registrable = "^0.0.4"
-autobahn = "^24.4.2"
-twisted = "^24.7.0"
+kafka-python-ng = "^2.2.2"
+pytest-mock = "^3.14.0"
 
 
 

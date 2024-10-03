@@ -1873,6 +1873,24 @@ dev = ["mypy (==1.11.2)", "pylint (==2.15.0)", "pytest (==7.2.0)", "pytest-cov (
 tests = ["mypy (==1.11.2)", "pylint (==2.15.0)", "pytest (==7.2.0)", "pytest-cov (==3.0.0)", "pytest-mock (==3.8.2)", "pytest-sugar (==0.9.5)", "types-requests"]
 
 [[package]]
+name = "kafka-python-ng"
+version = "2.2.2"
+description = "Pure Python client for Apache Kafka"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "kafka-python-ng-2.2.2.tar.gz", hash = "sha256:87ad3a766e2c0bec71d9b99bdd9e9c5cda62d96cfda61a8ca16510484d6ad7d4"},
+    {file = "kafka_python_ng-2.2.2-py2.py3-none-any.whl", hash = "sha256:3fab1a03133fade1b6fd5367ff726d980e59031c4aaca9bf02c516840a4f8406"},
+]
+
+[package.extras]
+boto = ["botocore"]
+crc32c = ["crc32c"]
+lz4 = ["lz4"]
+snappy = ["python-snappy"]
+zstd = ["zstandard"]
+
+[[package]]
 name = "kombu"
 version = "5.4.2"
 description = "Messaging library for Python."
@@ -2810,6 +2828,23 @@ pytest = ">=4.6"
 
 [package.extras]
 testing = ["fields", "hunter", "process-tests", "pytest-xdist", "virtualenv"]
+
+[[package]]
+name = "pytest-mock"
+version = "3.14.0"
+description = "Thin-wrapper around the mock package for easier use with pytest"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pytest-mock-3.14.0.tar.gz", hash = "sha256:2719255a1efeceadbc056d6bf3df3d1c5015530fb40cf347c0f9afac88410bd0"},
+    {file = "pytest_mock-3.14.0-py3-none-any.whl", hash = "sha256:0b72c38033392a5f4621342fe11e9219ac11ec9d375f8e2a0c164539e0d70f6f"},
+]
+
+[package.dependencies]
+pytest = ">=6.2.5"
+
+[package.extras]
+dev = ["pre-commit", "pytest-asyncio", "tox"]
 
 [[package]]
 name = "python-dateutil"
@@ -3750,4 +3785,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "0ead34c6f8468bc26d08c2f880fe5b5e0b68e945247ef263b490c312ec07775b"
+content-hash = "e90888dc42c56dec8fe57e6a9c2a40e8ec07a93cef8cb82483eb1d6d472e74c5"
