@@ -3,7 +3,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from app.utils.common.logger_utils import get_logger
+from app.utils.common.logger import get_logger
 
 logger = get_logger(__name__)
 

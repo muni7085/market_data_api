@@ -1,0 +1,21 @@
+defaults:
+  - _self_
+  - provider: smartsocket
+  - /data_pipeline: kafka
+
+name: smartsocket_connection
+provider: ${smartsocket}
+data_pipeline: ${kafka}
+symbols: null # List of stock symbols
+exchange_type: nse_cm # nse_cm, bse_cm
+num_connections: 3
+current_connection_number: 0
+use_thread: true
+num_tokens_per_instance: 1000
+
+################################ NOTE ################################
+# If you specify the stock_symbols, then the data will be streamed only for those symbols.
+# Do not enter the futures and options symbols here as it is not supported yet.
+# You have to specify the exchange_type that the symbols belong to.
+# If you do not specify the stock_symbols, then the data will be streamed for all the symbols
+# that are available in the exchange_type.

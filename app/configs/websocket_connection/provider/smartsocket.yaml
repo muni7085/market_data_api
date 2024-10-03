@@ -1,0 +1,4 @@
+name: smartsocket
+correlation_id: smart00001
+subscription_mode: snap_quote # ltp, quote, snap_quote, depth
+debug: false

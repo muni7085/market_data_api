@@ -27,6 +27,8 @@ sqlmodel = "^0.0.19"
 registrable = "^0.0.4"
 kafka-python-ng = "^2.2.2"
 pytest-mock = "^3.14.0"
+autobahn = "^24.4.2"
+twisted = "^24.7.0"
 
 
 
