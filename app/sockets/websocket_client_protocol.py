@@ -12,8 +12,8 @@ logger = get_logger(Path(__file__).name)
 class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
     """
     This class is a subclass of the `WebSocketClientProtocol` class from the `autobahn` library.
-    It is used to create a WebSocket client protocol that can be used to connect to a WebSocket server
-    and send and receive messages over the WebSocket connection.
+    It is used to create a WebSocket client protocol that can be used to connect to a WebSocket
+    server and send and receive messages over the WebSocket connection.
 
     Attributes
     ----------

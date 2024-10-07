@@ -2,11 +2,13 @@
 This module contains the CRUD operations for the SocketStockPriceInfo table in the SQLite database.
 """
 
-from app.database.sqlite.models.websocket_models import SocketStockPriceInfo
-from app.database.sqlite.sqlite_db_connection import get_session
-from sqlalchemy.dialects.sqlite import insert
-from app.utils.common.logger_utils import get_logger
 from pathlib import Path
+
+from sqlalchemy.dialects.sqlite import insert
+
+from app.data_layer.database.sqlite.models.websocket_models import SocketStockPriceInfo
+from app.data_layer.database.sqlite.sqlite_db_connection import get_session
+from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name)
 
@@ -62,7 +64,7 @@ def insert_data(
     update_existing: bool = False,
 ):
     """
-    Insert the provided data into the SocketStockPriceInfo table in the SQLite database. It 
+    Insert the provided data into the SocketStockPriceInfo table in the SQLite database. It
     will handle both single and multiple data objects. If the data already exists in the table,
     it will either update the existing data or ignore the new data based on the value of the
     `update_existing` parameter
@@ -74,16 +76,22 @@ def insert_data(
     update_existing: ``bool``
         If True, the existing data in the table will be updated with the new data.
     """
+    # Check if data is None or empty
     if not data:
         logger.warning("Provided data is empty. Skipping insertion.")
         return
 
-    if isinstance(data, SocketStockPriceInfo):
-        data = data.to_dict()
+    # Convert single item to a list
+    if isinstance(data, (SocketStockPriceInfo, dict)):
+        data = [data]
 
-    if isinstance(data[0], SocketStockPriceInfo):
-        data = [item.to_dict() for item in data]
+    # Convert list of SocketStockPriceInfo to a list of dicts
+    data = [
+        item.to_dict() if isinstance(item, SocketStockPriceInfo) else item
+        for item in data
+    ]
 
+    # Handle upsert or insert
     if update_existing:
         upsert(data)
     else:

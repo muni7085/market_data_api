@@ -1,20 +1,20 @@
+from itertools import islice
 from pathlib import Path
-
+from typing import Optional
 from omegaconf import DictConfig
 
-from app.database.sqlite.crud.smartapi_curd import get_smartapi_tokens_by_all_conditions
-from app.sockets.socket_connections.websocket_connection import WebsocketConnection
-from app.sockets.tiwsted_sockets.smartsocket import SmartSocket
-from app.sockets.websocket_datahandler.on_data_callbacks.base_callback import (
-    BaseCallback,
+from app.data_layer.database.sqlite.crud.smartapi_crud import (
+    get_smartapi_tokens_by_all_conditions,
 )
+from app.data_layer.streaming.streaming import Streaming
+from app.sockets.connections.websocket_connection import WebsocketConnection
+from app.sockets.twisted_sockets import SmartSocket
 from app.utils.common import init_from_cfg
 from app.utils.common.exceptions import SymbolNotFoundException
 from app.utils.common.logger import get_logger
 from app.utils.common.types.financial_types import Exchange
 from app.utils.smartapi.smartsocket_types import ExchangeType
 from app.utils.smartapi.validator import validate_symbol_and_get_token
-from itertools import islice
 
 logger = get_logger(Path(__file__).name)
 
@@ -105,7 +105,7 @@ class SmartSocketConnection(WebsocketConnection):
             )
 
         return valid_symbol_tokens
-    
+
     def get_tokens(self, cfg: DictConfig) -> dict[str, str] | None:
         """
         This is base method to get the tokens for the connection. Currently, it
@@ -143,7 +143,7 @@ class SmartSocketConnection(WebsocketConnection):
         return tokens
 
     @classmethod
-    def from_cfg(cls, cfg: DictConfig) -> "SmartSocketConnection" | None:
+    def from_cfg(cls, cfg: DictConfig) -> Optional["SmartSocketConnection"]:
         connection_cfg = cfg.connection
 
         connection_instance_num = connection_cfg.get("current_connection_number", 0)
@@ -156,15 +156,17 @@ class SmartSocketConnection(WebsocketConnection):
 
         # Get the tokens to subscribe to
         tokens = cls.get_tokens(cls, connection_cfg)
+        print(f"Tokens: {len(tokens)}, {token_start_idx}, {token_end_idx}")
         tokens = dict(islice(tokens.items(), token_start_idx, token_end_idx))
 
         # If there are no tokens to subscribe to, log an error and return None
         if not tokens:
-            logger.error("No tokens to subscribe to, exiting...")
+            logger.error("Instance %d has no tokens to subscribe to, exiting...", connection_instance_num)
             return None
 
+        
         # Initialize the callback to save the received data from the socket
-        save_data_callback = init_from_cfg(connection_cfg.data_streaming, BaseCallback)
+        save_data_callback = init_from_cfg(connection_cfg.streaming, Streaming)
 
         smart_socket = SmartSocket.initialize_socket(
             cfg.connection.provider, save_data_callback

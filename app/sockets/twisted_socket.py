@@ -54,7 +54,6 @@ class MarketDatasetTwistedSocket(ABC):
     def set_tokens(self, tokens: List[Dict[str, int | Dict[str, str]]]):
         """
         Set the tokens to subscribe to the WebSocket connection
-
         """
         raise NotImplementedError
 
@@ -218,10 +217,10 @@ class MarketDatasetTwistedSocket(ABC):
         """
         raise NotImplementedError
 
-    def _on_connect(self, ws: WebSocketClientProtocol, response:ConnectionResponse):
+    def _on_connect(self, ws: WebSocketClientProtocol, response: ConnectionResponse):
         """
         This function is called when the WebSocket connection is established with the server
-        
+
         Parameters
         ----------
         ws: ``WebSocketClientProtocol``

@@ -35,6 +35,9 @@ class SocketStockPriceInfo(SQLModel, table=True):
     last_traded_price: ``str``
         The price at which the last trade was executed
         Eg: "1700.0"
+    exchange: ``str``
+        The name of the exchange where the stock is listed
+        Eg: "NSE" or "BSE"
     last_traded_quantity: ``str``
         The quantity of the last trade executed
         Eg: "100"
@@ -59,6 +62,7 @@ class SocketStockPriceInfo(SQLModel, table=True):
     exchange_timestamp: str
     name: str
     last_traded_price: str
+    exchange: Optional[str] = None
     last_traded_quantity: Optional[str] = None
     average_traded_price: Optional[str] = None
     volume_trade_for_the_day: Optional[str] = None
@@ -70,12 +74,14 @@ class SocketStockPriceInfo(SQLModel, table=True):
         Returns the object as a dictionary
         """
         return {
-            "last_traded_timestamp": self.last_traded_timestamp,
             "token": self.token,
+            "retrieval_timestamp": self.retrieval_timestamp,
+            "last_traded_timestamp": self.last_traded_timestamp,
+            "socket_name": self.socket_name,
             "exchange_timestamp": self.exchange_timestamp,
             "name": self.name,
             "last_traded_price": self.last_traded_price,
-            "retrieval_timestamp": self.retrieval_timestamp,
+            "exchange": self.exchange,
             "last_traded_quantity": self.last_traded_quantity,
             "average_traded_price": self.average_traded_price,
             "volume_trade_for_the_day": self.volume_trade_for_the_day,

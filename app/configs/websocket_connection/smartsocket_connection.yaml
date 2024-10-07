@@ -1,11 +1,11 @@
 defaults:
   - _self_
   - provider: smartsocket
-  - /data_pipeline: kafka
+  - /streaming: kafka
 
 name: smartsocket_connection
 provider: ${smartsocket}
-data_pipeline: ${kafka}
+streaming: ${kafka}
 symbols: null # List of stock symbols
 exchange_type: nse_cm # nse_cm, bse_cm
 num_connections: 3

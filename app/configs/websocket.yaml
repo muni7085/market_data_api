@@ -5,3 +5,9 @@ defaults:
 connections:
   - name: smartsocket_connection
     connection: ${smartsocket_connection}
+
+
+hydra:  
+  output_subdir: null  
+  run:  
+    dir: .

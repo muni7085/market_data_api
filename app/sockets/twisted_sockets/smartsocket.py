@@ -15,14 +15,14 @@ from app.utils.smartapi.smartsocket_types import (
     SubscriptionMode,
 )
 
-logger = get_logger(Path(__file__).name, logging.DEBUG)
+logger = get_logger(Path(__file__).name, log_level="DEBUG")
 
 
 class SmartSocket(MarketDatasetTwistedSocket):
     """
     SmartSocket is a class that connects to the SmartAPI WebSocket server and subscribes
-    to the specified tokens. It receives the data for the subscribed tokens and parses 
-    the data to extract the required information for the subscribed tokens. The parsed 
+    to the specified tokens. It receives the data for the subscribed tokens and parses
+    the data to extract the required information for the subscribed tokens. The parsed
     data is then sent to the callback function for further processing or saving.
 
     Attributes
@@ -46,15 +46,15 @@ class SmartSocket(MarketDatasetTwistedSocket):
         The correlation id is used to uniquely identify the WebSocket connection which
         is useful for debugging and logging purposes in multi-connection scenarios
     subscription_mode: ``SubscriptionMode``
-        The subscription mode is used to specify the type of data to receive from 
+        The subscription mode is used to specify the type of data to receive from
         the WebSocket server. The subscription mode can be either "quote", "snap_quote",
         or "full"
     on_data_save_callback: ``Callable[[str], None]``, ( default = None )
-        The callback function that is called when the data is received from the 
+        The callback function that is called when the data is received from the
         WebSocket server
     debug: ``bool``, ( default = False )
-        A flag to enable or disable the debug mode for the WebSocket connection. 
-        Enable this flag in development mode to get detailed logs for debugging 
+        A flag to enable or disable the debug mode for the WebSocket connection.
+        Enable this flag in development mode to get detailed logs for debugging
         purposes
     """
 
@@ -70,9 +70,10 @@ class SmartSocket(MarketDatasetTwistedSocket):
         feed_token: str,
         correlation_id: str,
         subscription_mode: SubscriptionMode,
-        on_data_save_callback=None,
-        debug=False,
+        on_data_save_callback,
+        debug,
     ):
+        print("debug", debug)
         self.ping_interval = 5
         self.headers = {
             "Authorization": auth_token,
@@ -93,7 +94,7 @@ class SmartSocket(MarketDatasetTwistedSocket):
 
     def sanity_check(self):
         """
-        Check if the headers are set correctly and raise an exception if 
+        Check if the headers are set correctly and raise an exception if
         any of the headers are empty
         """
         for key, value in self.headers.items():
@@ -131,7 +132,7 @@ class SmartSocket(MarketDatasetTwistedSocket):
     def subscribe(self, tokens: List[Dict[str, int | List[str]]]):
         """
         Subscribe to the specified tokens on the WebSocket connection.
-        After subscribing, the WebSocket connection will receive data 
+        After subscribing, the WebSocket connection will receive data
         for the specified tokens. Based on the subscription mode, the
         received data will be different.
         Ref: https://smartapi.angelbroking.com/docs/WebSocket2
@@ -223,7 +224,7 @@ class SmartSocket(MarketDatasetTwistedSocket):
 
     def decode_data(self, binary_data):
         """
-        Parses binary data received from the websocket and returns a dictionary 
+        Parses binary data received from the websocket and returns a dictionary
         containing the parsed data.
 
         Parameters
@@ -313,7 +314,7 @@ class SmartSocket(MarketDatasetTwistedSocket):
         Process incoming WebSocket messages and prepare data for callback.
 
         This method is called whenever a message is received on the WebSocket
-        connection. It decodes the payload, enriches the data with additional 
+        connection. It decodes the payload, enriches the data with additional
         information, and triggers the data save callback if one is set
 
         Parameters
@@ -329,10 +330,13 @@ class SmartSocket(MarketDatasetTwistedSocket):
         data = self.decode_data(payload)
         data["name"] = self.TOKEN_MAP.get(data["token"])[0]
         data["socket_name"] = "smartapi"
-        data["retrived_timestamp"] = str(time.time())
-        data["exchange_type"] = self.TOKEN_MAP.get(data["token"])[1].name
+        data["retrieval_timestamp"] = str(time.time())
+        data["exchange"] = self.TOKEN_MAP.get(data["token"])[1].name
+        
+        if self.debug:
+            logger.debug(f"Received data: {data}") 
+        
         if self.on_data_save_callback:
-            # print(f"save data: {data}")
             self.on_data_save_callback(json.dumps(data))
 
     @staticmethod
@@ -353,5 +357,5 @@ class SmartSocket(MarketDatasetTwistedSocket):
                 cfg.get("subscription_mode", "snap_quote")
             ),
             on_save_data_callback,
-            debug=False,
+            debug=cfg.get("debug", False),
         )

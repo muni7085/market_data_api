@@ -10,3 +10,4 @@ sample.py
 *.coverage
 *.log
 *.sqlite3
+*outputs
