@@ -69,7 +69,7 @@ class SocketStockPriceInfo(SQLModel, table=True):
     total_buy_quantity: Optional[str] = None
     total_sell_quantity: Optional[str] = None
 
-    def as_dict(self):
+    def to_dict(self):
         """
         Returns the object as a dictionary
         """
