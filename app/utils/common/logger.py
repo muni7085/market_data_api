@@ -15,7 +15,9 @@ import logging
 from pathlib import Path
 
 
-def get_logger(name: str,log_level:str="INFO",log_to_file:bool=False) -> logging.Logger:
+def get_logger(
+    name: str, log_level: str = "INFO", log_to_file: bool = False
+) -> logging.Logger:
     """
     Return a logger object configured with a stream handler and a file handler.
 
@@ -28,7 +30,7 @@ def get_logger(name: str,log_level:str="INFO",log_to_file:bool=False) -> logging
     log_to_file: ``bool``, ( default = False )
         A boolean value to indicate if the logs should be written to a file.
         The file name will be the name of the module with a .log extension.
-        
+
 
     Returns
     -------
@@ -38,7 +40,7 @@ def get_logger(name: str,log_level:str="INFO",log_to_file:bool=False) -> logging
     """
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
-    
+
     # Add a stream handler
     c_handler = logging.StreamHandler()
     c_handler.setLevel(log_level)
@@ -47,15 +49,15 @@ def get_logger(name: str,log_level:str="INFO",log_to_file:bool=False) -> logging
     )
     c_handler.setFormatter(c_format)
     logger.addHandler(c_handler)
-    
+
     # Add a file handler if log_to_file is True
     if log_to_file:
         log_file = f"{Path(name).stem}.log"
         f_handler = logging.FileHandler(log_file)
         f_handler.setLevel(log_level)
         f_format = logging.Formatter(
-        "%(asctime)s - %(name)s:%(lineno)d  - %(levelname)s - %(message)s"
-    )
+            "%(asctime)s - %(name)s:%(lineno)d  - %(levelname)s - %(message)s"
+        )
         f_handler.setFormatter(f_format)
         logger.addHandler(f_handler)
 

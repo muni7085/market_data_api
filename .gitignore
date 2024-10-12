@@ -11,3 +11,4 @@ sample.py
 *.log
 *.sqlite3
 *outputs
+.DS_Store

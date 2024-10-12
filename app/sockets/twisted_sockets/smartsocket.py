@@ -332,10 +332,10 @@ class SmartSocket(MarketDatasetTwistedSocket):
         data["socket_name"] = "smartapi"
         data["retrieval_timestamp"] = str(time.time())
         data["exchange"] = self.TOKEN_MAP.get(data["token"])[1].name
-        
+
         if self.debug:
-            logger.debug(f"Received data: {data}") 
-        
+            logger.debug(f"Received data: {data}")
+
         if self.on_data_save_callback:
             self.on_data_save_callback(json.dumps(data))
 

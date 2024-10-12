@@ -40,12 +40,7 @@ class SubscriptionMode(Enum):
 
 class ExchangeType(Enum):
     NSE_CM = 1
-    NSE_FO = 2
     BSE_CM = 3
-    BSE_FO = 4
-    MCX_FO = 5
-    NCX_FO = 7
-    CDE_FO = 13
 
     @staticmethod
     def get_exchange(exchange_symbol: str | int) -> "ExchangeType":

@@ -1,6 +1,7 @@
 from itertools import islice
 from pathlib import Path
 from typing import Optional
+
 from omegaconf import DictConfig
 
 from app.data_layer.database.sqlite.crud.smartapi_crud import (
@@ -36,6 +37,7 @@ class SmartSocketConnection(WebsocketConnection):
         self.websocket = websocket
 
     def get_equity_stock_tokens(
+        self,
         exchange: str,
         instrument_type: str,
     ) -> dict[str, str]:
@@ -106,7 +108,9 @@ class SmartSocketConnection(WebsocketConnection):
 
         return valid_symbol_tokens
 
-    def get_tokens(self, cfg: DictConfig) -> dict[str, str] | None:
+    def get_tokens(
+        self, exchange_type: str, symbols: str | list[str] = None
+    ) -> dict[str, str] | None:
         """
         This is base method to get the tokens for the connection. Currently, it
         supports getting the tokens for the equity stocks that are provided in the
@@ -126,28 +130,54 @@ class SmartSocketConnection(WebsocketConnection):
             Eg: {"256265": "INFY"}
         """
         tokens: dict[str, str] = {}
+        exchange_symbol = None
 
-        # If the symbols are provided in the configuration, get the tokens for the symbols
-        if cfg.symbols:
-            exchange_symbol = (
-                Exchange.NSE.value
-                if cfg.exchange_type == "nse_cm"
-                else Exchange.BSE.value
+        if symbols and exchange_type is None:
+            logger.info(
+                "Exchange type not provided in the configuration, considering the NSE exchange type"
             )
-            tokens = self.get_tokens_from_symbols(self, cfg.symbols, exchange_symbol)
-        elif (
-            ExchangeType.get_exchange(cfg.exchange_type.lower()) == ExchangeType.NSE_CM
-        ):
-            tokens = self.get_equity_stock_tokens(Exchange.NSE.value, "EQ")
+            exchange_type = "nse_cm"
+            symbols = symbols if isinstance(symbols, list) else [symbols]
+        elif exchange_type is None:
+            logger.error("Exchange type not provided in the configuration, exiting...")
+            return tokens
+
+        if exchange_type:
+            try:
+                exchange_type = ExchangeType.get_exchange(exchange_type.lower())
+                exchange_symbol = (
+                    Exchange.NSE.value
+                    if "nse" in exchange_type.name.lower()
+                    else Exchange.BSE.value
+                )
+            except ValueError:
+                logger.error(
+                    "Invalid exchange type provided in the configuration: %s",
+                    exchange_type,
+                )
+                return tokens
+
+        if symbols:
+            tokens = self.get_tokens_from_symbols(symbols, exchange_symbol)
+        else:
+            tokens = self.get_equity_stock_tokens(exchange_symbol, "EQ")
 
         return tokens
 
     @classmethod
     def from_cfg(cls, cfg: DictConfig) -> Optional["SmartSocketConnection"]:
-        connection_cfg = cfg.connection
 
-        connection_instance_num = connection_cfg.get("current_connection_number", 0)
-        num_tokens_per_instance = connection_cfg.get("num_tokens_per_instance", 1000)
+        connection_instance_num = cfg.get("current_connection_number", 0)
+        num_tokens_per_instance = cfg.get("num_tokens_per_instance", 1000)
+        cfg.provider.correlation_id = cfg.provider.correlation_id.replace(
+            "_", str(connection_instance_num)
+        )
+
+        # Initialize the callback to save the received data from the socket
+        save_data_callback = init_from_cfg(cfg.streaming, Streaming)
+
+        smart_socket = SmartSocket.initialize_socket(cfg.provider, save_data_callback)
+        connection = cls(smart_socket)
 
         # Calculate the start and end index of the tokens to subscribe to based on
         # the connection instance number and the number of tokens per instance
@@ -155,30 +185,24 @@ class SmartSocketConnection(WebsocketConnection):
         token_end_idx = token_start_idx + num_tokens_per_instance
 
         # Get the tokens to subscribe to
-        tokens = cls.get_tokens(cls, connection_cfg)
-        print(f"Tokens: {len(tokens)}, {token_start_idx}, {token_end_idx}")
+        tokens = connection.get_tokens(cfg.exchange_type, cfg.symbols)
+
         tokens = dict(islice(tokens.items(), token_start_idx, token_end_idx))
 
         # If there are no tokens to subscribe to, log an error and return None
         if not tokens:
-            logger.error("Instance %d has no tokens to subscribe to, exiting...", connection_instance_num)
+            logger.error(
+                "Instance %d has no tokens to subscribe to, exiting...",
+                connection_instance_num,
+            )
             return None
 
-        
-        # Initialize the callback to save the received data from the socket
-        save_data_callback = init_from_cfg(connection_cfg.streaming, Streaming)
-
-        smart_socket = SmartSocket.initialize_socket(
-            cfg.connection.provider, save_data_callback
-        )
         tokens_list = [
             {
-                "exchangeType": ExchangeType.get_exchange(
-                    cfg.connection.exchange_type
-                ).value,
+                "exchangeType": ExchangeType.get_exchange(cfg.exchange_type).value,
                 "tokens": tokens,
             }
         ]
         smart_socket.set_tokens(tokens_list)
 
-        return cls(smart_socket)
+        return connection

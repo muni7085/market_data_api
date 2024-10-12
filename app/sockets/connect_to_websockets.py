@@ -13,12 +13,12 @@ logger = get_logger(Path(__file__).name)
 
 def create_websocket_connection(cfg: DictConfig):
     num_connections = cfg.connection.num_connections
-    
+
     for i in range(num_connections):
         logger.info(f"Creating connection instance {i}")
         cfg.connection.current_connection_number = i
         websocket_connection: WebsocketConnection = init_from_cfg(
-            cfg, WebsocketConnection
+            cfg.connection, WebsocketConnection
         )
 
         if websocket_connection:
