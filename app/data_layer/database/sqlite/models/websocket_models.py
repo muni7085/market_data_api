@@ -7,7 +7,7 @@ from typing import Optional
 from sqlmodel import Field, SQLModel
 
 
-class SocketStockPriceInfo(SQLModel, table=True):
+class SocketStockPriceInfo(SQLModel, table=True):  # type: ignore
     """
     This class holds the information about the stock prices received from the SmartAPI socket
 

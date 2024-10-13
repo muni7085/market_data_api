@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
-from typing import Dict
+from typing import Dict, Optional
 
 from omegaconf import DictConfig
 from registrable import Registrable
 
-from app.sockets.twisted_socket import MarketDatasetTwistedSocket
+from app.sockets.twisted_socket import MarketDataTwistedSocket
 
 
 class WebsocketConnection(ABC, Registrable):
@@ -23,11 +23,13 @@ class WebsocketConnection(ABC, Registrable):
         The websocket object to connect to the respective websocket
     """
 
-    def __init__(self, websocket: MarketDatasetTwistedSocket):
+    def __init__(self, websocket: MarketDataTwistedSocket):
         self.websocket = websocket
 
     @abstractmethod
-    def get_tokens(self, cfg: DictConfig) -> Dict[str, str]:
+    def get_tokens(
+        self, exchange_segment: str, symbols: str | list[str] | None = None
+    ) -> Dict[str, str]:
         """
         This method returns the tokens for the equity stocks based on the exchange
         and instrument type.
@@ -39,8 +41,12 @@ class WebsocketConnection(ABC, Registrable):
             Eg: {"256265": "INFY"}
 
         """
-        pass
+        raise NotImplementedError
 
     @classmethod
-    def from_cfg(cls, cfg: DictConfig) -> "WebsocketConnection":
-        pass
+    @abstractmethod
+    def from_cfg(cls, cfg: DictConfig) -> Optional["WebsocketConnection"]:
+        """
+        This method creates the object of the websocket connection from the configuration.
+        """
+        raise NotImplementedError

@@ -1,7 +1,11 @@
 from enum import Enum
+from typing import Type, TypeVar
+
+# Declare a TypeVar for enum types
+E = TypeVar("E", bound=Enum)
 
 
-def get_enum_member[E: Enum](enum_class: E, value: str | int) -> E:
+def get_enum_member(enum_class: Type[E], value: str | int) -> E:
     if isinstance(value, str):
         value = value.upper()
         try:

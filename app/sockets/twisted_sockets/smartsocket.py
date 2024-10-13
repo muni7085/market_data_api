@@ -1,11 +1,10 @@
 import json
-import logging
 import struct
 import time
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict, List, cast
 
-from app.sockets.twisted_socket import MarketDatasetTwistedSocket
+from app.sockets.twisted_socket import MarketDataTwistedSocket
 from app.sockets.websocket_client_protocol import MarketDataWebScoketClientProtocol
 from app.utils.common.logger import get_logger
 from app.utils.smartapi.connection import SmartApiConnection
@@ -18,7 +17,7 @@ from app.utils.smartapi.smartsocket_types import (
 logger = get_logger(Path(__file__).name, log_level="DEBUG")
 
 
-class SmartSocket(MarketDatasetTwistedSocket):
+class SmartSocket(MarketDataTwistedSocket):
     """
     SmartSocket is a class that connects to the SmartAPI WebSocket server and subscribes
     to the specified tokens. It receives the data for the subscribed tokens and parses
@@ -60,7 +59,7 @@ class SmartSocket(MarketDatasetTwistedSocket):
 
     WEBSOCKET_URL = "wss://smartapisocket.angelone.in/smart-stream"
     LITTLE_ENDIAN_BYTE_ORDER = "<"
-    TOKEN_MAP = {}
+    TOKEN_MAP: dict[str, tuple[str, ExchangeType]] = {}
 
     def __init__(
         self,
@@ -73,7 +72,6 @@ class SmartSocket(MarketDatasetTwistedSocket):
         on_data_save_callback,
         debug,
     ):
-        print("debug", debug)
         self.ping_interval = 5
         self.headers = {
             "Authorization": auth_token,
@@ -83,13 +81,12 @@ class SmartSocket(MarketDatasetTwistedSocket):
         }
 
         self.sanity_check()
-        self._tokens = []
         self.subscription_mode = subscription_mode
         self.correlation_id = correlation_id
         self.on_data_save_callback = on_data_save_callback
         self.counter = 0
 
-        self.subscribed_tokens = {}
+        self.subscribed_tokens: dict[str, int] = {}
         super().__init__(debug=debug)
 
     def sanity_check(self):
@@ -100,33 +97,52 @@ class SmartSocket(MarketDatasetTwistedSocket):
         for key, value in self.headers.items():
             assert value, f"{key} is empty"
 
-    def set_tokens(self, tokens: List[Dict[str, int | Dict[str, str]]]):
+    def set_tokens(
+        self,
+        tokens_with_exchanges: (
+            dict[str, int | dict[str, str]] | list[dict[str, int | dict[str, str]]]
+        ),
+    ):
         """
         Set the tokens to subscribe to the WebSocket connection
 
         Parameters
         ----------
-        tokens: ``List[Dict[str, int | Dict[str, str]]]``
+        tokens: ``Dict[str, int | Dict[str, str]] | List[Dict[str, int | Dict[str, str]]]``
             A list of dictionaries containing the exchange type and the tokens to subscribe
             e.g., [{"exchangeType": 1, "tokens": {"token1": "name1", "token2": "name2"}}]
+                or {"exchangeType": 1, "tokens": ["token1", "token2"]}
         """
-        assert isinstance(tokens, list)
+        if isinstance(tokens_with_exchanges, dict):
+            tokens_with_exchanges = [tokens_with_exchanges]
 
-        for token in tokens:
-            assert isinstance(token, dict)
-            assert "exchangeType" in token
-            assert "tokens" in token
+        for token_exchange_info in tokens_with_exchanges:
+            if (
+                "exchangeType" not in token_exchange_info
+                or "tokens" not in token_exchange_info
+                or not token_exchange_info["tokens"]
+                or not token_exchange_info["exchangeType"]
+            ):
+                logger.error(
+                    "Invalid token format %s, skipping token", token_exchange_info
+                )
+                continue
 
-            exchange_type = ExchangeType.get_exchange(token["exchangeType"])
-            assert isinstance(token["tokens"], dict)
+            exchange_type = ExchangeType.get_exchange(
+                cast(int, token_exchange_info["exchangeType"])
+            )
+
             self._tokens.append(
                 {
                     "exchangeType": exchange_type.value,
-                    "tokens": list(token["tokens"].keys()),
+                    "tokens": list(cast(dict, token_exchange_info["tokens"]).keys()),
                 }
             )
             self.TOKEN_MAP.update(
-                {k: (v, exchange_type) for k, v in token["tokens"].items()}
+                {
+                    k: (v, exchange_type)
+                    for k, v in cast(dict, token_exchange_info["tokens"]).items()
+                }
             )
 
     def subscribe(self, tokens: List[Dict[str, int | List[str]]]):
@@ -145,7 +161,11 @@ class SmartSocket(MarketDatasetTwistedSocket):
         """
 
         if self.debug:
-            logger.debug(f"Subscribing to {tokens}")
+            logger.debug("Subscribing to tokens: %s", tokens)
+
+        if not tokens:
+            logger.error("No tokens to subscribe")
+            return False
 
         request_data = {
             "correlationID": self.correlation_id,
@@ -158,14 +178,15 @@ class SmartSocket(MarketDatasetTwistedSocket):
         try:
             self.ws.sendMessage(json.dumps(request_data).encode("utf-8"))
 
-            for token in tokens[0]["tokens"]:
-                self.subscribed_tokens[token] = self.subscription_mode.value
+            for token_info in tokens:
+                for t in cast(list, token_info["tokens"]):
+                    self.subscribed_tokens[t] = cast(int, token_info["exchangeType"])
 
             return True
         except Exception as e:
-            logger.error(f"Error while sending message: {e}")
-            self._close(reason="Error while sending message: {}".format(e))
-            raise
+            logger.error("Error while sending message: %s", e)
+            self._close(reason=f"Error while sending message: {e}")
+            raise e
 
     def unsubscribe(self, tokens=None):
         """
@@ -178,21 +199,55 @@ class SmartSocket(MarketDatasetTwistedSocket):
         tokens: ``List[str]``
             A list of tokens to unsubscribe from the WebSocket connection
         """
+
+        if not tokens:
+            logger.error("No tokens to unsubscribe")
+            return False
+
+        subscribed_tokens = []
+        token_exchange_map = {}
+        tokens_not_subscribed = []
+
+        for token in tokens:
+            if token in self.subscribed_tokens:
+                subscribed_tokens.append(token)
+                if self.subscribed_tokens[token] not in token_exchange_map:
+                    token_exchange_map[self.subscribed_tokens[token]] = []
+
+                token_exchange_map[self.subscribed_tokens[token]].append(token)
+
+            else:
+                tokens_not_subscribed.append(token)
+
+        if tokens_not_subscribed:
+            logger.error("Tokens not subscribed: %s", tokens_not_subscribed)
+
+        tokens_to_unsubscribe = [
+            {"exchangeType": exchange, "tokens": token_list}
+            for exchange, token_list in token_exchange_map.items()
+        ]
+
         request_data = {
             "correlationId": self.correlation_id,
             "action": SubscriptionAction.UNSUBSCRIBE.value,
             "params": {
                 "mode": self.subscription_mode.value,
-                "exchange": tokens,
+                "exchange": tokens_to_unsubscribe,
             },
         }
+
         try:
+            if self.debug:
+                logger.debug("Unsubscribing from tokens: %s", tokens_to_unsubscribe)
+
             self.ws.sendMessage(json.dumps(request_data).encode("utf-8"))
-            for token in tokens:
+
+            for token in subscribed_tokens:
                 self.subscribed_tokens.pop(token)
 
             return True
         except Exception as e:
+            logger.error("Error while sending message to unsubscribe tokens: %s", e)
             self._close(reason="Error while sending message: {}".format(e))
             raise
 
@@ -204,14 +259,19 @@ class SmartSocket(MarketDatasetTwistedSocket):
         exchange type and then  calls the subscribe method with the grouped tokens
         """
         tokens_with_exchange = {}
-        for token, _ in self.subscribed_tokens.items():
-            exchange_type = self.TOKEN_MAP.get(token)[1]
+
+        for token, exchange_type in self.subscribed_tokens.items():
             tokens_with_exchange.setdefault(exchange_type, []).append(token)
+
         tokens_list = [
-            {"exchangeType": exchange_type.value, "tokens": tokens}
+            {"exchangeType": exchange_type, "tokens": tokens}
             for exchange_type, tokens in tokens_with_exchange.items()
         ]
-        self.subscribe(tokens_list)
+
+        if self.debug:
+            logger.debug("Resubscribing to tokens: %s", tokens_list)
+
+        return self.subscribe(tokens_list)
 
     def _unpack_data(self, binary_data, start, end, byte_format="I"):
         """
@@ -237,6 +297,7 @@ class SmartSocket(MarketDatasetTwistedSocket):
         parsed_data: ``Dict[str, Any]``
             A dictionary containing the parsed data.
         """
+
         parsed_data = {
             "subscription_mode": self._unpack_data(binary_data, 0, 1, byte_format="B")[
                 0
@@ -305,10 +366,13 @@ class SmartSocket(MarketDatasetTwistedSocket):
                 )[0]
             return parsed_data
         except Exception as e:
-            logger.exception(f"Error in parsing binary data: {e}")
+            logger.exception("Error in parsing binary data: %s", e)
 
     def _on_message(
-        self, ws: MarketDataWebScoketClientProtocol, payload: str, is_binary: bool
+        self,
+        ws: MarketDataWebScoketClientProtocol,
+        payload: bytes | str,
+        is_binary: bool,
     ):
         """
         Process incoming WebSocket messages and prepare data for callback.
@@ -326,15 +390,18 @@ class SmartSocket(MarketDatasetTwistedSocket):
         is_binary: ``bool``
             Flag indicating whether the payload is binary data
         """
+        if is_binary:
+            data = self.decode_data(payload)
+        else:
+            data = json.loads(payload)
 
-        data = self.decode_data(payload)
-        data["name"] = self.TOKEN_MAP.get(data["token"])[0]
+        data["name"] = self.TOKEN_MAP[data["token"]][0]
         data["socket_name"] = "smartapi"
         data["retrieval_timestamp"] = str(time.time())
-        data["exchange"] = self.TOKEN_MAP.get(data["token"])[1].name
+        data["exchange"] = self.TOKEN_MAP[data["token"]][1].name
 
         if self.debug:
-            logger.debug(f"Received data: {data}")
+            logger.debug("Received data: %s", data)
 
         if self.on_data_save_callback:
             self.on_data_save_callback(json.dumps(data))

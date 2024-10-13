@@ -3,6 +3,7 @@ This module contains the CRUD operations for the SocketStockPriceInfo table in t
 """
 
 from pathlib import Path
+from typing import cast
 
 from sqlalchemy.dialects.sqlite import insert
 
@@ -31,7 +32,7 @@ def upsert(stock_price_info: dict[str, str | None] | list[dict[str, str | None]]
     upsert_stmt = upsert_stmt.on_conflict_do_update(set_=columns)
 
     with next(get_session()) as session:
-        session.exec(upsert_stmt)
+        session.exec(upsert_stmt)  # type: ignore
         session.commit()
 
 
@@ -51,7 +52,7 @@ def insert_or_ignore(
     insert_stmt = insert_stmt.on_conflict_do_nothing()
 
     with next(get_session()) as session:
-        session.exec(insert_stmt)
+        session.exec(insert_stmt)  # type: ignore
         session.commit()
 
 
@@ -60,6 +61,7 @@ def insert_data(
         SocketStockPriceInfo
         | dict[str, str | None]
         | list[SocketStockPriceInfo | dict[str, str | None]]
+        | None
     ),
     update_existing: bool = False,
 ):
@@ -71,7 +73,7 @@ def insert_data(
 
     Parameters
     ----------
-    data: ``SocketStockPriceInfo | dict[str, str|None] | List[SocketStockPriceInfo | dict[str, str|None]]``
+    data: ``SocketStockPriceInfo | dict[str, str|None] | List[SocketStockPriceInfo | dict[str, str | None]] | None``
         The data to insert into the table
     update_existing: ``bool``
         If True, the existing data in the table will be updated with the new data.
@@ -86,13 +88,16 @@ def insert_data(
         data = [data]
 
     # Convert list of SocketStockPriceInfo to a list of dicts
-    data = [
-        item.to_dict() if isinstance(item, SocketStockPriceInfo) else item
-        for item in data
-    ]
+    data_to_insert = cast(
+        list[dict[str, str | None]],
+        [
+            item.to_dict() if isinstance(item, SocketStockPriceInfo) else item
+            for item in data
+        ],
+    )
 
     # Handle upsert or insert
     if update_existing:
-        upsert(data)
+        upsert(data_to_insert)
     else:
-        insert_or_ignore(data)
+        insert_or_ignore(data_to_insert)

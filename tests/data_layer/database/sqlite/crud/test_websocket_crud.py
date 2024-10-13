@@ -29,7 +29,7 @@ def mock_session(mocker) -> MagicMock:
 
 
 @pytest.fixture
-def sample_stock_price_info() -> Dict[str, str]:
+def sample_stock_price_info() -> dict[str, str | None]:
     """
     Sample stock price info dictionary
     """
@@ -45,8 +45,8 @@ def sample_stock_price_info() -> Dict[str, str]:
         "last_traded_quantity": "100",
         "average_traded_price": "1700.0",
         "volume_trade_for_the_day": "1000",
-        "total_buy_quantity": "500",
-        "total_sell_quantity": "500",
+        "total_buy_quantity": None,
+        "total_sell_quantity": None,
     }
 
 
@@ -77,7 +77,7 @@ def sample_socket_stock_price_info() -> SocketStockPriceInfo:
 
 # Test: 1
 def test_insert_data_single_dict(
-    mock_session: MagicMock, sample_stock_price_info: Dict[str, str]
+    mock_session: MagicMock, sample_stock_price_info: dict[str, str | None]
 ) -> None:
     """
     Test insert_data with a single dict and `update_existing=False`
@@ -90,7 +90,7 @@ def test_insert_data_single_dict(
 
 # Test: 2
 def test_insert_data_single_dict_upsert(
-    mock_session: MagicMock, sample_stock_price_info: Dict[str, str]
+    mock_session: MagicMock, sample_stock_price_info: dict[str, str | None]
 ) -> None:
     """
     Test insert_data with a single dict and `update_existing=True`
@@ -121,7 +121,7 @@ def test_insert_data_empty_input(mock_session: MagicMock, mocker) -> None:
 
 # Test: 4
 def test_insert_data_list_dicts(
-    mock_session: MagicMock, sample_stock_price_info: Dict[str, str]
+    mock_session: MagicMock, sample_stock_price_info: dict[str, str | None]
 ) -> None:
     """
     Test insert_data with a list of dicts and `update_existing=False`
@@ -134,7 +134,7 @@ def test_insert_data_list_dicts(
 
 # Test: 5
 def test_insert_data_list_dicts_upsert(
-    mock_session: MagicMock, sample_stock_price_info: Dict[str, str]
+    mock_session: MagicMock, sample_stock_price_info: dict[str, str | None]
 ) -> None:
     """
     Test insert_data with a list of dicts and `update_existing=True`
@@ -160,7 +160,7 @@ def test_insert_data_with_object_conversion(
 
 # Test: 7
 def test_upsert(
-    mock_session: MagicMock, sample_stock_price_info: Dict[str, str]
+    mock_session: MagicMock, sample_stock_price_info: dict[str, str | None]
 ) -> None:
     """
     Test upsert logic
@@ -173,7 +173,7 @@ def test_upsert(
 
 # Test: 8
 def test_insert_or_ignore(
-    mock_session: MagicMock, sample_stock_price_info: Dict[str, str]
+    mock_session: MagicMock, sample_stock_price_info: dict[str, str | None]
 ) -> None:
     """
     Test insert_or_ignore logic

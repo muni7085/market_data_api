@@ -1,3 +1,4 @@
+# pylint: disable=too-many-instance-attributes, too-many-arguments, no-member, not-callable
 import sys
 import threading
 from abc import ABC, abstractmethod
@@ -15,8 +16,32 @@ from app.utils.common.logger import get_logger
 logger = get_logger(Path(__file__).name)
 
 
-class MarketDatasetTwistedSocket(ABC):
-    WEBSOCKET_URL = None
+class MarketDataTwistedSocket(ABC):
+    """
+    MarketDataTwistedSocket is an abstract class that provides the interface for the WebSocket clients
+    to implement. It provides the methods to connect, disconnect, subscribe, and unsubscribe to the
+    WebSocket connection. The WebSocket clients should implement the set_tokens, subscribe, unsubscribe,
+    and resubscribe methods to connect to the WebSocket server and receive data for the specified tokens.
+
+    Attributes
+    ----------
+    max_retries: ``int``, ( default = 5 )
+        The maximum number of retries to reconnect to the WebSocket server
+    reconnect: ``bool``, ( default = True )
+        A boolean flag that indicates whether to reconnect to the WebSocket server
+    reconnect_max_tries: ``int``, ( default = 5 )
+        The maximum number of tries to reconnect to the WebSocket server
+    reconnect_max_delay: ``int``, ( default = 5 )
+        The maximum delay in seconds to reconnect to the WebSocket server
+    connection_timeout: ``int``, ( default = 5 )
+        The connection timeout in seconds
+    debug: ``bool``, ( default = False )
+        A boolean flag that indicates whether to enable debug mode for the WebSocket connection
+
+
+    """
+
+    WEBSOCKET_URL: Optional[str] = None
 
     def __init__(
         self,
@@ -29,7 +54,7 @@ class MarketDatasetTwistedSocket(ABC):
         debug: bool = False,
     ):
         self.ping_interval = ping_interval
-        self.RESUBSCRIBE = False
+        self.is_resubscribe = False
         self.max_retries = max_retries
         self.reconnect_max_tries = reconnect_max_tries
         self.reconnect = reconnect
@@ -39,7 +64,7 @@ class MarketDatasetTwistedSocket(ABC):
 
         self._is_first_connect = True
 
-        self.ws = None
+        self.ws: WebSocketClientProtocol = None
 
         self.on_tick = None
         self.on_connect = None
@@ -49,6 +74,7 @@ class MarketDatasetTwistedSocket(ABC):
         self.on_close = None
         self.on_reconnect = None
         self.on_noreconnect = None
+        self._tokens: List[Dict[str, int | list[str]]] = []
 
     @abstractmethod
     def set_tokens(self, tokens: List[Dict[str, int | Dict[str, str]]]):
@@ -81,8 +107,8 @@ class MarketDatasetTwistedSocket(ABC):
         self.factory.on_reconnect = self._on_reconnect
         self.factory.on_noreconnect = self._on_noreconnect
 
-        self.factory.maxDelay = self.reconnect_max_delay
-        self.factory.maxRetries = self.reconnect_max_tries
+        self.factory.max_delay = self.reconnect_max_delay
+        self.factory.max_retries = self.reconnect_max_tries
 
     def connect(self, threaded=False, disable_ssl_verification=False, proxy=None):
         """
@@ -100,6 +126,7 @@ class MarketDatasetTwistedSocket(ABC):
         """
 
         # Check if the WebSocket URL and headers are set by the implementation class
+        # The implementation class should set the WEBSOCKET_URL and headers attributes
         assert self.WEBSOCKET_URL, "WEBSOCKET_URL is not set"
         assert self.headers, "Headers are not set"
 
@@ -251,7 +278,7 @@ class MarketDatasetTwistedSocket(ABC):
         """
 
         if self.debug:
-            logger.debug(f"Connection closed. Code: {code}, Reason: {reason}")
+            logger.debug("Connection closed. Code: %s, Reason: %s", code, reason)
 
         if self.on_close:
             self.on_close(ws, code, reason)
@@ -270,13 +297,15 @@ class MarketDatasetTwistedSocket(ABC):
             The reason for closing the connection sent by the server
         """
         if self.debug:
-            logger.debug(f"Error. Code: {code}, Reason: {reason}")
+            logger.debug("Error. Code: %s, Reason: %s", code, reason)
 
         if self.on_error:
             self.on_error(ws, code, reason)
 
     @abstractmethod
-    def _on_message(self, ws: WebSocketClientProtocol, payload: bytes, is_binary: bool):
+    def _on_message(
+        self, ws: WebSocketClientProtocol, payload: bytes | str, is_binary: bool
+    ):
         """
         This function is called when a message is received from the WebSocket server
 
@@ -284,7 +313,7 @@ class MarketDatasetTwistedSocket(ABC):
         ----------
         ws: ``WebSocketClientProtocol``
             The WebSocket client protocol object
-        payload: ``bytes``
+        payload: ``bytes | str``
             The message payload received from the server
         is_binary: ``bool``
             A boolean flag that indicates whether the message is binary or text
@@ -304,7 +333,7 @@ class MarketDatasetTwistedSocket(ABC):
             The WebSocket client protocol object
         """
         if self.debug:
-            logger.info(f"on open : {ws.state}")
+            logger.info("on open : %s", ws.state)
 
         if not self._is_first_connect:
             self.resubscribe()
@@ -324,7 +353,7 @@ class MarketDatasetTwistedSocket(ABC):
             The number of retries left for reconnection
         """
         if self.debug:
-            logger.debug(f"Reconnecting. Retries left: {retries}")
+            logger.debug("Reconnecting. Retries left: %s", retries)
 
         if self.on_reconnect:
             self.on_reconnect(self, retries)

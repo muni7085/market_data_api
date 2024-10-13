@@ -25,15 +25,15 @@ class MarketDataWebSocketClientFactory(
         The protocol class that is used to create a WebSocket client protocol
     maxDelay: ``int``
         The maximum delay (in seconds) between reconnection attempts
-    maxRetries: ``int``
+    max_retries: ``int``
         The maximum number of reconnection attempts before stopping the connection
     _last_connection_time: ``float``
         The timestamp of the last connection attempt
     """
 
     protocol = MarketDataWebScoketClientProtocol
-    maxDelay = 5
-    maxRetries = 10
+    max_delay = 5
+    max_retries = 10
 
     _last_connection_time = None
 
@@ -119,10 +119,10 @@ class MarketDataWebSocketClientFactory(
         This method is used to check if the maximum number of retries has been reached
         and if so, it stops the connection and calls the on_noreconnect callback
         """
-        if self.maxRetries and (self.retries > self.maxRetries):
+        if self.max_retries and (self.retries > self.max_retries):
             if self.debug:
                 logger.debug(
-                    f"Max {self.maxRetries} retries reached. Stopping the connection"
+                    f"Max {self.max_retries} retries reached. Stopping the connection"
                 )
 
                 self.stop()

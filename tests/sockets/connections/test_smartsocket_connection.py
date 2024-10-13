@@ -13,6 +13,7 @@ from pytest_mock import MockerFixture, MockType
 from app.data_layer.database.sqlite.models.smartapi_models import SmartAPIToken
 from app.sockets.connections import SmartSocketConnection
 from app.utils.common.exceptions import SymbolNotFoundException
+from app.utils.common.types.financial_types import Exchange
 
 
 #################### Fixtures ####################
@@ -182,12 +183,11 @@ def test_init_from_cfg_invalid_cfg(
     connection_cfg["exchange_type"] = "invalid_exchange_type"
     cfg = OmegaConf.create(connection_cfg)
     connection = SmartSocketConnection.from_cfg(cfg)
-
-    validate_invalid_connection(
-        connection, mock_logger, mock_smartsocket, mock_init_from_cfg
-    )
     mock_logger.error.assert_called_with(
         "Instance %d has no tokens to subscribe to, exiting...", 0
+    )
+    validate_invalid_connection(
+        connection, mock_logger, mock_smartsocket, mock_init_from_cfg
     )
 
     # Test: 2.3 ( Number of tokens per instance is 0, meaning no tokens to subscribe to )
@@ -222,7 +222,7 @@ def test_get_equity_stock_tokens(
     with valid and invalid exchange types.
     """
     mock_get_smartapi_tokens_by_all_conditions.return_value = smartapi_tokens[0]
-    stocks = connection.get_equity_stock_tokens("nse", "EQ")
+    stocks = connection.get_equity_stock_tokens(Exchange.NSE, "EQ")
 
     assert stocks == smartapi_tokens[1]
 
@@ -245,7 +245,7 @@ def test_get_tokens_from_symbols(
         return_value=token_symbol,
     )
 
-    stocks = connection.get_tokens_from_symbols(token_symbol[0], "nse")
+    stocks = connection.get_tokens_from_symbols([token_symbol[0]], Exchange.NSE)
 
     assert stocks == {token_symbol[0]: token_symbol[1]}
 
@@ -254,11 +254,11 @@ def test_get_tokens_from_symbols(
         "app.sockets.connections.smartsocket_connection.validate_symbol_and_get_token",
         side_effect=SymbolNotFoundException("FAKE_SYMBOL"),
     )
-    stocks = connection.get_tokens_from_symbols(["FAKE_SYMBOL"], "nse")
+    stocks = connection.get_tokens_from_symbols(["FAKE_SYMBOL"], Exchange.NSE)
 
     assert stocks == {}
     mock_logger.error.assert_called_once_with(
-        "Invalid symbols: ['FAKE_SYMBOL'], discarded for subscription"
+        "Invalid symbols: %s discarded for subscription", ["FAKE_SYMBOL"]
     )
 
 
@@ -275,7 +275,7 @@ def test_get_tokens(
     the possible scenarios.
     """
     # Test: 5.1 ( Test with exchange type as None and symbols as None )
-    tokens = connection.get_tokens(exchange_type=None, symbols=None)
+    tokens = connection.get_tokens(exchange_segment=None, symbols=None)  # type: ignore
     mock_logger.error.assert_called_once_with(
         "Exchange type not provided in the configuration, exiting..."
     )
@@ -283,7 +283,7 @@ def test_get_tokens(
     assert tokens == {}
 
     # Test: 5.2 ( Test with invalid exchange type )
-    tokens = connection.get_tokens(exchange_type="nse_fo", symbols=["INFY"])
+    tokens = connection.get_tokens(exchange_segment="nse_fo", symbols=["INFY"])
     mock_logger.error.assert_called_once_with(
         "Invalid exchange type provided in the configuration: %s", "nse_fo"
     )
@@ -291,7 +291,7 @@ def test_get_tokens(
     mock_logger.reset_mock()
 
     # Test: 5.3 ( Test with invalid exchange type )
-    tokens = connection.get_tokens(exchange_type="nse_fo")
+    tokens = connection.get_tokens(exchange_segment="nse_fo")
     mock_logger.error.assert_called_once_with(
         "Invalid exchange type provided in the configuration: %s", "nse_fo"
     )
@@ -299,29 +299,29 @@ def test_get_tokens(
 
     # Test: 5.4 ( Test with exchange type as None and symbols )
     mock_validate_symbol_and_get_token.return_value = ("256265", "INFY")
-    tokens = connection.get_tokens(exchange_type=None, symbols=["INFY"])
+    tokens = connection.get_tokens(exchange_segment=None, symbols=["INFY"])  # type: ignore
     mock_logger.info.assert_called_once_with(
         "Exchange type not provided in the configuration, considering the NSE exchange type"
     )
-    mock_validate_symbol_and_get_token.assert_called_once_with("NSE", "INFY")
+    mock_validate_symbol_and_get_token.assert_called_once_with(Exchange.NSE, "INFY")
     assert tokens == {"256265": "INFY"}
     mock_logger.reset_mock()
     mock_validate_symbol_and_get_token.reset_mock()
 
     # Test: 5.5 ( Test with NSE exchange  and symbols )
-    tokens = connection.get_tokens(exchange_type="nse_cm", symbols=["INFY"])
-    mock_validate_symbol_and_get_token.assert_called_once_with("NSE", "INFY")
+    tokens = connection.get_tokens(exchange_segment="nse_cm", symbols=["INFY"])
+    mock_validate_symbol_and_get_token.assert_called_once_with(Exchange.NSE, "INFY")
     assert tokens == {"256265": "INFY"}
     mock_validate_symbol_and_get_token.reset_mock()
 
     # Test: 5.6 ( Test with BSE exchange and symbols )
-    tokens = connection.get_tokens(exchange_type="bse_cm", symbols=["INFY"])
-    mock_validate_symbol_and_get_token.assert_called_once_with("BSE", "INFY")
+    tokens = connection.get_tokens(exchange_segment="bse_cm", symbols=["INFY"])
+    mock_validate_symbol_and_get_token.assert_called_once_with(Exchange.BSE, "INFY")
     assert tokens == {"256265": "INFY"}
 
     # Test: 5.7 ( Test with NSE exchange only )
     mock_get_smartapi_tokens_by_all_conditions.return_value = smartapi_tokens[0]
-    tokens = connection.get_tokens(exchange_type="nse_cm")
+    tokens = connection.get_tokens(exchange_segment="nse_cm")
 
     mock_get_smartapi_tokens_by_all_conditions.assert_called_once_with(
         exchange="NSE", instrument_type="EQ"
@@ -332,7 +332,7 @@ def test_get_tokens(
     }
 
     # Test: 5.8 ( Test with BSE exchange only )
-    tokens = connection.get_tokens(exchange_type="bse_cm")
+    tokens = connection.get_tokens(exchange_segment="bse_cm")
 
     mock_get_smartapi_tokens_by_all_conditions.assert_any_call(
         exchange="BSE", instrument_type="EQ"
