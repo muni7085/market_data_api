@@ -1,11 +1,12 @@
+# pylint: disable=too-many-arguments
 import json
 import struct
 import time
 from pathlib import Path
-from typing import Dict, List, cast
+from typing import Any, Dict, List, cast
 
 from app.sockets.twisted_socket import MarketDataTwistedSocket
-from app.sockets.websocket_client_protocol import MarketDataWebScoketClientProtocol
+from app.sockets.websocket_client_protocol import MarketDataWebSocketClientProtocol
 from app.utils.common.logger import get_logger
 from app.utils.smartapi.connection import SmartApiConnection
 from app.utils.smartapi.smartsocket_types import (
@@ -248,7 +249,7 @@ class SmartSocket(MarketDataTwistedSocket):
             return True
         except Exception as e:
             logger.error("Error while sending message to unsubscribe tokens: %s", e)
-            self._close(reason="Error while sending message: {}".format(e))
+            self._close(reason=f"Error while sending message: {e}")
             raise
 
     def resubscribe(self):
@@ -282,7 +283,7 @@ class SmartSocket(MarketDataTwistedSocket):
             self.LITTLE_ENDIAN_BYTE_ORDER + byte_format, binary_data[start:end]
         )
 
-    def decode_data(self, binary_data):
+    def decode_data(self, binary_data: bytes) -> dict[str, Any]:
         """
         Parses binary data received from the websocket and returns a dictionary
         containing the parsed data.
@@ -364,13 +365,14 @@ class SmartSocket(MarketDataTwistedSocket):
                 parsed_data["open_interest_change_percentage"] = self._unpack_data(
                     binary_data, 139, 147, byte_format="q"
                 )[0]
-            return parsed_data
         except Exception as e:
             logger.exception("Error in parsing binary data: %s", e)
 
+        return parsed_data
+
     def _on_message(
         self,
-        ws: MarketDataWebScoketClientProtocol,
+        ws: MarketDataWebSocketClientProtocol,
         payload: bytes | str,
         is_binary: bool,
     ):
@@ -391,7 +393,7 @@ class SmartSocket(MarketDataTwistedSocket):
             Flag indicating whether the payload is binary data
         """
         if is_binary:
-            data = self.decode_data(payload)
+            data = self.decode_data(cast(bytes, payload))
         else:
             data = json.loads(payload)
 
@@ -408,6 +410,9 @@ class SmartSocket(MarketDataTwistedSocket):
 
     @staticmethod
     def initialize_socket(cfg, on_save_data_callback=None):
+        """
+        Initialize the SmartSocket connection with the specified configuration.
+        """
         smartapi_connection = SmartApiConnection.get_connection()
         auth_token = smartapi_connection.get_auth_token()
         feed_token = smartapi_connection.api.getfeedToken()

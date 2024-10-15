@@ -1,3 +1,4 @@
+# pylint: disable=too-many-instance-attributes,
 import time
 from pathlib import Path
 
@@ -5,19 +6,19 @@ from autobahn.twisted.websocket import WebSocketClientFactory
 from twisted.internet.protocol import ReconnectingClientFactory
 from twisted.internet.tcp import Connector
 
-from app.sockets.websocket_client_protocol import MarketDataWebScoketClientProtocol
+from app.sockets.websocket_client_protocol import MarketDataWebSocketClientProtocol
 from app.utils.common.logger import get_logger
 
-logger = get_logger(Path(__file__).name)
+logger = get_logger(Path(__file__).name, log_level="DEBUG")
 
 
 class MarketDataWebSocketClientFactory(
     WebSocketClientFactory, ReconnectingClientFactory
 ):
     """
-    This class is used to create a WebSocket client factory that can be used to establish a connection
-    to a WebSocket server and handle the connection lifecycle events such as connection failure, connection loss,
-    reconnection, etc.
+    This class is used to create a WebSocket client factory that can be used to establish
+    a connection to a WebSocket server and handle the connection lifecycle events such as
+    connection failure, connection loss, reconnection, etc.
 
     Attributes
     ----------
@@ -31,8 +32,8 @@ class MarketDataWebSocketClientFactory(
         The timestamp of the last connection attempt
     """
 
-    protocol = MarketDataWebScoketClientProtocol
-    max_delay = 5
+    protocol = MarketDataWebSocketClientProtocol
+    max_delay = 2
     max_retries = 10
 
     _last_connection_time = None
@@ -52,7 +53,7 @@ class MarketDataWebSocketClientFactory(
 
     def startedConnecting(self, connector: Connector):
         """
-        This callback is triggered when the client starts connecting to the server
+        This callback is triggered when the client starts connecting to the server.
 
         Parameters
         ----------
@@ -67,7 +68,7 @@ class MarketDataWebSocketClientFactory(
 
     def clientConnectionFailed(self, connector: Connector, reason: str):
         """
-        This callback is triggered when the client fails to connect to the server
+        This callback is triggered when the client fails to connect to the server.
 
         Parameters
         ----------
@@ -78,16 +79,19 @@ class MarketDataWebSocketClientFactory(
             The reason for the connection failure (e.g., "Connection refused")
         """
         if self.retries > 0:
-            logger.error(f"Connection failed. Reason: {reason}")
+            logger.error("Connection failed. Reason: %s", reason)
             logger.info(
-                f"Trying to reconnect in {int(round(self.delay))}. Retries left: {self.retries}"
+                "Trying to reconnect in %s. Retries left: %s",
+                int(round(self.delay)),
+                self.retries,
             )
 
             if self.on_reconnect:
                 self.on_reconnect(self.retries)
 
-        self.retry(connector)
-        self.send_noreconnect()
+            self.retry(connector)
+        else:
+            self.send_noreconnect()
 
     def clientConnectionLost(self, connector: Connector, reason: str):
         """
@@ -103,16 +107,18 @@ class MarketDataWebSocketClientFactory(
             The reason for the connection loss (e.g., "Connection lost")
         """
         if self.retries > 0:
-            logger.error(f"Connection lost. Reason: {reason}")
+            logger.error("Connection lost. Reason: %s", reason)
             logger.info(
-                f"Trying to reconnect in {int(round(self.delay))}. Retries left: {self.retries}"
+                "Trying to reconnect in %s. Retries left: %s",
+                int(round(self.delay)),
+                self.retries,
             )
 
             if self.on_reconnect:
                 self.on_reconnect(self.retries)
-
-        self.retry(connector)
-        self.send_noreconnect()
+        else:
+            self.retry(connector)
+            self.send_noreconnect()
 
     def send_noreconnect(self):
         """
@@ -122,7 +128,7 @@ class MarketDataWebSocketClientFactory(
         if self.max_retries and (self.retries > self.max_retries):
             if self.debug:
                 logger.debug(
-                    f"Max {self.max_retries} retries reached. Stopping the connection"
+                    "Max %s retries reached. Stopping the connection", self.max_retries
                 )
 
                 self.stop()

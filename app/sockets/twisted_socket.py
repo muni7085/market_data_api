@@ -13,7 +13,7 @@ from twisted.python import log as twisted_log
 from app.sockets.websocket_client_factory import MarketDataWebSocketClientFactory
 from app.utils.common.logger import get_logger
 
-logger = get_logger(Path(__file__).name)
+logger = get_logger(Path(__file__).name, log_level="DEBUG")
 
 
 class MarketDataTwistedSocket(ABC):
@@ -37,8 +37,6 @@ class MarketDataTwistedSocket(ABC):
         The connection timeout in seconds
     debug: ``bool``, ( default = False )
         A boolean flag that indicates whether to enable debug mode for the WebSocket connection
-
-
     """
 
     WEBSOCKET_URL: Optional[str] = None
@@ -75,9 +73,11 @@ class MarketDataTwistedSocket(ABC):
         self.on_reconnect = None
         self.on_noreconnect = None
         self._tokens: List[Dict[str, int | list[str]]] = []
+        self.factory = None
+        self.websocket_thread = None
 
     @abstractmethod
-    def set_tokens(self, tokens: List[Dict[str, int | Dict[str, str]]]):
+    def set_tokens(self, tokens_with_exchanges: List[Dict[str, int | Dict[str, str]]]):
         """
         Set the tokens to subscribe to the WebSocket connection
         """
