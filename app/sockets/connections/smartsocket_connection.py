@@ -186,13 +186,9 @@ class SmartSocketConnection(WebsocketConnection):
         tokens = connection.get_tokens(cfg.exchange_type, cfg.symbols)
 
         tokens = dict(islice(tokens.items(), token_start_idx, token_end_idx))
-        print(tokens)
+
         # If there are no tokens to subscribe to, log an error and return None
         if not tokens:
-            print(
-                "Instance %d has no tokens to subscribe to, exiting...",
-                connection_instance_num,
-            )
             logger.error(
                 "Instance %d has no tokens to subscribe to, exiting...",
                 connection_instance_num,

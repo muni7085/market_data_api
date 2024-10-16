@@ -43,16 +43,17 @@ class MarketDataTwistedSocket(ABC):
 
     def __init__(
         self,
+        ping_interval: int = 10,
+        ping_message: str = "ping",
         max_retries: int = 5,
         reconnect: bool = True,
-        ping_interval: int = 5,
         reconnect_max_tries: int = 5,
         reconnect_max_delay: int = 5,
         connection_timeout=5,
         debug: bool = False,
     ):
         self.ping_interval = ping_interval
-        self.is_resubscribe = False
+        self.ping_message = ping_message
         self.max_retries = max_retries
         self.reconnect_max_tries = reconnect_max_tries
         self.reconnect = reconnect
@@ -64,7 +65,6 @@ class MarketDataTwistedSocket(ABC):
 
         self.ws: WebSocketClientProtocol = None
 
-        self.on_tick = None
         self.on_connect = None
         self.on_open = None
         self.on_message = None
@@ -95,7 +95,9 @@ class MarketDataTwistedSocket(ABC):
         kwargs: ``dict``
             Additional options to pass to the WebSocket client factory
         """
-        self.factory = MarketDataWebSocketClientFactory(url, **kwargs)
+        self.factory = MarketDataWebSocketClientFactory(
+            self.ping_interval, self.ping_message, url, **kwargs
+        )
         self.ws = self.factory.ws
         self.factory.debug = self.debug
 

@@ -1,3 +1,4 @@
+# pylint: disable=no-member, super-with-arguments
 import time
 from pathlib import Path
 
@@ -27,7 +28,6 @@ class MarketDataWebSocketClientProtocol(WebSocketClientProtocol):
         The timestamp of the last ping message sent to the server
     """
 
-    PING_INTERVAL = 20
     KEEPALIVE_INTERVAL = 20
 
     _next_ping = None
@@ -35,7 +35,9 @@ class MarketDataWebSocketClientProtocol(WebSocketClientProtocol):
     _last_pong_time = None
     _last_ping_time = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, ping_interval, ping_message, *args, **kwargs):
+        self.ping_interval = ping_interval
+        self.ping_message = ping_message
         super(MarketDataWebSocketClientProtocol, self).__init__(*args, **kwargs)
 
     def onConnect(self, response: ConnectionResponse):
@@ -95,15 +97,14 @@ class MarketDataWebSocketClientProtocol(WebSocketClientProtocol):
             if self.factory.on_message:
                 self.factory.on_message(self, payload, isBinary)
         else:
-            # Decode the text message safely
             try:
-                message = payload.decode("utf-8")  # Decode as UTF-8 text
+                message = payload.decode("utf-8")
             except UnicodeDecodeError:
                 logger.error("Failed to decode message as UTF-8: %s", payload)
-                return  # Exit early if decoding fails
+                return
 
             # Handle heartbeat pong response
-            if message == "pong":  # Handle heartbeat response
+            if message == "pong":
                 if self.factory.debug and self._last_pong_time:
                     logger.debug(
                         "Last pong was received at %.2f seconds ago (%.4f)",
@@ -162,14 +163,15 @@ class MarketDataWebSocketClientProtocol(WebSocketClientProtocol):
                 self._last_ping_time,
             )
 
-        if self.factory.debug:
+        if self.factory.debug and not self._last_ping_time:
             logger.debug("Sending heartbeat ping...")
 
-        self.sendMessage(b"ping", isBinary=False)  # Sending "ping" as a text message
+        # Sending "ping" as a text message
+        self.sendMessage(self.factory.ping_message.encode("utf-8"), isBinary=False)
         self._last_ping_time = time.time()
 
         self._next_ping = self.factory.reactor.callLater(
-            self.PING_INTERVAL, self._loop_ping
+            self.ping_interval, self._loop_ping
         )
 
     def _loop_pong_check(self):

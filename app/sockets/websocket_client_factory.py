@@ -1,4 +1,4 @@
-# pylint: disable=too-many-instance-attributes,
+# pylint: disable=too-many-instance-attributes, super-with-arguments, no-member
 import time
 from pathlib import Path
 
@@ -32,13 +32,15 @@ class MarketDataWebSocketClientFactory(
         The timestamp of the last connection attempt
     """
 
-    protocol = MarketDataWebSocketClientProtocol
     max_delay = 2
     max_retries = 10
 
     _last_connection_time = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, ping_interval, ping_message, *args, **kwargs):
+
+        self.ping_interval = ping_interval
+        self.ping_message = ping_message
 
         self.debug = False
         self.ws = None
@@ -50,6 +52,27 @@ class MarketDataWebSocketClientFactory(
         self.on_noreconnect = None
         self.on_close = None
         super(MarketDataWebSocketClientFactory, self).__init__(*args, **kwargs)
+
+    def buildProtocol(self, addr):
+        """
+        This method is used to create a new instance of the protocol class that is used to
+        create a WebSocket client protocol
+
+        Parameters
+        ----------
+        addr: ``str``
+            The address of the server to which the client is connecting
+
+        Returns
+        -------
+        ``MarketDataWebSocketClientProtocol``
+            A new instance of the protocol class that is used to create a WebSocket client protocol
+        """
+        protocol = MarketDataWebSocketClientProtocol(
+            self.ping_interval, self.ping_message
+        )
+        protocol.factory = self
+        return protocol
 
     def startedConnecting(self, connector: Connector):
         """
@@ -116,14 +139,15 @@ class MarketDataWebSocketClientFactory(
 
             if self.on_reconnect:
                 self.on_reconnect(self.retries)
-        else:
             self.retry(connector)
+        else:
+
             self.send_noreconnect()
 
     def send_noreconnect(self):
         """
         This method is used to check if the maximum number of retries has been reached
-        and if so, it stops the connection and calls the on_noreconnect callback
+        and if so, it stops the connection and calls the `on_noreconnect` callback
         """
         if self.max_retries and (self.retries > self.max_retries):
             if self.debug:

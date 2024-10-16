@@ -72,7 +72,12 @@ class SmartSocket(MarketDataTwistedSocket):
         subscription_mode: SubscriptionMode,
         on_data_save_callback,
         debug,
+        ping_interval,
+        ping_message,
     ):
+        super().__init__(
+            ping_interval=ping_interval, ping_message=ping_message, debug=debug
+        )
         self.ping_interval = 5
         self.headers = {
             "Authorization": auth_token,
@@ -88,7 +93,6 @@ class SmartSocket(MarketDataTwistedSocket):
         self.counter = 0
 
         self.subscribed_tokens: dict[str, int] = {}
-        super().__init__(debug=debug)
 
     def sanity_check(self):
         """
@@ -430,4 +434,6 @@ class SmartSocket(MarketDataTwistedSocket):
             ),
             on_save_data_callback,
             debug=cfg.get("debug", False),
+            ping_interval=cfg.get("ping_interval", 25),
+            ping_message=cfg.get("ping_message", "ping"),
         )
