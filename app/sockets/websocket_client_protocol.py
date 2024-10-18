@@ -18,17 +18,11 @@ class MarketDataWebSocketClientProtocol(WebSocketClientProtocol):
 
     Attributes
     ----------
-    PING_INTERVAL: ``float``
-        The interval at which the client sends ping messages to the server to keep the connection alive
-    KEEPALIVE_INTERVAL: ``float``
-        The interval at which the client checks if the server is sending pong messages to keep the connection alive
-    _last_pong_time: ``float``
-        The timestamp of the last pong message received from the server
-    _last_ping_time: ``float``
-        The timestamp of the last ping message sent to the server
+    ping_interval: ``int``
+        The interval (in seconds) at which the client should send ping messages to the server
+    ping_message: ``str``
+        The text message that should be sent as a ping message to the server
     """
-
-    KEEPALIVE_INTERVAL = 20
 
     _next_ping = None
     _next_pong_check = None
@@ -38,6 +32,7 @@ class MarketDataWebSocketClientProtocol(WebSocketClientProtocol):
     def __init__(self, ping_interval, ping_message, *args, **kwargs):
         self.ping_interval = ping_interval
         self.ping_message = ping_message
+        self.keepalive_interval = 2 * ping_interval
         super(MarketDataWebSocketClientProtocol, self).__init__(*args, **kwargs)
 
     def onConnect(self, response: ConnectionResponse):
@@ -183,7 +178,7 @@ class MarketDataWebSocketClientProtocol(WebSocketClientProtocol):
         if self._last_pong_time:
             last_pong_diff = time.time() - self._last_pong_time
 
-            if last_pong_diff > 2 * self.KEEPALIVE_INTERVAL:
+            if last_pong_diff > self.keepalive_interval:
                 if self.factory.debug:
                     logger.debug(
                         "Last pong was received %s seconds ago. Dropping the connection to reconnect.",
@@ -192,5 +187,5 @@ class MarketDataWebSocketClientProtocol(WebSocketClientProtocol):
                 self.dropConnection(abort=True)
 
         self._next_pong_check = self.factory.reactor.callLater(
-            self.KEEPALIVE_INTERVAL, self._loop_pong_check
+            self.keepalive_interval, self._loop_pong_check
         )

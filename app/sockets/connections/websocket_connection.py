@@ -34,12 +34,7 @@ class WebsocketConnection(ABC, Registrable):
         This method returns the tokens for the equity stocks based on the exchange
         and instrument type.
 
-        Returns
-        -------
-        ``Dict[str, str]``
-            A dictionary containing the tokens as keys and the symbols as values.
-            Eg: {"256265": "INFY"}
-
+        Refer to the subclasses for the implementation of this method
         """
         raise NotImplementedError
 

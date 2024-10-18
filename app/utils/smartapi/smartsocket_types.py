@@ -38,6 +38,7 @@ def get_enum_member(enum_class: Type[E], value: str | int) -> E:
             return enum_class[value]
         except KeyError:
             valid_names = [member.name for member in enum_class]
+            
             raise ValueError(
                 f"{enum_class.__name__} name '{value}' is not supported. "
                 f"Supported {enum_class.__name__} names are: {valid_names}"
@@ -47,6 +48,7 @@ def get_enum_member(enum_class: Type[E], value: str | int) -> E:
             return enum_class(value)
         except ValueError:
             valid_values = [member.value for member in enum_class]
+            
             raise ValueError(
                 f"{enum_class.__name__} value '{value}' is not supported. "
                 f"Supported {enum_class.__name__} values are: {valid_values}"

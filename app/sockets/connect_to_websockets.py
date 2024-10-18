@@ -49,8 +49,8 @@ def main(cfg: DictConfig):
     """
     Main function to create and connect to the websockets. It will connect to
     the multiple websockets and multiple connection instances to each websocket.
-    For example, if there are 2 websockets and 1 connection to each websocket,
-    then it will create 2 connections in total.
+    For example, if there are 2 websockets and 3 connection to each websocket,
+    then it will create 6 connections in total.
     """
     create_smartapi_tokens_db()
     for connection in cfg.connections:

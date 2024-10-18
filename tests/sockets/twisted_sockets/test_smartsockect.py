@@ -199,8 +199,8 @@ def test_set_tokens(mock_logger):
     smartsocket.set_tokens(tokens)
 
     assert len(smartsocket._tokens) == 1
-    assert smartsocket.TOKEN_MAP["token1"] == ("name1", ExchangeType.NSE_CM)
-    assert smartsocket.TOKEN_MAP["token2"] == ("name2", ExchangeType.NSE_CM)
+    assert smartsocket.token_map["token1"] == ("name1", ExchangeType.NSE_CM)
+    assert smartsocket.token_map["token2"] == ("name2", ExchangeType.NSE_CM)
 
     assert smartsocket._tokens == [{"exchangeType": 1, "tokens": ["token1", "token2"]}]
 
@@ -208,8 +208,8 @@ def test_set_tokens(mock_logger):
     tokens = {"exchangeType": 1, "tokens": {"token1": "name1", "token2": "name2"}}
     smartsocket.set_tokens(tokens)
     assert len(smartsocket._tokens) == 1
-    assert smartsocket.TOKEN_MAP["token1"] == ("name1", ExchangeType.NSE_CM)
-    assert smartsocket.TOKEN_MAP["token2"] == ("name2", ExchangeType.NSE_CM)
+    assert smartsocket.token_map["token1"] == ("name1", ExchangeType.NSE_CM)
+    assert smartsocket.token_map["token2"] == ("name2", ExchangeType.NSE_CM)
 
     assert smartsocket._tokens == [{"exchangeType": 1, "tokens": ["token1", "token2"]}]
 

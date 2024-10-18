@@ -31,12 +31,10 @@ def get_logger(
         A boolean value to indicate if the logs should be written to a file.
         The file name will be the name of the module with a .log extension.
 
-
     Returns
     -------
     logger: ``Logger``
         The logger object configured with a stream handler and a file handler
-
     """
     logger = logging.getLogger(name)
     logger.setLevel(log_level)

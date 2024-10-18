@@ -25,12 +25,7 @@ class SmartSocketConnection(WebsocketConnection):
     """
     This class is responsible for creating a connection to the SmartSocket.
     It creates a connection to the SmartSocket and subscribes to the tokens
-    provided in the configuration
-
-    Attributes
-    ----------
-    websocket: ``SmartSocket``
-        The SmartSocket object to connect to the SmartSocket
+    provided in the configuration.
     """
 
     def get_equity_stock_tokens(
@@ -40,11 +35,13 @@ class SmartSocketConnection(WebsocketConnection):
     ) -> dict[str, str]:
         """
         This method returns the tokens for the equity stocks based on the exchange
-        and instrument type.
+        and instrument type. For example, if the exchange is `NSE` and the instrument
+        type is `EQ`, this method will return the tokens for all the equity stocks in
+        the NSE exchange.
 
         Parameters
         ----------
-        exchange: ``str``
+        exchange: ``Exchange``
             The exchange for which the tokens are required.
             Eg: "NSE" or "BSE"
         instrument_type: ``str``
@@ -55,8 +52,7 @@ class SmartSocketConnection(WebsocketConnection):
         -------
         ``Dict[str, str]``
             A dictionary containing the tokens as keys and the symbols as values.
-            Eg: {"256265": "INFY"}
-
+            Eg: {"256265": "INFY",...}
         """
         smartapi_tokens = get_smartapi_tokens_by_all_conditions(
             instrument_type=instrument_type, exchange=exchange.name
@@ -108,20 +104,22 @@ class SmartSocketConnection(WebsocketConnection):
         self, exchange_segment: str, symbols: str | list[str] | None = None
     ) -> dict[str, str]:
         """
-        This is base method to get the tokens for the connection. Currently, it
-        supports getting the tokens for the equity stocks that are provided in the
-        configuration or getting the tokens for all the equity stocks based on the
-        exchange type
+        This is base method to get the tokens for the connection. It gets the tokens
+        based on the exchange segment and the symbols provided. If the symbols are not
+        provided, it gets the tokens for all the equity stocks in the given exchange.
 
         Parameters
         ----------
-        cfg: ``DictConfig``
-            The configuration object containing the connection details and the symbols
-            to subscribe to.
+        exchange_segment: ``str``
+            The exchange segment for which the tokens are required.
+            Eg: "nse_cm" or "bse_cm"
+        symbols: ``str | list[str] | None``, ( defaults = None )
+            The symbols for which the tokens are required. If not provided, the tokens
+            for all the equity stocks in the given exchange are returned.
 
         Returns
         -------
-        ``Dict[str, str]``
+        ``dict[str, str]``
             A dictionary containing the tokens as keys and the symbols as values.
             Eg: {"256265": "INFY"}
         """
@@ -164,21 +162,20 @@ class SmartSocketConnection(WebsocketConnection):
 
     @classmethod
     def from_cfg(cls, cfg: DictConfig) -> Optional["SmartSocketConnection"]:
-
         connection_instance_num = cfg.get("current_connection_number", 0)
         num_tokens_per_instance = cfg.get("num_tokens_per_instance", 1000)
         cfg.provider.correlation_id = cfg.provider.correlation_id.replace(
             "_", str(connection_instance_num)
         )
 
-        # Initialize the callback to save the received data from the socket
+        # Initialize the callback to save the received data from the socket.
         save_data_callback = init_from_cfg(cfg.streaming, Streaming)
 
         smart_socket = SmartSocket.initialize_socket(cfg.provider, save_data_callback)
         connection = cls(smart_socket)
 
         # Calculate the start and end index of the tokens to subscribe to based on
-        # the connection instance number and the number of tokens per instance
+        # the connection instance number and the number of tokens per instance.
         token_start_idx = connection_instance_num * num_tokens_per_instance
         token_end_idx = token_start_idx + num_tokens_per_instance
 
@@ -187,7 +184,7 @@ class SmartSocketConnection(WebsocketConnection):
 
         tokens = dict(islice(tokens.items(), token_start_idx, token_end_idx))
 
-        # If there are no tokens to subscribe to, log an error and return None
+        # If there are no tokens to subscribe to, log an error and return None.
         if not tokens:
             logger.error(
                 "Instance %d has no tokens to subscribe to, exiting...",

@@ -19,12 +19,35 @@ def upsert(stock_price_info: dict[str, str | None] | list[dict[str, str | None]]
     Upsert means insert the data into the table if it does not already exist.
     If the data already exists, it will be updated with the new data
 
+    Example:
+    --------
+    >>> If the table has the following data:
+    | id | symbol | price |
+    |----|--------|-------|
+    | 1  | AAPL   | 100   |
+    | 2  | MSFT   | 200   |
+
+    >>> If the following data is upserted:
+    | id | symbol | price |
+    |----|--------|-------|
+    | 1  | AAPL   | 150   |
+    | 3  | GOOGL  | 300   |
+
+    >>> The table will be updated as:
+    | id | symbol | price |
+    |----|--------|-------|
+    | 1  | AAPL   | 150   |
+    | 2  | MSFT   | 200   |
+    | 3  | GOOGL  | 300   |
+
     Parameters
     ----------
     stock_price_info: ``dict[str, str|None]| list[dict[str, str|None]]``
         The SocketStockPriceInfo objects to upsert into the table
     """
     upsert_stmt = insert(SocketStockPriceInfo).values(stock_price_info)
+
+    # Create a dictionary of columns to update if the data already exists
     columns = {
         column.name: getattr(upsert_stmt.excluded, column.name)
         for column in upsert_stmt.excluded
@@ -75,15 +98,13 @@ def insert_data(
     ----------
     data: ``SocketStockPriceInfo | dict[str, str|None] | List[SocketStockPriceInfo | dict[str, str | None]] | None``
         The data to insert into the table
-    update_existing: ``bool``
+    update_existing: ``bool``, ( defaults = False )
         If True, the existing data in the table will be updated with the new data.
     """
-    # Check if data is None or empty
     if not data:
         logger.warning("Provided data is empty. Skipping insertion.")
         return
 
-    # Convert single item to a list
     if isinstance(data, (SocketStockPriceInfo, dict)):
         data = [data]
 
@@ -96,7 +117,6 @@ def insert_data(
         ],
     )
 
-    # Handle upsert or insert
     if update_existing:
         upsert(data_to_insert)
     else:
