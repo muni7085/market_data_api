@@ -14,7 +14,7 @@ from app.data_layer.database.sqlite.sqlite_db_connection import (
 )
 from app.utils.urls import SQLITE_DB_URL
 
-table_names = ["smartapitoken"]
+table_names = ["smartapitoken", "socketstockpriceinfo"]
 
 
 def test_database_init_and_interaction():
