@@ -1,0 +1,6 @@
+defaults:
+  - _self_
+  - data_saver@sqlite_saver: sqlite_saver
+
+data_saver:
+  - sqlite_saver: ${sqlite_saver}

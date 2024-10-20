@@ -12,3 +12,4 @@ sample.py
 *.sqlite3
 *outputs
 .DS_Store
+.env

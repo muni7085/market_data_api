@@ -1,0 +1,58 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import os
+import subprocess
+
+
+def setup_env_vars():
+    # Ensure the script runs inside a conda environment
+    if "CONDA_PREFIX" not in os.environ:
+        print("Not inside a conda environment. Exiting...")
+        return
+
+    # Set the paths for activation and deactivation scripts
+    env_dir = Path(os.environ["CONDA_PREFIX"])
+    activate_dir = env_dir / "etc" / "conda" / "activate.d"
+    deactivate_dir = env_dir / "etc" / "conda" / "deactivate.d"
+    activate_dir.mkdir(parents=True, exist_ok=True)
+    deactivate_dir.mkdir(parents=True, exist_ok=True)
+
+    # Define the paths you want to add to PYTHONPATH
+    project_root = Path(os.getcwd()).parent / "app"
+
+    # Create activation script
+    with open(activate_dir / "project_env_vars.sh", "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write(f"export ROOT_PATH={project_root}\n")
+
+    # Create deactivation script
+    with open(deactivate_dir / "project_env_vars.sh", "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write("unset ROOT_PATH\n")
+
+    with open(project_root.parent / ".env", "w") as f:
+        f.write("ROOT_PATH=" + str(project_root) + "\n")
+
+    print(
+        "Environment variables set. Reactivate your conda environment to apply changes."
+    )
+
+
+def install_dependencies():
+    """Installs dependencies using Poetry."""
+    try:
+        print("Installing dependencies with Poetry...")
+        subprocess.run(["poetry", "install"], check=True)
+        print("Dependencies installed successfully.")
+    except subprocess.CalledProcessError:
+        print("Error installing dependencies. Please check your Poetry setup.")
+
+
+def main():
+
+    setup_env_vars()
+    install_dependencies()
+
+
+if __name__ == "__main__":
+    main()

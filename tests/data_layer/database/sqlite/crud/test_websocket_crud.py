@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
 import pytest
-
+from app.data_layer.database.sqlite.sqlite_db_connection import get_session
 from app.data_layer.database.sqlite.crud.websocket_crud import (
     insert_data,
     insert_or_ignore,
@@ -87,6 +87,19 @@ def test_insert_data_single_dict(
     mock_session.commit.assert_called_once()  # Ensure commit was called
 
 
+def test_insert_with_session(
+    mock_session: MagicMock, sample_stock_price_info: dict[str | str]
+) -> None:
+    """
+    Test insert_data with a single dict and `update_existing=False` by passing a session
+    """
+    mock_session.__next__.return_value = mock_session
+    insert_data(sample_stock_price_info, update_existing=False, session=mock_session)
+
+    mock_session.exec.assert_called_once()
+    mock_session.commit.assert_called_once()
+
+
 # Test: 2
 def test_insert_data_single_dict_upsert(
     mock_session: MagicMock, sample_stock_price_info: dict[str, str | None]
@@ -158,13 +171,13 @@ def test_insert_data_with_object_conversion(
 
 
 # Test: 7
-def test_upsert(
-    mock_session: MagicMock, sample_stock_price_info: dict[str, str | None]
-) -> None:
+def test_upsert(mock_session, sample_stock_price_info: dict[str, str | None]) -> None:
     """
     Test upsert logic
     """
-    upsert(sample_stock_price_info)
+
+    mock_session.__next__.return_value = mock_session
+    upsert(sample_stock_price_info, mock_session)
 
     mock_session.exec.assert_called_once()
     mock_session.commit.assert_called_once()
@@ -177,7 +190,8 @@ def test_insert_or_ignore(
     """
     Test insert_or_ignore logic
     """
-    insert_or_ignore(sample_stock_price_info)
+    mock_session.__next__.return_value = mock_session
+    insert_or_ignore(sample_stock_price_info, mock_session)
 
     mock_session.exec.assert_called_once()
     mock_session.commit.assert_called_once()
