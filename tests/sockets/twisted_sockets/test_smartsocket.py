@@ -142,6 +142,8 @@ def test_initialize_socket(mock_connection: MockType):
     assert socket.subscription_mode == SubscriptionMode.QUOTE
     assert socket.on_data_save_callback is not None
     assert socket.debug is True
+    assert socket.ping_interval == 25
+    assert socket.ping_message == "ping"
     assert not socket._tokens
     assert not socket.subscribed_tokens
 
@@ -178,6 +180,8 @@ def test_direct_initialization(mock_connection: MockType):
     assert socket.correlation_id == "correlation_id"
     assert socket.subscription_mode == SubscriptionMode.QUOTE
     assert socket.on_data_save_callback is not None
+    assert socket.ping_interval == 10
+    assert socket.ping_message == "ping"
     assert socket.debug is True
     assert not socket._tokens
     assert not socket.subscribed_tokens

@@ -107,8 +107,13 @@ def connection_cfg() -> dict:
 
 
 @pytest.fixture
-def connection(connection_cfg: dict) -> SmartSocketConnection:
+def connection(
+    connection_cfg: dict,
+    smartapi_tokens: tuple[list[SmartAPIToken], dict[str, str]],
+    mock_get_smartapi_tokens_by_all_conditions: MockType,
+) -> SmartSocketConnection:
     cfg = OmegaConf.create(connection_cfg)
+    mock_get_smartapi_tokens_by_all_conditions.return_value = smartapi_tokens[0]
 
     return cast(SmartSocketConnection, SmartSocketConnection.from_cfg(cfg))
 
@@ -147,11 +152,14 @@ def test_init_from_cfg_valid_cfg(
     mock_smartsocket: MockType,
     mock_init_from_cfg: MockType,
     mock_streaming: MockType,
+    smartapi_tokens: tuple[list[SmartAPIToken], dict[str, str]],
+    mock_get_smartapi_tokens_by_all_conditions: MockType,
 ):
     """
     Test the initialization of the SmartSocketConnection object from a valid configuration.
     """
 
+    mock_get_smartapi_tokens_by_all_conditions.return_value = smartapi_tokens[0]
     cfg = OmegaConf.create(connection_cfg)
     connection = SmartSocketConnection.from_cfg(cfg)
 
@@ -171,6 +179,7 @@ def test_init_from_cfg_invalid_cfg(
     mock_logger: MockType,
     mock_smartsocket: MockType,
     mock_init_from_cfg: MockType,
+    mock_get_smartapi_tokens_by_all_conditions: MockType,
 ):
     """
     Test the initialization of the SmartSocketConnection object from all the invalid
@@ -194,6 +203,7 @@ def test_init_from_cfg_invalid_cfg(
     connection_cfg = deepcopy(connection_cfg_cp)
     connection_cfg["num_tokens_per_instance"] = 0
     cfg = OmegaConf.create(connection_cfg)
+    mock_get_smartapi_tokens_by_all_conditions.return_value = []
     connection = SmartSocketConnection.from_cfg(cfg)
 
     validate_invalid_connection(
@@ -323,7 +333,7 @@ def test_get_tokens(
     mock_get_smartapi_tokens_by_all_conditions.return_value = smartapi_tokens[0]
     tokens = connection.get_tokens(exchange_segment="nse_cm")
 
-    mock_get_smartapi_tokens_by_all_conditions.assert_called_once_with(
+    mock_get_smartapi_tokens_by_all_conditions.assert_any_call(
         exchange="NSE", instrument_type="EQ"
     )
     assert tokens == {
