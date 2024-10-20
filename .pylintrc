@@ -5,3 +5,4 @@ disable=  C0114, E0611, R0903, W0621, E0401, R0801, W0718
 
 [FORMAT]
 max-line-length=130
+max-args=10

@@ -5,7 +5,7 @@ from kafka import KafkaProducer
 from omegaconf import DictConfig
 
 from app.data_layer.streaming import Streaming
-from app.utils.common.logger_utils import get_logger
+from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name)
 
