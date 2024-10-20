@@ -402,7 +402,7 @@ class SmartSocket(MarketDataTwistedSocket):
 
     def _on_message(
         self,
-        ws: MarketDataWebSocketClientProtocol,
+        ws: MarketDataWebSocketClientProtocol | None,
         payload: bytes | str,
         is_binary: bool,
     ):

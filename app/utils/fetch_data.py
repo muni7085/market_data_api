@@ -12,7 +12,7 @@ from app.utils.urls import NSE_BASE_URL
 logger = get_logger(Path(__file__).name)
 
 
-def fetch_data(url: str, max_tries: int = 1000) -> Any:
+def fetch_data(url: str, max_tries: int = 10) -> Any:
     """
     Fetch the data from given nse url and decode the response as a key value paris.
 

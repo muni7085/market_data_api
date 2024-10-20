@@ -4,7 +4,7 @@ from itertools import islice
 from unittest.mock import MagicMock
 
 import pytest
-from pytest_mock import MockerFixture
+from pytest_mock import MockerFixture, MockType
 
 from app.sockets.twisted_sockets import SmartSocket
 from app.utils.smartapi.smartsocket_types import (
@@ -16,7 +16,7 @@ from app.utils.smartapi.smartsocket_types import (
 
 ####################### Fixtures #######################
 @pytest.fixture
-def mock_connection(mocker: MockerFixture):
+def mock_connection(mocker: MockerFixture) -> MockType:
     """
     Fixture to create a mock SmartApiConnection instance.
     """
@@ -29,7 +29,7 @@ def mock_connection(mocker: MockerFixture):
 
 
 @pytest.fixture
-def mock_market_data_twisted_socket(mocker: MockerFixture):
+def mock_market_data_twisted_socket(mocker: MockerFixture) -> MockType:
     """
     Fixture to create a mock MarketDataTwistedSocket instance.
     """
@@ -39,7 +39,7 @@ def mock_market_data_twisted_socket(mocker: MockerFixture):
 
 
 @pytest.fixture
-def mock_logger(mocker: MockerFixture):
+def mock_logger(mocker: MockerFixture) -> MockType:
     """
     Fixture to create a mock logger instance.
     """
@@ -47,7 +47,7 @@ def mock_logger(mocker: MockerFixture):
 
 
 @pytest.fixture
-def binary_data_io():
+def binary_data_io() -> tuple[bytes, dict]:
     """
     Fixture to create binary data and expected data for decoding
     """
@@ -94,7 +94,7 @@ def binary_data_io():
     )
 
 
-def get_smartsocket():
+def get_smartsocket() -> SmartSocket:
     """
     Fixture to create a SmartSocket instance for use in tests.
     """
@@ -115,7 +115,8 @@ def get_smartsocket():
 ####################### Tests #######################
 
 
-def test_initialize_socket(mock_connection):
+# Test: 1
+def test_initialize_socket(mock_connection: MockType):
     """
     Test initializing the SmartSocket with the SmartApiConnection.
     """
@@ -145,7 +146,8 @@ def test_initialize_socket(mock_connection):
     assert not socket.subscribed_tokens
 
 
-def test_direct_initialization(mock_connection):
+# Test: 2
+def test_direct_initialization(mock_connection: MockType):
     """
     Test initializing the SmartSocket with the SmartApiConnection.
     """
@@ -181,12 +183,14 @@ def test_direct_initialization(mock_connection):
     assert not socket.subscribed_tokens
 
 
-def test_set_tokens(mock_logger):
+# Test: 3
+def test_set_tokens(mock_logger: MockType):
     """
     Test setting tokens for subscription.
     """
+    # Test 3.1: Invalid token format
     smartsocket = get_smartsocket()
-    tokens = {}
+    tokens: dict = {}
     smartsocket.set_tokens(tokens)
     mock_logger.error.assert_called_once_with(
         "Invalid token format %s, skipping token", {}
@@ -194,16 +198,26 @@ def test_set_tokens(mock_logger):
     assert len(smartsocket._tokens) == 0
     assert not smartsocket._tokens
 
+    # Test 3.2: Tokens with multiple exchange types
     smartsocket = get_smartsocket()
-    tokens = [{"exchangeType": 1, "tokens": {"token1": "name1", "token2": "name2"}}]
-    smartsocket.set_tokens(tokens)
+    subscription_tokens: list[dict[str, int | dict[str, str]]] = [
+        {"exchangeType": 1, "tokens": {"token1": "name1", "token2": "name2"}},
+        {"exchangeType": 2, "tokens": {"token3": "name3", "token4": "name4"}},
+    ]
+    smartsocket.set_tokens(subscription_tokens)
 
-    assert len(smartsocket._tokens) == 1
+    assert len(smartsocket._tokens) == 2
     assert smartsocket.token_map["token1"] == ("name1", ExchangeType.NSE_CM)
     assert smartsocket.token_map["token2"] == ("name2", ExchangeType.NSE_CM)
+    assert smartsocket.token_map["token3"] == ("name3", ExchangeType.BSE_CM)
+    assert smartsocket.token_map["token4"] == ("name4", ExchangeType.BSE_CM)
 
-    assert smartsocket._tokens == [{"exchangeType": 1, "tokens": ["token1", "token2"]}]
+    assert smartsocket._tokens == [
+        {"exchangeType": 1, "tokens": ["token1", "token2"]},
+        {"exchangeType": 2, "tokens": ["token3", "token4"]},
+    ]
 
+    # Test 3.3: Tokens with single exchange type
     smartsocket = get_smartsocket()
     tokens = {"exchangeType": 1, "tokens": {"token1": "name1", "token2": "name2"}}
     smartsocket.set_tokens(tokens)
@@ -213,6 +227,7 @@ def test_set_tokens(mock_logger):
 
     assert smartsocket._tokens == [{"exchangeType": 1, "tokens": ["token1", "token2"]}]
 
+    # Test 3.4: Tokens without token names
     smartsocket = get_smartsocket()
     tokens = {"exchangeType": 1, "tokens": ["token1", "token2"]}
 
@@ -220,10 +235,12 @@ def test_set_tokens(mock_logger):
         smartsocket.set_tokens(tokens)
 
 
-def test_subscribe(mocker, mock_logger):
+# Test: 4
+def test_subscribe(mocker: MockerFixture, mock_logger: MockType):
     """
     Test subscribing to tokens.
     """
+    # Test 4.1: Error while sending message
     mock_ws = mocker.MagicMock()
     mock_ws.sendMessage.side_effect = Exception("Test error")
     smartsocket = get_smartsocket()
@@ -235,7 +252,7 @@ def test_subscribe(mocker, mock_logger):
     ]
 
     with pytest.raises(Exception):
-        smartsocket.subscribe(tokens)
+        smartsocket.subscribe(tokens)  # type: ignore
 
     mock_logger.error.assert_called_once_with(
         "Error while sending message: %s", mock_ws.sendMessage.side_effect
@@ -246,6 +263,7 @@ def test_subscribe(mocker, mock_logger):
     )
     mock_logger.reset_mock()
 
+    # Test 4.2: Valid subscription
     mock_ws = mocker.MagicMock()
     smartsocket = get_smartsocket()
     smartsocket.ws = mock_ws
@@ -254,7 +272,7 @@ def test_subscribe(mocker, mock_logger):
         {"exchangeType": 2, "tokens": ["token3", "token4"]},
     ]
 
-    assert smartsocket.subscribe(tokens)
+    assert smartsocket.subscribe(tokens)  # type: ignore
 
     mock_ws.sendMessage.assert_called_once_with(
         json.dumps(
@@ -275,18 +293,20 @@ def test_subscribe(mocker, mock_logger):
         "token4": 2,
     }
 
-    assert not smartsocket.subscribe({})
+    # Test 4.3: Subscription without tokens
+    assert not smartsocket.subscribe({})  # type: ignore
     mock_logger.error.assert_called_once_with("No tokens to subscribe")
 
 
-def test_unsubscribe(mocker, mock_logger):
+# Test: 5
+def test_unsubscribe(mocker: MockerFixture, mock_logger: MockType):
     """
     Test unsubscribing from tokens.
     """
     mock_ws = mocker.MagicMock()
     smartsocket = get_smartsocket()
     smartsocket.ws = mock_ws
-    tokens = [
+    tokens: list[dict[str, int | list[str]]] = [
         {"exchangeType": 1, "tokens": ["token1", "token2"]},
         {"exchangeType": 2, "tokens": ["token3", "token4"]},
     ]
@@ -294,6 +314,7 @@ def test_unsubscribe(mocker, mock_logger):
     assert smartsocket.subscribe(tokens)
     mock_ws.reset_mock()
 
+    # Test 5.1: Error while sending message
     mock_ws.sendMessage.side_effect = Exception("Test error")
     smartsocket.ws = mock_ws
     tokens_to_unsubscribe = ["token1", "token2"]
@@ -311,6 +332,8 @@ def test_unsubscribe(mocker, mock_logger):
     )
     mock_logger.reset_mock()
     mock_ws.reset_mock()
+
+    # Check if the tokens are still subscribed
     assert smartsocket.subscribed_tokens == {
         "token1": 1,
         "token2": 1,
@@ -318,11 +341,12 @@ def test_unsubscribe(mocker, mock_logger):
         "token4": 2,
     }
 
+    # Test 5.2: Valid unsubscription
     mock_ws = mocker.MagicMock()
     smartsocket.ws = mock_ws
     smartsocket.unsubscribe(["token1", "token2"])
 
-    tokens_to_unsubscribe = [{"exchangeType": 1, "tokens": ["token1", "token2"]}]
+    unsubscribe_tokens = [{"exchangeType": 1, "tokens": ["token1", "token2"]}]
     mock_ws.sendMessage.assert_called_once_with(
         json.dumps(
             {
@@ -330,19 +354,20 @@ def test_unsubscribe(mocker, mock_logger):
                 "action": SubscriptionAction.UNSUBSCRIBE.value,
                 "params": {
                     "mode": smartsocket.subscription_mode.value,
-                    "exchange": tokens_to_unsubscribe,
+                    "exchange": unsubscribe_tokens,
                 },
             }
         ).encode("utf-8")
     )
     assert smartsocket.subscribed_tokens == {"token3": 2, "token4": 2}
 
+    # Test 5.3: Test unsubscription with the token not subscribed
     mock_ws = mocker.MagicMock()
     smartsocket.ws = mock_ws
     smartsocket.subscribed_tokens.update({"token1": 1, "token2": 1})
     smartsocket.unsubscribe(["token1", "token5"])
 
-    tokens_to_unsubscribe = [{"exchangeType": 1, "tokens": ["token1"]}]
+    unsubscribe_tokens = [{"exchangeType": 1, "tokens": ["token1"]}]
     mock_ws.sendMessage.assert_called_once_with(
         json.dumps(
             {
@@ -350,7 +375,7 @@ def test_unsubscribe(mocker, mock_logger):
                 "action": SubscriptionAction.UNSUBSCRIBE.value,
                 "params": {
                     "mode": smartsocket.subscription_mode.value,
-                    "exchange": tokens_to_unsubscribe,
+                    "exchange": unsubscribe_tokens,
                 },
             }
         ).encode("utf-8")
@@ -358,14 +383,18 @@ def test_unsubscribe(mocker, mock_logger):
     assert smartsocket.subscribed_tokens == {"token2": 1, "token3": 2, "token4": 2}
     mock_logger.error.assert_any_call("Tokens not subscribed: %s", ["token5"])
     mock_logger.reset_mock()
+
+    # Test 5.4: Unsubscribe without tokens
     smartsocket.unsubscribe([])
     mock_logger.error.assert_called_once_with("No tokens to unsubscribe")
 
 
-def test_resubscribe(mocker, mock_logger):
+# Test: 6
+def test_resubscribe(mocker: MockerFixture, mock_logger: MockType):
     """
     Test resubscribing to previously subscribed tokens.
     """
+    # Test 6.1: Test directly calling resubscribe without subscribing
     mock_ws = mocker.MagicMock()
     smartsocket = get_smartsocket()
     smartsocket.ws = mock_ws
@@ -373,13 +402,13 @@ def test_resubscribe(mocker, mock_logger):
     assert not smartsocket.resubscribe()
     mock_logger.error.assert_called_once_with("No tokens to subscribe")
 
+    # Test 6.2: Test resubscribing to previously subscribed tokens
     smartsocket.subscribed_tokens = {
         "token1": 1,
         "token2": 1,
     }
 
     assert smartsocket.resubscribe()
-
     expected_tokens_list = [{"exchangeType": 1, "tokens": ["token1", "token2"]}]
 
     mock_ws.sendMessage.assert_called_once_with(
@@ -396,16 +425,19 @@ def test_resubscribe(mocker, mock_logger):
     )
 
 
-def test_decode_data(binary_data_io):
+# Test: 7
+def test_decode_data(binary_data_io: tuple[bytes, dict]):
     """
     Test binary data decoding and parsing.
     """
+    # Test 7.1: Test decoding binary data with subscription mode as `SNAP_QUOTE`
     binary_data = binary_data_io[0]
     smartsocket = get_smartsocket()
     result = smartsocket.decode_data(binary_data)
     expected_result = binary_data_io[1]
     assert result == expected_result
 
+    # Test 7.2: Test decoding binary data with subscription mode as `LTP`
     binary_data = b"\x01" + binary_data[1:]
     result = smartsocket.decode_data(binary_data)
     ltp_expected_result = dict(islice(expected_result.items(), 0, 7))
@@ -413,6 +445,7 @@ def test_decode_data(binary_data_io):
     ltp_expected_result["subscription_mode_val"] = "LTP"
     assert result == ltp_expected_result
 
+    # Test 7.3: Test decoding binary data with subscription mode as `QUOTE`
     binary_data = b"\x02" + binary_data[1:]
     result = smartsocket.decode_data(binary_data)
     quote_expected_result = dict(islice(expected_result.items(), 0, 16))
@@ -421,10 +454,12 @@ def test_decode_data(binary_data_io):
     assert result == quote_expected_result
 
 
-def test_on_message_callback(binary_data_io):
+# Test: 8
+def test_on_message_callback(binary_data_io: tuple[bytes, dict]):
     """
     Test the data callback when a WebSocket message is received.
     """
+    # Test 8.1: Test on_message callback with binary data
     smartsocket = get_smartsocket()
 
     smartsocket.set_tokens([{"exchangeType": 1, "tokens": {"17758": "name"}}])
@@ -445,9 +480,37 @@ def test_on_message_callback(binary_data_io):
     assert actual_call_args == exptected_data
     smartsocket.on_data_save_callback.reset_mock()
 
+    # Test 8.2: Test on_message callback with text data
     smartsocket._on_message(None, json.dumps(binary_data_io[1]), is_binary=False)
     actual_call_args = json.loads(smartsocket.on_data_save_callback.call_args.args[0])
     assert actual_call_args.pop("retrieval_timestamp")
 
     assert smartsocket.on_data_save_callback.call_count == 1
     assert actual_call_args == exptected_data
+
+
+# Test: 9
+def test_on_open():
+    """
+    Test the `on_open` callback when the WebSocket connection is opened.
+    """
+    smartsocket = get_smartsocket()
+    smartsocket._tokens = [{"exchangeType": 1, "tokens": ["token1", "token2"]}]
+    smartsocket.ws = MagicMock()
+
+    assert smartsocket._is_first_connect is True
+
+    smartsocket._on_open(smartsocket.ws)
+    expected_message = {
+        "correlationID": smartsocket.correlation_id,
+        "action": SubscriptionAction.SUBSCRIBE.value,
+        "params": {
+            "mode": smartsocket.subscription_mode.value,
+            "tokenList": smartsocket._tokens,
+        },
+    }
+    smartsocket.ws.sendMessage.assert_called_once_with(
+        json.dumps(expected_message).encode("utf-8")
+    )
+
+    assert smartsocket._is_first_connect is False

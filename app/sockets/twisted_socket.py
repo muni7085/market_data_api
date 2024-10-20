@@ -3,7 +3,7 @@ import sys
 import threading
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Callable, Optional
 
 from autobahn.twisted.websocket import connectWS
 from autobahn.websocket.types import ConnectionResponse
@@ -68,14 +68,14 @@ class MarketDataTwistedSocket(ABC):
         self.ws: MarketDataWebSocketClientProtocol | None = None
 
         # Callbacks for the WebSocket connection
-        self.on_connect = None
-        self.on_open = None
-        self.on_message = None
-        self.on_error = None
-        self.on_close = None
-        self.on_reconnect = None
-        self.on_noreconnect = None
-        self.factory = None
+        self.on_connect: Callable | None = None
+        self.on_open: Callable | None = None
+        self.on_message: Callable | None = None
+        self.on_error: Callable | None = None
+        self.on_close: Callable | None = None
+        self.on_reconnect: Callable | None = None
+        self.on_noreconnect: Callable | None = None
+        self.factory: MarketDataWebSocketClientFactory | None = None
         self.websocket_thread = None
 
     @abstractmethod
