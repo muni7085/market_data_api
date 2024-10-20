@@ -1,3 +1,4 @@
+# pylint: disable=no-member, super-with-arguments
 import time
 from pathlib import Path
 
@@ -6,37 +7,33 @@ from autobahn.websocket.types import ConnectionResponse
 
 from app.utils.common.logger import get_logger
 
-logger = get_logger(Path(__file__).name)
+logger = get_logger(Path(__file__).name, log_level="DEBUG")
 
 
-class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
+class MarketDataWebSocketClientProtocol(WebSocketClientProtocol):
     """
     This class is a subclass of the `WebSocketClientProtocol` class from the `autobahn` library.
-    It is used to create a WebSocket client protocol that can be used to connect to a WebSocket server
-    and send and receive messages over the WebSocket connection.
+    It is used to create a WebSocket client protocol that can be used to connect to a WebSocket
+    server and send and receive messages over the WebSocket connection.
 
     Attributes
     ----------
-    PING_INTERVAL: ``float``
-        The interval at which the client sends ping messages to the server to keep the connection alive
-    KEEPALIVE_INTERVAL: ``float``
-        The interval at which the client checks if the server is sending pong messages to keep the connection alive
-    _last_pong_time: ``float``
-        The timestamp of the last pong message received from the server
-    _last_ping_time: ``float``
-        The timestamp of the last ping message sent to the server
+    ping_interval: ``int``
+        The interval (in seconds) at which the client should send ping messages to the server
+    ping_message: ``str``
+        The text message that should be sent as a ping message to the server
     """
-
-    PING_INTERVAL = 2.5
-    KEEPALIVE_INTERVAL = 5
 
     _next_ping = None
     _next_pong_check = None
     _last_pong_time = None
     _last_ping_time = None
 
-    def __init__(self, *args, **kwargs):
-        super(MarketDataWebScoketClientProtocol, self).__init__(*args, **kwargs)
+    def __init__(self, ping_interval, ping_message, *args, **kwargs):
+        self.ping_interval = ping_interval
+        self.ping_message = ping_message
+        self.keepalive_interval = 2 * ping_interval
+        super(MarketDataWebSocketClientProtocol, self).__init__(*args, **kwargs)
 
     def onConnect(self, response: ConnectionResponse):
         """
@@ -52,7 +49,7 @@ class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
             - WebSocket protocol details and more
         """
         if self.factory.debug:
-            logger.debug(f"Connected to {response.peer} with {response.protocol}")
+            logger.debug("Connected to %s with %s", response.peer, response.protocol)
 
         self.factory.ws = self
 
@@ -64,31 +61,54 @@ class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
     def onOpen(self):
         """
         This callback is triggered when the WebSocket connection has been established
-        and is open for sending and receiving messages
+        and is open for sending and receiving messages. This will be called after
+        `onConnect`.
         """
+        # Start the heartbeat messages to keep the connection alive
         self._loop_ping()
         self._loop_pong_check()
 
         if self.factory.debug:
-            logger.debug(f"Connection Opened")
+            logger.debug("Connection Opened")
 
         if self.factory.on_open:
             self.factory.on_open(self)
 
     def onMessage(self, payload: bytes, isBinary: bool):
         """
-        This callback is triggered when a WebSocket message is received from the server
+        This callback is triggered when a WebSocket message is received from the server.
+
+        If the message is a pong (heartbeat response), update the last pong timestamp.
+        This method handles both binary and text messages.
 
         Parameters
         ----------
         payload: ``bytes``
-            The message payload received from the server
+            The received data, either in binary or text format.
         isBinary: ``bool``
-            A boolean flag that indicates whether the message is binary or text
+            A flag indicating if the message is in binary format.
         """
-        if self.factory.on_message:
-            self.factory.on_message(self, payload, isBinary)
+        if isBinary:
+            if self.factory.on_message:
+                self.factory.on_message(self, payload, isBinary)
+        else:
+            try:
+                message = payload.decode("utf-8")
+            except UnicodeDecodeError:
+                logger.error("Failed to decode message as UTF-8: %s", payload)
+                return
 
+            # Handle heartbeat pong response
+            if message == "pong":
+                if self.factory.debug and self._last_pong_time:
+                    logger.debug(
+                        "Last pong was received at %.2f seconds ago (%.4f)",
+                        time.time() - self._last_ping_time,
+                        self._last_pong_time,
+                    )
+                self._last_pong_time = time.time()
+
+    # pylint: disable=arguments-renamed
     def onClose(self, was_clean: bool, code: int, reason: str):
         """
         This callback is triggered when the WebSocket connection is closed
@@ -103,6 +123,13 @@ class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
         reason: ``str``
             The reason for closing the connection sent by the server
         """
+        if self.factory.debug:
+            logger.debug(
+                "Closing the connection with code %s and reason %s, is closing clean %s",
+                code,
+                reason,
+                was_clean,
+            )
         if not was_clean:
             if self.factory.on_error:
                 self.factory.on_error(self, code, reason)
@@ -113,64 +140,52 @@ class MarketDataWebScoketClientProtocol(WebSocketClientProtocol):
         self._last_ping_time = None
         self._last_pong_time = None
 
-        if self._next_ping:
+        if self._next_ping and self._next_ping.active():
             self._next_ping.cancel()
 
-        if self._next_pong_check:
+        if self._next_pong_check and self._next_pong_check.active():
             self._next_pong_check.cancel()
-
-    def onPing(self, payload: str):
-        """
-        This callback is triggered when a WebSocket ping message is received from the server.
-        This method is used to respond to the ping message with a pong message and to keep
-        the connection alive as long as the server is sending ping messages.
-
-        Parameters
-        ----------
-        payload: ``str``
-            The payload of the ping message received from the server
-        """
-
-        if self._last_ping_time and self.factory.debug:
-            logger.debug(f"Last pong was received at {time.time-self._last_pong_time}")
-
-        self._last_ping_time = time.time()
-
-        if self.factory.debug:
-            logger.debug(f"Received ping {payload}")
 
     def _loop_ping(self):
         """
-        This method is used to send a ping message to the server at regular intervals
-        to keep the connection alive.
+        This method is used to send a text-based ping message ("ping") to the server
+        at regular intervals to keep the connection alive.
         """
-        if self.factory.debug:
-            if self._last_ping_time:
-                logger.debug(
-                    f"Last ping was sent at {time.time()-self._last_ping_time}"
-                )
+        if self.factory.debug and self._last_ping_time:
+            logger.debug(
+                "Last ping was sent at %.2f seconds ago (%.4f)",
+                time.time() - self._last_ping_time,
+                self._last_ping_time,
+            )
 
+        if self.factory.debug and not self._last_ping_time:
+            logger.debug("Sending heartbeat ping...")
+
+        # Sending "ping" as a text message
+        self.sendMessage(self.factory.ping_message.encode("utf-8"), isBinary=False)
         self._last_ping_time = time.time()
+
         self._next_ping = self.factory.reactor.callLater(
-            self.PING_INTERVAL, self._loop_ping
+            self.ping_interval, self._loop_ping
         )
 
     def _loop_pong_check(self):
         """
-        This method is used to check if the server is sending pong messages at regular intervals
+        This method is used to check if the server is sending pong messages (text-based "pong")
         to keep the connection alive. If the server does not send a pong message within the
-        specified interval, the connection is dropped and reconnected
+        specified interval, the connection is dropped and reconnected.
         """
         if self._last_pong_time:
             last_pong_diff = time.time() - self._last_pong_time
 
-            if last_pong_diff > (2 * self.PING_INTERVAL):
+            if last_pong_diff > self.keepalive_interval:
                 if self.factory.debug:
                     logger.debug(
-                        f"Last pong was received at {last_pong_diff}. So dropping the connection to reconnect"
+                        "Last pong was received %s seconds ago. Dropping the connection to reconnect.",
+                        last_pong_diff,
                     )
                 self.dropConnection(abort=True)
 
         self._next_pong_check = self.factory.reactor.callLater(
-            self.KEEPALIVE_INTERVAL, self._loop_pong_check
+            self.keepalive_interval, self._loop_pong_check
         )

@@ -1,4 +1,6 @@
 name: smartsocket
-correlation_id: smart00001
+correlation_id: smart0000_
 subscription_mode: snap_quote # ltp, quote, snap_quote, depth
-debug: false
+debug: False
+ping_interval: 25
+ping_message: ping

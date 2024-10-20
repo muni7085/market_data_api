@@ -10,7 +10,5 @@ sample.py
 *.coverage
 *.log
 *.sqlite3
-*.txt
-*credentials_cache.json
-/docker/docker_data
-*outputs/
+*outputs
+.DS_Store

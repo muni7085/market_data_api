@@ -1,4 +1,4 @@
-from app.data_layer.database.sqlite.crud.smartapi_curd import insert_data
+from app.data_layer.database.sqlite.crud.smartapi_crud import insert_data
 from app.data_layer.database.sqlite.sqlite_db_connection import create_db_and_tables
 from app.utils.fetch_data import fetch_data
 from app.utils.smartapi.data_processor import process_token_data
