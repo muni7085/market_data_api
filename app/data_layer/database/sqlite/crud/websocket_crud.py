@@ -15,7 +15,10 @@ from app.utils.common.logger import get_logger
 logger = get_logger(Path(__file__).name)
 
 
-def upsert(stock_price_info: dict[str, str | None] | list[dict[str, str | None]], session: Session):
+def upsert(
+    stock_price_info: dict[str, str | None] | list[dict[str, str | None]],
+    session: Session,
+):
     """
     Upsert means insert the data into the table if it does not already exist.
     If the data already exists, it will be updated with the new data
@@ -63,7 +66,8 @@ def upsert(stock_price_info: dict[str, str | None] | list[dict[str, str | None]]
 
 
 def insert_or_ignore(
-    stock_price_info: dict[str, str | None] | list[dict[str, str | None]],session:Session
+    stock_price_info: dict[str, str | None] | list[dict[str, str | None]],
+    session: Session,
 ):
     """
     Add the provided data into the StockPriceInfo table if the data does not already exist.
@@ -116,7 +120,7 @@ def insert_data(
 
     if isinstance(data, (SocketStockPriceInfo, dict)):
         data = [data]
-    
+
     if not session:
         session = get_session()
 
@@ -132,4 +136,4 @@ def insert_data(
     if update_existing:
         upsert(data_to_insert, session)
     else:
-        insert_or_ignore(data_to_insert,session)
+        insert_or_ignore(data_to_insert, session)

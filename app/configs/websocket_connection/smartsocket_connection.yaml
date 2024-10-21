@@ -8,10 +8,10 @@ provider: ${smartsocket}
 streaming: ${kafka}
 symbols: null # List of stock symbols
 exchange_type: nse_cm # nse_cm, bse_cm
-num_connections: 3
+num_connections: 1
 current_connection_number: 0
 use_thread: true
-num_tokens_per_instance: 1000
+num_tokens_per_instance: 10
 
 ################################ NOTE ################################
 # If you specify the stock_symbols, then the data will be streamed only for those symbols.

@@ -13,11 +13,6 @@ from app.utils.urls import SQLITE_DB_URL
 
 sqlite_engine = create_engine(SQLITE_DB_URL, echo=True)
 
-def create_sqlite_engine(sqlite_db_url: str=None) -> Engine:
-    """
-    Creates and returns a SQLite engine object.
-    """
-    return create_engine(sqlite_db_url)
 
 
 def create_db_and_tables(engine: Engine = None) -> None:
@@ -30,12 +25,12 @@ def create_db_and_tables(engine: Engine = None) -> None:
     SQLModel.metadata.create_all(engine)
 
 
-def get_session(engine:Engine) -> Generator[Session, None, None]:
+def get_session(engine:Engine=None) -> Generator[Session, None, None]:
     """
     Yields a session object to interact with the database.
     """
     if engine is None:
         engine = sqlite_engine
     
-    with Session(sqlite_engine) as session:
+    with Session(engine) as session:
         yield session

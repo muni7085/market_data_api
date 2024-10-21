@@ -11,9 +11,9 @@ from app.utils.common.logger import get_logger
 from app.utils.smartapi.smartsocket_types import ExchangeType
 from app.data_layer.database.sqlite.sqlite_db_connection import (
     create_db_and_tables,
-    create_sqlite_engine,
     get_session,
 )
+from sqlalchemy import create_engine
 from datetime import datetime
 
 logger = get_logger(Path(__file__).name)
@@ -26,18 +26,19 @@ class SqliteDataSaver(DataSaver):
 
         current_date = datetime.now().strftime("%Y_%m_%d")
         self.sqlite_db = f"sqlite:///{sqlite_db}/{current_date}.sqlite3"
-        self.engine = create_sqlite_engine(self.sqlite_db)
+        self.engine = create_engine(self.sqlite_db,connect_args={'check_same_thread': False})
         create_db_and_tables(self.engine)
 
     def save_stock_data(self, data):
         socket_stock_price_info = SocketStockPriceInfo(
-            last_traded_timestamp=data["last_traded_timestamp"],
             token=data["token"],
             retrieval_timestamp=data["retrieval_timestamp"],
+            last_traded_timestamp=data["last_traded_timestamp"],
             socket_name=data["socket_name"],
             exchange_timestamp=data["exchange_timestamp"],
             name=data["name"],
             last_traded_price=data["last_traded_price"],
+            exchange=data["exchange"],
             last_traded_quantity=data.get("last_traded_quantity"),
             average_traded_price=data.get("average_traded_price"),
             volume_trade_for_the_day=data.get("volume_trade_for_the_day"),
@@ -50,7 +51,8 @@ class SqliteDataSaver(DataSaver):
         decoded_data = data.decode("utf-8")
         decoded_data = json.loads(decoded_data)
 
-        if decoded_data["exchange_type"] == ExchangeType.NSE_CM.name:
+        if decoded_data["exchange"] == ExchangeType.NSE_CM.name:
+            decoded_data['exchange'] = ExchangeType.NSE_CM.name
             self.save_stock_data(decoded_data)
         else:
             logger.error(
@@ -65,12 +67,11 @@ class SqliteDataSaver(DataSaver):
     def from_cfg(cls, cfg):
         try:
             return cls(
-                # KafkaConsumer(
-                #     cfg.data_source.kafka_topic,
-                #     bootstrap_servers=cfg.data_source.kafka_server,
-                #     auto_offset_reset="earliest",
-                # ),
-                None,
+                KafkaConsumer(
+                    cfg.streaming.kafka_topic,
+                    bootstrap_servers=cfg.streaming.kafka_server,
+                    auto_offset_reset="earliest",
+                ),
                 cfg.get("sqlite_db"),
             )
         except NoBrokersAvailable:

@@ -1,10 +1,4 @@
-sample.ipynb
 __pycache__
-/fetch_data/options/__pycache__
-sample.py
-/temporary
-
-/.idea
 *.tar.bz2
 .vscode
 *.coverage
