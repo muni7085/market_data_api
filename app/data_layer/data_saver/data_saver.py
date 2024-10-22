@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from registrable import Registrable
 
@@ -22,5 +23,9 @@ class DataSaver(ABC, Registrable):
         raise NotImplementedError
 
     @abstractmethod
-    def from_cfg(cls, cfg) -> "DataSaver":
-        pass
+    def from_cfg(cls, cfg) -> Optional["DataSaver"]:
+        """
+        This method creates an instance of the DataSaver class from the
+        given configuration
+        """
+        raise NotImplementedError

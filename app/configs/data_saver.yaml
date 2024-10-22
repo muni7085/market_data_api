@@ -9,3 +9,7 @@ data_saver:
   - jsonl_saver: ${jsonl_saver}
   - sqlite_saver: ${sqlite_saver}
 
+hydra:  
+  output_subdir: null  
+  run:  
+    dir: .

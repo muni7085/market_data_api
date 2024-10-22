@@ -1,13 +1,14 @@
 from unittest.mock import MagicMock
 
 import pytest
-from app.data_layer.database.sqlite.sqlite_db_connection import get_session
+
 from app.data_layer.database.sqlite.crud.websocket_crud import (
     insert_data,
     insert_or_ignore,
     upsert,
 )
 from app.data_layer.database.sqlite.models.websocket_models import SocketStockPriceInfo
+from app.data_layer.database.sqlite.sqlite_db_connection import get_session
 
 #################### FIXTURES ####################
 

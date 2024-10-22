@@ -1,18 +1,34 @@
-
+from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable
+from omegaconf import DictConfig
+
 from app.data_layer.data_saver import DataSaver
 from app.utils.common.logger import get_logger
-import json
-from datetime import datetime
 
 logger = get_logger(Path(__file__).name)
 
 
 @DataSaver.register("jsonl_saver")
 class JSONLDataSaver(DataSaver):
+    """
+    JSONLDataSaver retrieve the data from kafka consumer and save it
+    to a jsonl file.
+
+    Attributes
+    ----------
+    consumer: ``KafkaConsumer``
+        Kafka consumer object to consume the data from the specified topic
+    jsonl_file_path: ``str | Path``
+        Path to save the jsonl file. The file name will be the given name
+        appended with the current date.
+        For example: `jsonl_file_path` = "data.jsonl", then the file name will
+        be `data_2021_09_01.jsonl`
+    """
+
     def __init__(self, consumer: KafkaConsumer, jsonl_file_path: str | Path) -> None:
         self.consumer = consumer
 
@@ -25,6 +41,9 @@ class JSONLDataSaver(DataSaver):
         self.jsonl_file_path = jsonl_file_path.with_name(file_name)
 
     def retrieve_and_save(self):
+        """
+        Retrieve the data from the kafka consumer and save it to the jsonl file.
+        """
         try:
             idx: int = 0
             with open(self.jsonl_file_path, "a", newline="") as file:
@@ -38,7 +57,10 @@ class JSONLDataSaver(DataSaver):
             logger.info("%s messages saved to jsonl", idx)
 
     @classmethod
-    def from_cfg(cls, cfg):
+    def from_cfg(cls, cfg: DictConfig) -> Optional["JSONLDataSaver"]:
+        """
+        Create an instance of the JSONLDataSaver class from the given configuration.
+        """
         try:
             return cls(
                 KafkaConsumer(

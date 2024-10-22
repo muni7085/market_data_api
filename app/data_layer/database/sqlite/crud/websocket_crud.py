@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import cast
 
 from sqlalchemy.dialects.sqlite import insert
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.data_layer.database.sqlite.models.websocket_models import SocketStockPriceInfo
 from app.data_layer.database.sqlite.sqlite_db_connection import get_session
@@ -137,3 +137,22 @@ def insert_data(
         upsert(data_to_insert, session)
     else:
         insert_or_ignore(data_to_insert, session)
+
+
+def get_all_stock_price_info(session: Session) -> list[SocketStockPriceInfo]:
+    """
+    Retrieve all the data from the SocketStockPriceInfo table in the SQLite database.
+
+    Parameters
+    ----------
+    session: ``Session``
+        The SQLModel session object to use for the database operations
+
+    Returns
+    -------
+    ``List[SocketStockPriceInfo]``
+        The list of all the SocketStockPriceInfo objects present in the table
+    """
+    with next(session) as db_session:
+        stmt = select(SocketStockPriceInfo)
+        return db_session.exec(stmt).all()  # type: ignore
