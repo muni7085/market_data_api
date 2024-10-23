@@ -22,6 +22,7 @@ def main(cfg: DictConfig) -> None:
     for data_saver_config in cfg.data_saver:
         data_saver_name, config = list(data_saver_config.items())[0]
         data_saver = init_from_cfg(config, DataSaver)
+        print(data_saver)
 
         # Create a thread for each saver
         saver_thread = Thread(target=data_saver.retrieve_and_save)
@@ -29,10 +30,10 @@ def main(cfg: DictConfig) -> None:
 
         # Start the saver thread to retrieve and save the data
         saver_thread.start()
-        savers.append(saver)
+        savers.append(saver_thread)
 
     for saver in savers:
-        saver_thread.join()
+        saver.join()
 
 
 if __name__ == "__main__":

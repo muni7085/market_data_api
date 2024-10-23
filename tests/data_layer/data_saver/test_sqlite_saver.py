@@ -2,7 +2,7 @@ import json
 from collections import namedtuple
 from datetime import datetime
 from tempfile import TemporaryDirectory
-
+from pytest_mock import MockerFixture, MockType
 import pytest
 from kafka.errors import NoBrokersAvailable
 from omegaconf import DictConfig, OmegaConf
@@ -18,73 +18,26 @@ Message = namedtuple("Message", ["value"])
 
 ####################################### FIXTURES #######################################
 @pytest.fixture
-def kafka_data():
-    return [
-        {
-            "subscription_mode": 3,
-            "exchange_type": 1,
-            "token": "10893",
-            "sequence_number": 18537152,
-            "exchange_timestamp": 1729506514000,
-            "last_traded_price": 13468,
-            "subscription_mode_val": "SNAP_QUOTE",
-            "last_traded_quantity": 414,
-            "average_traded_price": 13529,
-            "volume_trade_for_the_day": 131137,
-            "total_buy_quantity": 0.0,
-            "total_sell_quantity": 0.0,
-            "open_price_of_the_day": 13820,
-            "high_price_of_the_day": 13820,
-            "low_price_of_the_day": 13365,
-            "closed_price": 13726,
-            "last_traded_timestamp": 1729504796,
-            "open_interest": 0,
-            "open_interest_change_percentage": 0,
-            "name": "DBOL",
-            "socket_name": "smartapi",
-            "retrieval_timestamp": "1729532024.309936",
-            "exchange": "NSE_CM",
-        },
-        {
-            "subscription_mode": 3,
-            "exchange_type": 1,
-            "token": "13658",
-            "sequence_number": 18578253,
-            "exchange_timestamp": 1729506939000,
-            "last_traded_price": 40260,
-            "subscription_mode_val": "SNAP_QUOTE",
-            "last_traded_quantity": 50,
-            "average_traded_price": 40510,
-            "volume_trade_for_the_day": 13846,
-            "total_buy_quantity": 0.0,
-            "total_sell_quantity": 0.0,
-            "open_price_of_the_day": 41220,
-            "high_price_of_the_day": 41270,
-            "low_price_of_the_day": 39685,
-            "closed_price": 41000,
-            "last_traded_timestamp": 1729505946,
-            "open_interest": 0,
-            "open_interest_change_percentage": 0,
-            "name": "GEECEE",
-            "socket_name": "smartapi",
-            "retrieval_timestamp": "1729532024.31136",
-            "exchange": 1,
-        },
-    ]
-
-
-@pytest.fixture
-def mock_consumer(mocker):
+def mock_consumer(mocker: MockerFixture) -> MockType:
+    """
+    Mock the KafkaConsumer object.
+    """
     return mocker.patch("app.data_layer.data_saver.sqlite_saver.KafkaConsumer")
 
 
 @pytest.fixture
-def mock_logger(mocker):
+def mock_logger(mocker: MockerFixture) -> MockType:
+    """
+    Mock the logger object in the SqliteDataSaver.
+    """
     return mocker.patch("app.data_layer.data_saver.sqlite_saver.logger")
 
 
 @pytest.fixture
 def sqlite_config() -> DictConfig:
+    """
+    Configuration for the SqliteDataSaver.
+    """
     return OmegaConf.create(
         {
             "name": "sqlite_saver",
@@ -98,15 +51,26 @@ def sqlite_config() -> DictConfig:
 
 
 @pytest.fixture
-def sqlite_saver(mock_consumer, sqlite_config, mocker, kafka_data):
+def sqlite_saver(
+    mock_consumer: MockType, sqlite_config: MockType, mocker: MockerFixture
+) -> SqliteDataSaver:
+    """
+    Initialize the SqliteDataSaver object.
+    """
     mock_consumer.return_value = mocker.MagicMock()
+
     return SqliteDataSaver.from_cfg(sqlite_config)
 
 
 ####################################### TESTS #######################################
 
 
-def validate_init(sqlite_saver, mock_consumer, sqlite_config):
+def validate_init(
+    sqlite_saver: SqliteDataSaver, mock_consumer: MockType, sqlite_config: DictConfig
+):
+    """
+    Validate the initialization of the SqliteDataSaver.
+    """
     assert sqlite_saver is not None
     assert sqlite_saver.consumer is not None
     assert sqlite_saver.engine is not None
@@ -124,17 +88,29 @@ def validate_init(sqlite_saver, mock_consumer, sqlite_config):
     )
 
 
-def test_init(mock_consumer, mocker, sqlite_config, mock_logger):
+# Test: 1
+def test_init(
+    mock_consumer: MockType,
+    mocker: MockerFixture,
+    sqlite_config: DictConfig,
+    mock_logger: MockType,
+):
+    """
+    Test the initialization of the SqliteDataSaver.
+    """
     mock_consumer.return_value = mocker.MagicMock()
 
+    # Test: 1.1 ( Valid initialization from configuration )
     sqlite_saver = SqliteDataSaver.from_cfg(sqlite_config)
     validate_init(sqlite_saver, mock_consumer, sqlite_config)
     mock_consumer.reset_mock()
 
+    # Test: 1.2 ( Valid initialization using init_from_cfg )
     sqlite_saver = init_from_cfg(sqlite_config, DataSaver)
     validate_init(sqlite_saver, mock_consumer, sqlite_config)
     mock_consumer.reset_mock()
 
+    # Test: 1.3 ( Test constructor initialization )
     consumer = mock_consumer(
         sqlite_config.streaming.kafka_topic,
         bootstrap_servers=sqlite_config.streaming.kafka_server,
@@ -144,6 +120,7 @@ def test_init(mock_consumer, mocker, sqlite_config, mock_logger):
     validate_init(sqlite_saver, mock_consumer, sqlite_config)
     mock_consumer.reset_mock()
 
+    # Test: 1.4 ( Test NoBrokersAvailable exception )
     mock_consumer.side_effect = NoBrokersAvailable()
     sqlite_saver = SqliteDataSaver.from_cfg(sqlite_config)
     assert sqlite_saver is None
@@ -157,10 +134,17 @@ def test_init(mock_consumer, mocker, sqlite_config, mock_logger):
     )
 
 
-def test_retrieve_and_save(sqlite_saver, mock_logger, kafka_data):
+# Test: 2
+def test_retrieve_and_save(
+    sqlite_saver: SqliteDataSaver, mock_logger: MockType, kafka_data: list[dict]
+):
+    """
+    Test the `retrieve_and_save` method of the SqliteDataSaver.
+    """
     encoded_data = [
         Message(value=json.dumps(data).encode("utf-8")) for data in kafka_data
     ]
+    # Test: 2.1 ( Test saving data to the sqlite database )
     sqlite_saver.consumer.__iter__.return_value = encoded_data
     sqlite_saver.retrieve_and_save()
 
@@ -175,6 +159,7 @@ def test_retrieve_and_save(sqlite_saver, mock_logger, kafka_data):
 
     assert inserted_data == expected_data
 
+    # Test: 2.2 ( Test saving data to the sqlite database with invalid exchange type )
     kafka_data[0]["exchange"] = -1
     encoded_data = [
         Message(value=json.dumps(data).encode("utf-8")) for data in kafka_data

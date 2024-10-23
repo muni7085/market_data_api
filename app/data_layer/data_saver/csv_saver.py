@@ -36,6 +36,9 @@ class CSVDataSaver(DataSaver):
 
         if isinstance(csv_file_path, str):
             csv_file_path = Path(csv_file_path)
+        
+        if not csv_file_path.parent.exists():
+            csv_file_path.parent.mkdir(parents=True, exist_ok=True)
 
         file_name = csv_file_path.stem + f"_{datetime.now().strftime('%Y_%m_%d')}.csv"
         self.csv_file_path = csv_file_path.with_name(file_name)
@@ -86,6 +89,6 @@ class CSVDataSaver(DataSaver):
             )
         except NoBrokersAvailable:
             logger.error(
-                f"No Broker is availble at the address: {cfg.data_source.kafka_server}. No data will be saved."
+                f"No Broker is available at the address: {cfg.streaming.kafka_server}. No data will be saved."
             )
             return None

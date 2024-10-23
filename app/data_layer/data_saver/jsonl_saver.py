@@ -34,6 +34,9 @@ class JSONLDataSaver(DataSaver):
 
         if isinstance(jsonl_file_path, str):
             jsonl_file_path = Path(jsonl_file_path)
+        
+        if not jsonl_file_path.parent.exists():
+            jsonl_file_path.parent.mkdir(parents=True, exist_ok=True)
 
         file_name = (
             jsonl_file_path.stem + f"_{datetime.now().strftime('%Y_%m_%d')}.jsonl"
@@ -72,6 +75,6 @@ class JSONLDataSaver(DataSaver):
             )
         except NoBrokersAvailable:
             logger.error(
-                f"No Broker is availble at the address: {cfg.data_source.kafka_server}. No data will be saved."
+                f"No Broker is available at the address: {cfg.streaming.kafka_server}. No data will be saved."
             )
             return None

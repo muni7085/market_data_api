@@ -2,6 +2,7 @@ import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
+import csv
 
 from app.utils.common.logger import get_logger
 
@@ -131,7 +132,27 @@ def create_dir(dir_path: str | Path) -> Path:
     """
     if isinstance(dir_path, str):
         dir_path = Path(dir_path)
+
     if not dir_path.exists():
         dir_path.mkdir(parents=True, exist_ok=True)
 
     return dir_path
+
+def read_csv(file_path: str | Path) -> list:
+    """
+    Read the data from given csv file path.
+
+    Parameters:
+    -----------
+    file_path: ``str | Path``
+        Path to the csv file
+
+    Return:
+    -------
+    ``list``
+        Loaded data from the given file path
+    """
+    with open(file_path, "r", encoding="utf-8") as fp:
+        reader = csv.reader(fp)
+    
+    return list(reader)
