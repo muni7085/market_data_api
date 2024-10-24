@@ -23,15 +23,18 @@ jobs:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
-      - name: List files in app directory
-        run: |
-          ls -la
+      
 
       - name: Install miniconda and create environment
         uses: conda-incubator/setup-miniconda@v2
         with:
           python-version: ${{ env.PYTHON_VERSION }}
           activate-environment: app
+
+      - name: List files in app directory
+        run: |
+          ls -la
+          ls -la app
 
       # Install poetry and all the packages in pyproject.toml file
       - name: Install poetry
