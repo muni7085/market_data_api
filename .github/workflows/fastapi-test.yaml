@@ -23,6 +23,9 @@ jobs:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
+      - name: List files in app directory
+        run: |
+          ls -la
 
       - name: Install miniconda and create environment
         uses: conda-incubator/setup-miniconda@v2
