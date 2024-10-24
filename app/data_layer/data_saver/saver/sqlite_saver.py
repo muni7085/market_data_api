@@ -8,7 +8,7 @@ from kafka.errors import NoBrokersAvailable
 from omegaconf import DictConfig
 from sqlalchemy import create_engine
 
-from app.data_layer.data_saver import DataSaver
+from app.data_layer.data_saver.data_saver import DataSaver
 from app.data_layer.database.sqlite.crud.websocket_crud import insert_data
 from app.data_layer.database.sqlite.models.websocket_models import SocketStockPriceInfo
 from app.data_layer.database.sqlite.sqlite_db_connection import (
@@ -101,15 +101,17 @@ class SqliteDataSaver(DataSaver):
             should be in json format.
         """
         decoded_data = data.decode("utf-8")
-        decoded_data = json.loads(decoded_data)
+        data_to_insert = json.loads(decoded_data)
 
         try:
-            decoded_data["exchange"] = ExchangeType.get_exchange(
-                decoded_data["exchange"]
+            data_to_insert["exchange"] = ExchangeType.get_exchange(
+                data_to_insert["exchange"]
             ).name
-            self.save_stock_data(decoded_data)
+            self.save_stock_data(data_to_insert)
         except ValueError:
-            logger.error(f"Exchange type {decoded_data['exchange']} is not supported")
+            logger.error(
+                "Exchange type %s is not supported", data_to_insert["exchange"]
+            )
 
     def retrieve_and_save(self):
         """
@@ -132,6 +134,7 @@ class SqliteDataSaver(DataSaver):
             )
         except NoBrokersAvailable:
             logger.error(
-                f"No Broker is availble at the address: {cfg.streaming.kafka_server}. No data will be saved."
+                "No Broker is availble at the address: %s. No data will be saved.",
+                cfg.streaming.kafka_server,
             )
             return None

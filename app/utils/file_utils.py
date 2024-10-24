@@ -1,8 +1,8 @@
+import csv
 import json
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
-import csv
 
 from app.utils.common.logger import get_logger
 
@@ -138,6 +138,7 @@ def create_dir(dir_path: str | Path) -> Path:
 
     return dir_path
 
+
 def read_csv(file_path: str | Path) -> list:
     """
     Read the data from given csv file path.
@@ -154,5 +155,5 @@ def read_csv(file_path: str | Path) -> list:
     """
     with open(file_path, "r", encoding="utf-8") as fp:
         reader = csv.reader(fp)
-    
+
     return list(reader)

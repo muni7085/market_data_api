@@ -2,10 +2,12 @@ import json
 from collections import namedtuple
 from datetime import datetime
 from tempfile import TemporaryDirectory
-from pytest_mock import MockerFixture, MockType
+from typing import cast
+
 import pytest
 from kafka.errors import NoBrokersAvailable
 from omegaconf import DictConfig, OmegaConf
+from pytest_mock import MockerFixture, MockType
 
 from app.data_layer.data_saver import DataSaver, SqliteDataSaver
 from app.data_layer.database.sqlite.crud.websocket_crud import get_all_stock_price_info
@@ -59,14 +61,16 @@ def sqlite_saver(
     """
     mock_consumer.return_value = mocker.MagicMock()
 
-    return SqliteDataSaver.from_cfg(sqlite_config)
+    return cast(SqliteDataSaver, SqliteDataSaver.from_cfg(sqlite_config))
 
 
 ####################################### TESTS #######################################
 
 
 def validate_init(
-    sqlite_saver: SqliteDataSaver, mock_consumer: MockType, sqlite_config: DictConfig
+    sqlite_saver: SqliteDataSaver | None,
+    mock_consumer: MockType,
+    sqlite_config: DictConfig,
 ):
     """
     Validate the initialization of the SqliteDataSaver.
@@ -106,7 +110,7 @@ def test_init(
     mock_consumer.reset_mock()
 
     # Test: 1.2 ( Valid initialization using init_from_cfg )
-    sqlite_saver = init_from_cfg(sqlite_config, DataSaver)
+    sqlite_saver = cast(SqliteDataSaver, init_from_cfg(sqlite_config, DataSaver))
     validate_init(sqlite_saver, mock_consumer, sqlite_config)
     mock_consumer.reset_mock()
 
@@ -125,7 +129,8 @@ def test_init(
     sqlite_saver = SqliteDataSaver.from_cfg(sqlite_config)
     assert sqlite_saver is None
     mock_logger.error.assert_called_once_with(
-        f"No Broker is availble at the address: {sqlite_config.streaming.kafka_server}. No data will be saved."
+        "No Broker is availble at the address: %s. No data will be saved.",
+        "localhost:9092",
     )
     mock_consumer.assert_called_once_with(
         sqlite_config.streaming.kafka_topic,
@@ -167,4 +172,4 @@ def test_retrieve_and_save(
 
     sqlite_saver.consumer.__iter__.return_value = encoded_data
     sqlite_saver.retrieve_and_save()
-    mock_logger.error.assert_called_once_with("Exchange type -1 is not supported")
+    mock_logger.error.assert_called_once_with("Exchange type %s is not supported", -1)

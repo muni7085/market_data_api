@@ -8,7 +8,7 @@ from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable
 from omegaconf import DictConfig
 
-from app.data_layer.data_saver import DataSaver
+from app.data_layer.data_saver.data_saver import DataSaver
 from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name)
@@ -36,7 +36,7 @@ class CSVDataSaver(DataSaver):
 
         if isinstance(csv_file_path, str):
             csv_file_path = Path(csv_file_path)
-        
+
         if not csv_file_path.parent.exists():
             csv_file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -48,8 +48,8 @@ class CSVDataSaver(DataSaver):
         Retrieve the data from the kafka consumer and save it to the csv file.
         """
         try:
-            idx: int = 0
-            with open(self.csv_file_path, "a", newline="") as file:
+            idx = 0
+            with open(self.csv_file_path, "a", encoding="utf-8", newline="") as file:
                 writer = csv.writer(file)
 
                 for idx, message in enumerate(self.consumer):
@@ -63,7 +63,7 @@ class CSVDataSaver(DataSaver):
                     # Save the data as soon as it is received
                     file.flush()
         except Exception as e:
-            logger.error(f"Error while saving data to csv: {e}")
+            logger.error("Error while saving data to csv: %s", e)
         finally:
             logger.info("%s messages saved to csv", idx)
 
@@ -89,6 +89,7 @@ class CSVDataSaver(DataSaver):
             )
         except NoBrokersAvailable:
             logger.error(
-                f"No Broker is available at the address: {cfg.streaming.kafka_server}. No data will be saved."
+                "No Broker is available at the address: %s. No data will be saved.",
+                cfg.streaming.kafka_server,
             )
             return None

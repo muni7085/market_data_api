@@ -22,11 +22,14 @@ def main(cfg: DictConfig) -> None:
     for data_saver_config in cfg.data_saver:
         data_saver_name, config = list(data_saver_config.items())[0]
         data_saver = init_from_cfg(config, DataSaver)
-        print(data_saver)
+
+        if data_saver is None:
+            logger.error("Data saver %s is not registered", data_saver_name)
+            continue
 
         # Create a thread for each saver
         saver_thread = Thread(target=data_saver.retrieve_and_save)
-        logger.info(f"Starting the saver {data_saver_name}")
+        logger.info("Starting the saver %s", data_saver_name)
 
         # Start the saver thread to retrieve and save the data
         saver_thread.start()
@@ -37,4 +40,4 @@ def main(cfg: DictConfig) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pylint: disable=no-value-for-parameter

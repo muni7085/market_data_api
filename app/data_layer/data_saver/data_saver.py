@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from omegaconf import DictConfig
 from registrable import Registrable
 
 
@@ -22,8 +23,9 @@ class DataSaver(ABC, Registrable):
         """
         raise NotImplementedError
 
+    @classmethod
     @abstractmethod
-    def from_cfg(cls, cfg) -> Optional["DataSaver"]:
+    def from_cfg(cls, cfg: DictConfig) -> Optional["DataSaver"]:
         """
         This method creates an instance of the DataSaver class from the
         given configuration

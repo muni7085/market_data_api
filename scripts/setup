@@ -2,12 +2,19 @@
 from pathlib import Path
 import os
 import subprocess
+import logging
+
+
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(Path(__file__).name)
 
 
 def setup_env_vars():
     # Ensure the script runs inside a conda environment
     if "CONDA_PREFIX" not in os.environ:
-        print("Not inside a conda environment. Exiting...")
+        logger.error("Not inside a conda environment. Exiting...")
         return
 
     # Set the paths for activation and deactivation scripts
@@ -33,7 +40,7 @@ def setup_env_vars():
     with open(project_root.parent / ".env", "w") as f:
         f.write("ROOT_PATH=" + str(project_root) + "\n")
 
-    print(
+    logger.info(
         "Environment variables set. Reactivate your conda environment to apply changes."
     )
 
@@ -41,15 +48,14 @@ def setup_env_vars():
 def install_dependencies():
     """Installs dependencies using Poetry."""
     try:
-        print("Installing dependencies with Poetry...")
+        logger.info("Installing dependencies with Poetry...")
         subprocess.run(["poetry", "install"], check=True)
-        print("Dependencies installed successfully.")
+        logger.info("Dependencies installed successfully.")
     except subprocess.CalledProcessError:
-        print("Error installing dependencies. Please check your Poetry setup.")
+        logger.error("Error installing dependencies. Please check your Poetry setup.")
 
 
 def main():
-
     setup_env_vars()
     install_dependencies()
 

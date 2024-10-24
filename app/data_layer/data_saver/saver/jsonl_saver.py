@@ -6,7 +6,7 @@ from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable
 from omegaconf import DictConfig
 
-from app.data_layer.data_saver import DataSaver
+from app.data_layer.data_saver.data_saver import DataSaver
 from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name)
@@ -34,7 +34,7 @@ class JSONLDataSaver(DataSaver):
 
         if isinstance(jsonl_file_path, str):
             jsonl_file_path = Path(jsonl_file_path)
-        
+
         if not jsonl_file_path.parent.exists():
             jsonl_file_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -47,15 +47,15 @@ class JSONLDataSaver(DataSaver):
         """
         Retrieve the data from the kafka consumer and save it to the jsonl file.
         """
+        idx = 0
         try:
-            idx: int = 0
-            with open(self.jsonl_file_path, "a", newline="") as file:
+            with open(self.jsonl_file_path, "a", encoding="utf-8", newline="") as file:
                 for idx, message in enumerate(self.consumer):
                     decoded_data = message.value.decode("utf-8")
                     file.write(decoded_data + "\n")
                     file.flush()
         except Exception as e:
-            logger.error(f"Error while saving data to jsonl: {e}")
+            logger.error("Error while saving data to jsonl: %s", e)
         finally:
             logger.info("%s messages saved to jsonl", idx)
 
@@ -75,6 +75,7 @@ class JSONLDataSaver(DataSaver):
             )
         except NoBrokersAvailable:
             logger.error(
-                f"No Broker is available at the address: {cfg.streaming.kafka_server}. No data will be saved."
+                "No Broker is available at the address: %s. No data will be saved.",
+                cfg.streaming.kafka_server,
             )
             return None

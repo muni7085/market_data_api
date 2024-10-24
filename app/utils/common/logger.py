@@ -38,6 +38,7 @@ def get_logger(
     """
     logger = logging.getLogger(name)
     logger.setLevel(log_level)
+    logger.propagate = False  # Disable propagation to avoid duplicate logs
 
     # Add a stream handler
     c_handler = logging.StreamHandler()
@@ -58,5 +59,10 @@ def get_logger(
         )
         f_handler.setFormatter(f_format)
         logger.addHandler(f_handler)
+
+    # Suppress Kafka logs
+    logging.getLogger("kafka").setLevel(
+        logging.WARNING
+    )  # Set to ERROR or CRITICAL to suppress more
 
     return logger

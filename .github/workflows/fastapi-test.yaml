@@ -31,10 +31,10 @@ jobs:
           activate-environment: app
 
       # Install poetry and all the packages in pyproject.toml file
-      - name: Install poetry and dependencies
+      - name: Install poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
-          poetry install
+          ./app/setup
       - name: black check
         run: black --diff --check $(git ls-files '*.py')
       - name: isort check
@@ -78,7 +78,7 @@ jobs:
       - name: Install poetry and dependencies
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
-          poetry install
+          ./app/setup
   
       - name: testing
         run: pytest . -vvv

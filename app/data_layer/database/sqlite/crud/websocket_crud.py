@@ -3,7 +3,7 @@ This module contains the CRUD operations for the SocketStockPriceInfo table in t
 """
 
 from pathlib import Path
-from typing import cast
+from typing import Generator, cast
 
 from sqlalchemy.dialects.sqlite import insert
 from sqlmodel import Session, select
@@ -17,7 +17,7 @@ logger = get_logger(Path(__file__).name)
 
 def upsert(
     stock_price_info: dict[str, str | None] | list[dict[str, str | None]],
-    session: Session,
+    session: Generator[Session, None, None],
 ):
     """
     Upsert means insert the data into the table if it does not already exist.
@@ -48,7 +48,7 @@ def upsert(
     ----------
     stock_price_info: ``dict[str, str|None]| list[dict[str, str|None]]``
         The SocketStockPriceInfo objects to upsert into the table
-    session: ``Session``
+    session: ``Generator[Session, None, None]``
         The SQLModel session object to use for the database operations
     """
     upsert_stmt = insert(SocketStockPriceInfo).values(stock_price_info)
@@ -67,7 +67,7 @@ def upsert(
 
 def insert_or_ignore(
     stock_price_info: dict[str, str | None] | list[dict[str, str | None]],
-    session: Session,
+    session: Generator[Session, None, None],
 ):
     """
     Add the provided data into the StockPriceInfo table if the data does not already exist.
@@ -77,7 +77,7 @@ def insert_or_ignore(
     ----------
     stock_price_info: ``dict[str, str|None]| list[dict[str, str|None]]``
         The SocketStockPriceInfo objects to insert into the table
-    session: ``Session``
+    session: ``Generator[Session, None, None]``
         The SQLModel session object to use for the database operations
     """
     insert_stmt = insert(SocketStockPriceInfo).values(stock_price_info)
@@ -96,7 +96,7 @@ def insert_data(
         | None
     ),
     update_existing: bool = False,
-    session: Session = None,
+    session: Generator[Session, None, None] | None = None,
 ):
     """
     Insert the provided data into the SocketStockPriceInfo table in the SQLite database. It
@@ -110,7 +110,7 @@ def insert_data(
         The data to insert into the table
     update_existing: ``bool``, ( defaults = False )
         If True, the existing data in the table will be updated with the new data
-    session: ``Session``, ( defaults = None )
+    session: ``Generator[Session, None, None]``, ( defaults = None )
         The SQLModel session object to use for the database operations. If not provided,
         a new session will be created from the database connection pool
     """
@@ -139,13 +139,15 @@ def insert_data(
         insert_or_ignore(data_to_insert, session)
 
 
-def get_all_stock_price_info(session: Session) -> list[SocketStockPriceInfo]:
+def get_all_stock_price_info(
+    session: Generator[Session, None, None]
+) -> list[SocketStockPriceInfo]:
     """
     Retrieve all the data from the SocketStockPriceInfo table in the SQLite database.
 
     Parameters
     ----------
-    session: ``Session``
+    session: ``Generator[Session, None, None]``
         The SQLModel session object to use for the database operations
 
     Returns

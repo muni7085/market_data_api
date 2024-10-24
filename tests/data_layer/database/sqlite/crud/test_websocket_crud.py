@@ -8,7 +8,6 @@ from app.data_layer.database.sqlite.crud.websocket_crud import (
     upsert,
 )
 from app.data_layer.database.sqlite.models.websocket_models import SocketStockPriceInfo
-from app.data_layer.database.sqlite.sqlite_db_connection import get_session
 
 #################### FIXTURES ####################
 
@@ -89,7 +88,7 @@ def test_insert_data_single_dict(
 
 
 def test_insert_with_session(
-    mock_session: MagicMock, sample_stock_price_info: dict[str | str]
+    mock_session: MagicMock, sample_stock_price_info: dict[str, str | None]
 ) -> None:
     """
     Test insert_data with a single dict and `update_existing=False` by passing a session

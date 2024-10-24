@@ -2,14 +2,15 @@ import json
 from collections import namedtuple
 from datetime import datetime
 from tempfile import TemporaryDirectory
+from typing import cast
+
+import pandas as pd
+import pytest
+from kafka.errors import NoBrokersAvailable
+from omegaconf import DictConfig, OmegaConf
 from pytest_mock import MockerFixture, MockType
 
-import pytest
-import pandas as pd
-from kafka.errors import NoBrokersAvailable
-
-from omegaconf import DictConfig, OmegaConf
-from app.data_layer.data_saver import DataSaver, CSVDataSaver
+from app.data_layer.data_saver import CSVDataSaver, DataSaver
 from app.utils.common import init_from_cfg
 
 Message = namedtuple("Message", ["value"])
@@ -20,7 +21,7 @@ Message = namedtuple("Message", ["value"])
 def csv_config() -> DictConfig:
     """
     Configuration for the CSVDataSaver.
-    
+
     Returns:
     --------
     ``DictConfig``
@@ -36,9 +37,11 @@ def csv_config() -> DictConfig:
             },
         }
     )
+
+
 @pytest.fixture
 def mock_consumer(mocker: MockerFixture) -> MockType:
-    """ 
+    """
     Mock the KafkaConsumer object.
     """
     return mocker.patch("app.data_layer.data_saver.csv_saver.KafkaConsumer")
@@ -51,6 +54,7 @@ def mock_logger(mocker: MockerFixture) -> MockType:
     """
     return mocker.patch("app.data_layer.data_saver.csv_saver.logger")
 
+
 @pytest.fixture
 def csv_saver(
     mock_consumer: MockType, csv_config: DictConfig, mocker: MockerFixture
@@ -60,14 +64,14 @@ def csv_saver(
     """
     mock_consumer.return_value = mocker.MagicMock()
 
-    return CSVDataSaver.from_cfg(csv_config)
+    return cast(CSVDataSaver, CSVDataSaver.from_cfg(csv_config))
 
 
 ####################################### TESTS #######################################
 
 
 def validate_init(
-    csv_saver: CSVDataSaver, mock_consumer: MockType, csv_config: DictConfig
+    csv_saver: CSVDataSaver | None, mock_consumer: MockType, csv_config: DictConfig
 ):
     """
     Validate the initialization of the CSVDataSaver object.
@@ -87,6 +91,7 @@ def validate_init(
         auto_offset_reset="earliest",
     )
 
+
 # Test: 1
 def test_init(
     mock_consumer: MockType,
@@ -102,9 +107,9 @@ def test_init(
     csv_saver = CSVDataSaver.from_cfg(csv_config)
     validate_init(csv_saver, mock_consumer, csv_config)
     mock_consumer.reset_mock()
-    
+
     # Test: 1.2 ( valid initialization using init_from_cfg )
-    csv_saver = init_from_cfg(csv_config, DataSaver)
+    csv_saver = cast(CSVDataSaver, init_from_cfg(csv_config, DataSaver))
     validate_init(csv_saver, mock_consumer, csv_config)
     mock_consumer.reset_mock()
 
@@ -113,18 +118,19 @@ def test_init(
         bootstrap_servers=csv_config.streaming.kafka_server,
         auto_offset_reset="earliest",
     )
-    
+
     # Test: 1.3 ( valid initialization from constructor )
     csv_saver = CSVDataSaver(consumer, csv_config.csv_file_path)
     validate_init(csv_saver, mock_consumer, csv_config)
     mock_consumer.reset_mock()
-    
+
     # Test: 1.4 ( Test NoBrokersAvailable exception )
     mock_consumer.side_effect = NoBrokersAvailable()
     csv_saver = CSVDataSaver.from_cfg(csv_config)
     assert csv_saver is None
     mock_logger.error.assert_called_once_with(
-        f"No Broker is available at the address: {csv_config.streaming.kafka_server}. No data will be saved."
+        "No Broker is available at the address: %s. No data will be saved.",
+        "localhost:9092",
     )
     mock_consumer.assert_called_once_with(
         csv_config.streaming.kafka_topic,
@@ -135,13 +141,13 @@ def test_init(
 
 # Test: 2
 def test_retrieve_and_save(csv_saver: CSVDataSaver, kafka_data: list[dict]):
-    """ 
+    """
     Test the `retrieve_and_save` method of the CSVDataSaver object.
     """
     encoded_data = [
         Message(value=json.dumps(data).encode("utf-8")) for data in kafka_data
     ]
-    
+
     # Setting the return value of the consumer to the encoded data
     csv_saver.consumer.__iter__.return_value = encoded_data
     csv_saver.retrieve_and_save()
@@ -150,23 +156,24 @@ def test_retrieve_and_save(csv_saver: CSVDataSaver, kafka_data: list[dict]):
 
     stored_data = pd.read_csv(csv_saver.csv_file_path)
     stored_data = stored_data.to_dict(orient="records")
-    
+
     # Converting the data to string to compare
     stored_data = [{k: str(v) for k, v in record.items()} for record in stored_data]
     kafka_data = [{k: str(v) for k, v in record.items()} for record in kafka_data]
 
     assert stored_data == kafka_data
 
+
 # Test: 3
 def test_retrieve_and_save_error(csv_saver: CSVDataSaver, mock_logger: MockType):
-    """ 
+    """
     Test the `retrieve_and_save` method of the CSVDataSaver object when an error occurs.
     """
     csv_saver.consumer.__iter__.side_effect = PermissionError("Permission denied")
     csv_saver.retrieve_and_save()
-    
+
     mock_logger.error.assert_called_once_with(
-        "Error while saving data to csv: Permission denied"
+        "Error while saving data to csv: %s", csv_saver.consumer.__iter__.side_effect
     )
     mock_logger.info.assert_called_once_with("%s messages saved to csv", 0)
     assert csv_saver.consumer.__iter__.call_count == 1
