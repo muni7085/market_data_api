@@ -1,2 +1,2 @@
-from .streaming import Streaming  # isort:skip
-from .kafka_streaming import KafkaStreaming
+from .streamer import Streamer  # isort:skip
+from .streamers import *
