@@ -47,15 +47,15 @@ def mock_validate_symbol_and_get_token(mocker: MockerFixture) -> MockType:
 
 
 @pytest.fixture
-def mock_streaming(mocker: MockerFixture) -> MockType:
-    return mocker.patch("app.sockets.connections.smartsocket_connection.Streaming")
+def mock_streamer(mocker: MockerFixture) -> MockType:
+    return mocker.patch("app.sockets.connections.smartsocket_connection.Streamer")
 
 
 @pytest.fixture
-def mock_init_from_cfg(mocker: MockerFixture, mock_streaming) -> MockType:
+def mock_init_from_cfg(mocker: MockerFixture, mock_streamer) -> MockType:
     return mocker.patch(
         "app.sockets.connections.smartsocket_connection.init_from_cfg",
-        return_value=mock_streaming,
+        return_value=mock_streamer,
     )
 
 
@@ -151,7 +151,7 @@ def test_init_from_cfg_valid_cfg(
     connection_cfg: dict,
     mock_smartsocket: MockType,
     mock_init_from_cfg: MockType,
-    mock_streaming: MockType,
+    mock_streamer: MockType,
     smartapi_tokens: tuple[list[SmartAPIToken], dict[str, str]],
     mock_get_smartapi_tokens_by_all_conditions: MockType,
 ):
@@ -166,8 +166,8 @@ def test_init_from_cfg_valid_cfg(
     assert connection is not None
     assert connection.websocket == mock_smartsocket
 
-    mock_init_from_cfg.assert_called_with(cfg.streaming, mock_streaming)
-    assert mock_init_from_cfg.return_value == mock_streaming
+    mock_init_from_cfg.assert_called_with(cfg.streaming, mock_streamer)
+    assert mock_init_from_cfg.return_value == mock_streamer
 
     mock_smartsocket.set_tokens.assert_called_once()
     mock_smartsocket.initialize_socket.assert_called_once()
