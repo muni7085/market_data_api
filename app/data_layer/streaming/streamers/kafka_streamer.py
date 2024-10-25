@@ -4,14 +4,14 @@ from typing import Optional
 from kafka import KafkaProducer
 from omegaconf import DictConfig
 
-from app.data_layer.streaming import Streaming
+from app.data_layer.streaming import Streamer
 from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name)
 
 
-@Streaming.register("kafka")
-class KafkaStreaming(Streaming):
+@Streamer.register("kafka")
+class KafkaStreamer(Streamer):
     """
     Kafka streaming class to send data to Kafka server. This can be used as a callback
     function to send data to Kafka.
@@ -56,7 +56,7 @@ class KafkaStreaming(Streaming):
                 logger.error("Error closing Kafka producer: %s", e)
 
     @classmethod
-    def from_cfg(cls, cfg: DictConfig) -> Optional["KafkaStreaming"]:
+    def from_cfg(cls, cfg: DictConfig) -> Optional["KafkaStreamer"]:
         try:
             return cls(cfg["kafka_server"], cfg["kafka_topic"])
         except Exception as e:

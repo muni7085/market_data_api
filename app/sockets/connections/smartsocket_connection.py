@@ -7,7 +7,7 @@ from omegaconf import DictConfig
 from app.data_layer.database.sqlite.crud.smartapi_crud import (
     get_smartapi_tokens_by_all_conditions,
 )
-from app.data_layer.streaming import Streaming
+from app.data_layer.streaming import Streamer
 from app.sockets.connections.websocket_connection import WebsocketConnection
 from app.sockets.twisted_sockets import SmartSocket
 from app.utils.common import init_from_cfg
@@ -169,7 +169,7 @@ class SmartSocketConnection(WebsocketConnection):
         )
 
         # Initialize the callback to save the received data from the socket.
-        save_data_callback = init_from_cfg(cfg.streaming, Streaming)
+        save_data_callback = init_from_cfg(cfg.streaming, Streamer)
 
         smart_socket = SmartSocket.initialize_socket(cfg.provider, save_data_callback)
         connection = cls(smart_socket)

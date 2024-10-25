@@ -9,7 +9,7 @@ from omegaconf import DictConfig
 from registrable import Registrable
 
 
-class Streaming(ABC, Registrable):
+class Streamer(ABC, Registrable):
     """
     This is the base class for all streaming classes. All the concrete streaming classes
     should inherit from this class and implement the __call__ method. This class also
@@ -30,7 +30,7 @@ class Streaming(ABC, Registrable):
         raise NotImplementedError
 
     @classmethod
-    def from_cfg(cls, cfg: DictConfig) -> Optional["Streaming"]:
+    def from_cfg(cls, cfg: DictConfig) -> Optional["Streamer"]:
         """
         This class method creates a streaming object from the configuration file.
 
