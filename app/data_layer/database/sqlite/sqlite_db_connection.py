@@ -6,24 +6,30 @@ to get a session object to interact with the database.
 
 from typing import Generator
 
+from sqlalchemy.engine import Engine
 from sqlmodel import Session, SQLModel, create_engine
 
 from app.utils.urls import SQLITE_DB_URL
 
-sqlite_engine = create_engine(SQLITE_DB_URL, echo=True)
+sqlite_engine = create_engine(SQLITE_DB_URL)
 
 
-def create_db_and_tables():
+def create_db_and_tables(engine: Engine | None = None) -> None:
     """
     Creates the database and tables if they do not exist.
     """
+    if engine is None:
+        engine = sqlite_engine
 
-    SQLModel.metadata.create_all(sqlite_engine)
+    SQLModel.metadata.create_all(engine)
 
 
-def get_session() -> Generator[Session, None, None]:
+def get_session(engine: Engine | None = None) -> Generator[Session, None, None]:
     """
     Yields a session object to interact with the database.
     """
-    with Session(sqlite_engine) as session:
+    if engine is None:
+        engine = sqlite_engine
+
+    with Session(engine) as session:
         yield session

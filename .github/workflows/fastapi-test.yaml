@@ -23,6 +23,7 @@ jobs:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v3
+      
 
       - name: Install miniconda and create environment
         uses: conda-incubator/setup-miniconda@v2
@@ -31,10 +32,10 @@ jobs:
           activate-environment: app
 
       # Install poetry and all the packages in pyproject.toml file
-      - name: Install poetry and dependencies
+      - name: Install poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
-          poetry install
+          ./scripts/setup
       - name: black check
         run: black --diff --check $(git ls-files '*.py')
       - name: isort check
@@ -78,7 +79,7 @@ jobs:
       - name: Install poetry and dependencies
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
-          poetry install
+          ./scripts/setup
   
       - name: testing
         run: pytest . -vvv
