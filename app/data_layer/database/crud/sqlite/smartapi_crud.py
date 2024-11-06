@@ -8,8 +8,8 @@ from typing import Sequence
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlmodel import delete, or_, select
 
+from app.data_layer.database.db_connections.sqlite import get_session
 from app.data_layer.database.models.smartapi_model import SmartAPIToken
-from app.data_layer.database.crud.sqlite_db_connection import get_session
 from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name)

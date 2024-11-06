@@ -10,11 +10,11 @@ from sqlalchemy import create_engine
 
 from app.data_layer.data_saver.data_saver import DataSaver
 from app.data_layer.database.crud.sqlite.websocket_crud import insert_data
-from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
-from app.data_layer.database.crud.sqlite_db_connection import (
+from app.data_layer.database.db_connections.sqlite import (
     create_db_and_tables,
     get_session,
 )
+from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
 from app.utils.common.logger import get_logger
 from app.utils.smartapi.smartsocket_types import ExchangeType
 
