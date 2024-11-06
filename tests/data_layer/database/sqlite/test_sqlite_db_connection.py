@@ -6,15 +6,15 @@ from pathlib import Path
 
 from sqlmodel import inspect, select
 
-from app.data_layer.database.sqlite.models.smartapi_models import SmartAPIToken
-from app.data_layer.database.sqlite.sqlite_db_connection import (
+from app.data_layer.database.models.smartapi_model import SmartAPIToken
+from app.data_layer.database.crud.sqlite_db_connection import (
     create_db_and_tables,
     get_session,
     sqlite_engine,
 )
 from app.utils.urls import SQLITE_DB_URL
 
-table_names = ["smartapitoken", "socketstockpriceinfo"]
+table_names = ["smartapitoken", "socketstockpriceinfo", 'user']
 
 
 def test_database_init_and_interaction():

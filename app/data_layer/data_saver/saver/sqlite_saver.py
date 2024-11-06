@@ -9,9 +9,9 @@ from omegaconf import DictConfig
 from sqlalchemy import create_engine
 
 from app.data_layer.data_saver.data_saver import DataSaver
-from app.data_layer.database.sqlite.crud.websocket_crud import insert_data
-from app.data_layer.database.sqlite.models.websocket_models import SocketStockPriceInfo
-from app.data_layer.database.sqlite.sqlite_db_connection import (
+from app.data_layer.database.crud.sqlite.websocket_crud import insert_data
+from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
+from app.data_layer.database.crud.sqlite_db_connection import (
     create_db_and_tables,
     get_session,
 )

@@ -6,12 +6,12 @@ from pathlib import Path
 
 import pytest
 
-from app.data_layer.database.sqlite.crud.smartapi_crud import (
+from app.data_layer.database.crud.sqlite.smartapi_crud import (
     get_smartapi_tokens_by_all_conditions,
     get_smartapi_tokens_by_any_condition,
 )
-from app.data_layer.database.sqlite.models.smartapi_models import SmartAPIToken
-from app.data_layer.database.sqlite.sqlite_db_connection import (
+from app.data_layer.database.models.smartapi_model import SmartAPIToken
+from app.data_layer.database.crud.sqlite_db_connection import (
     get_session,
     sqlite_engine,
 )

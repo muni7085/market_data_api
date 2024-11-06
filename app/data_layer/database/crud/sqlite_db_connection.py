@@ -8,6 +8,7 @@ from typing import Generator
 
 from sqlalchemy.engine import Engine
 from sqlmodel import Session, SQLModel, create_engine
+from app.data_layer.database.models import *
 
 from app.utils.urls import SQLITE_DB_URL
 

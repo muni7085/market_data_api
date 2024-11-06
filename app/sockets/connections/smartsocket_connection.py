@@ -4,7 +4,7 @@ from typing import Optional
 
 from omegaconf import DictConfig
 
-from app.data_layer.database.sqlite.crud.smartapi_crud import (
+from app.data_layer.database.crud.sqlite.smartapi_crud import (
     get_smartapi_tokens_by_all_conditions,
 )
 from app.data_layer.streaming.streamer import Streamer
