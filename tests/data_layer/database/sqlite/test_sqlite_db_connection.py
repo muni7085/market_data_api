@@ -6,15 +6,15 @@ from pathlib import Path
 
 from sqlmodel import inspect, select
 
-from app.data_layer.database.sqlite.models.smartapi_models import SmartAPIToken
-from app.data_layer.database.sqlite.sqlite_db_connection import (
+from app.data_layer.database.db_connections.sqlite import (
     create_db_and_tables,
     get_session,
     sqlite_engine,
 )
+from app.data_layer.database.models.smartapi_model import SmartAPIToken
 from app.utils.urls import SQLITE_DB_URL
 
-table_names = ["smartapitoken", "socketstockpriceinfo"]
+table_names = {"smartapitoken", "socketstockpriceinfo"}
 
 
 def test_database_init_and_interaction():
@@ -38,6 +38,10 @@ def test_database_init_and_interaction():
         metadata = inspect(sqlite_engine)
         for table in metadata.get_table_names():
             assert table in table_names
+            table_names.remove(table)
+
+        # Check if all the tables are found
+        assert not table_names
 
         # Check if the tables are empty and able to interact with the database
         try:

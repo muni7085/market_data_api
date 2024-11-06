@@ -2,12 +2,12 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from app.data_layer.database.sqlite.crud.websocket_crud import (
+from app.data_layer.database.crud.sqlite.websocket_crud import (
     insert_data,
     insert_or_ignore,
     upsert,
 )
-from app.data_layer.database.sqlite.models.websocket_models import SocketStockPriceInfo
+from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
 
 #################### FIXTURES ####################
 
@@ -19,7 +19,7 @@ def mock_session(mocker) -> MagicMock:
     """
     mock_session = mocker.MagicMock()
     mocker.patch(
-        "app.data_layer.database.sqlite.crud.websocket_crud.get_session",
+        "app.data_layer.database.crud.sqlite.websocket_crud.get_session",
         return_value=iter([mock_session]),
     )
     mock_session.__enter__.return_value = mock_session
@@ -119,7 +119,7 @@ def test_insert_data_empty_input(mock_session: MagicMock, mocker) -> None:
     Test insert_data with empty input (should log a warning and not perform insert)
     """
     mock_logger = mocker.patch(
-        "app.data_layer.database.sqlite.crud.websocket_crud.logger"
+        "app.data_layer.database.crud.sqlite.websocket_crud.logger"
     )
     insert_data(None, update_existing=False)
 
