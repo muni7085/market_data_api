@@ -39,7 +39,7 @@ def test_database_init_and_interaction():
         for table in metadata.get_table_names():
             assert table in table_names
             table_names.remove(table)
-        
+
         # Check if all the tables are found
         assert not table_names
 
