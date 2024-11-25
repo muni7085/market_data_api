@@ -21,10 +21,10 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
+        working-directory: backend
     steps:
       - uses: actions/checkout@v3
       
-
       - name: Install miniconda and create environment
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -36,21 +36,17 @@ jobs:
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
           ./scripts/setup
-      - name: black check
-        run: black --diff --check $(git ls-files '*.py')
-      - name: isort check
-        run: isort --diff --check --profile black $(git ls-files '*.py')
-      - name: mypy check
-        run: mypy $(git ls-files '*.py')
-      - name: pylint check
-        run: pylint $(git ls-files '*.py')
-
+      - name: Format check
+        run: ./scripts/format.sh --check
+      - name: Lint check
+        run: ./scripts/lint.sh
         
   test:
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -l {0}
+        working-directory: backend
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
