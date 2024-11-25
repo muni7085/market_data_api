@@ -36,22 +36,20 @@ jobs:
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
           ./backend/scripts/setup
-      # - name: Change to backend directory
-      #   run: |
-      #     cd backend
-      #     echo $(pwd)
-      #     ls -a
       - name: black check
         run: black --diff --check $(git ls-files '*.py')
       - name: isort check
         run: |
-          echo $(pwd)
           cd backend
           isort --diff --check --profile black $(git ls-files '*.py')
       - name: mypy check
-        run: mypy $(git ls-files '*.py')
+        run: |
+          cd backend
+          mypy $(git ls-files '*.py')
       - name: pylint check
-        run: pylint $(git ls-files '*.py')
+        run: |
+          cd backend
+          pylint $(git ls-files '*.py')
 
         
   test:
