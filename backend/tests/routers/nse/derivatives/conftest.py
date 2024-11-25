@@ -1,5 +1,6 @@
 # pylint: disable=missing-function-docstring
 import pytest
+
 from app.utils.date_utils import get_date, get_expiry_dates
 from app.utils.type_utils import SymbolType
 

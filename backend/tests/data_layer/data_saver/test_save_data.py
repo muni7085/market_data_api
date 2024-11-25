@@ -2,10 +2,11 @@ from tempfile import TemporaryDirectory
 from typing import cast
 
 import pytest
-from app.data_layer.data_saver import CSVDataSaver, DataSaver
-from app.data_layer.data_saver.save_data import main
 from omegaconf import DictConfig, OmegaConf
 from pytest_mock import MockerFixture, MockType
+
+from app.data_layer.data_saver import CSVDataSaver, DataSaver
+from app.data_layer.data_saver.save_data import main
 
 #################### Fixtures ####################
 

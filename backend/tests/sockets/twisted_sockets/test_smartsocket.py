@@ -4,13 +4,14 @@ from itertools import islice
 from unittest.mock import MagicMock
 
 import pytest
+from pytest_mock import MockerFixture, MockType
+
 from app.sockets.twisted_sockets import SmartSocket
 from app.utils.smartapi.smartsocket_types import (
     ExchangeType,
     SubscriptionAction,
     SubscriptionMode,
 )
-from pytest_mock import MockerFixture, MockType
 
 
 ####################### Fixtures #######################

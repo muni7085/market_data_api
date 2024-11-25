@@ -5,11 +5,12 @@ This module contains the CRUD operations for the SocketStockPriceInfo table in t
 from pathlib import Path
 from typing import Generator, cast
 
+from sqlalchemy.dialects.sqlite import insert
+from sqlmodel import Session, select
+
 from app.data_layer.database.db_connections.sqlite import get_session
 from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
 from app.utils.common.logger import get_logger
-from sqlalchemy.dialects.sqlite import insert
-from sqlmodel import Session, select
 
 logger = get_logger(Path(__file__).name)
 

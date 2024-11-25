@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import pytest
+
 from app.utils.common.exceptions import (
     AllDaysHolidayException,
     DataUnavailableException,

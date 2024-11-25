@@ -6,11 +6,12 @@ from typing import cast
 
 import pandas as pd
 import pytest
-from app.data_layer.data_saver import CSVDataSaver, DataSaver
-from app.utils.common import init_from_cfg
 from kafka.errors import NoBrokersAvailable
 from omegaconf import DictConfig, OmegaConf
 from pytest_mock import MockerFixture, MockType
+
+from app.data_layer.data_saver import CSVDataSaver, DataSaver
+from app.utils.common import init_from_cfg
 
 Message = namedtuple("Message", ["value"])
 

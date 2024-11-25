@@ -6,10 +6,11 @@ to get a session object to interact with the database.
 
 from typing import Generator
 
-import app.data_layer.database.models  # pylint: disable=unused-import
-from app.utils.urls import SQLITE_DB_URL
 from sqlalchemy.engine import Engine
 from sqlmodel import Session, SQLModel, create_engine
+
+import app.data_layer.database.models  # pylint: disable=unused-import
+from app.utils.urls import SQLITE_DB_URL
 
 sqlite_engine = create_engine(SQLITE_DB_URL)
 

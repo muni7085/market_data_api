@@ -5,11 +5,12 @@ This script contains the CRUD operations for the SmartAPIToken table.
 from pathlib import Path
 from typing import Sequence
 
+from sqlalchemy.sql.elements import BinaryExpression
+from sqlmodel import delete, or_, select
+
 from app.data_layer.database.db_connections.sqlite import get_session
 from app.data_layer.database.models.smartapi_model import SmartAPIToken
 from app.utils.common.logger import get_logger
-from sqlalchemy.sql.elements import BinaryExpression
-from sqlmodel import delete, or_, select
 
 logger = get_logger(Path(__file__).name)
 

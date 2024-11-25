@@ -1,7 +1,8 @@
 # pylint: disable=missing-function-docstring
 import pytest
-from app.data_layer.streaming import KafkaStreamer
 from kafka.errors import KafkaError, NoBrokersAvailable
+
+from app.data_layer.streaming import KafkaStreamer
 
 
 ####################### FIXTURES #######################

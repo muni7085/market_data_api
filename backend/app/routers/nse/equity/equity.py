@@ -1,5 +1,7 @@
 from typing import Annotated
 
+from fastapi import APIRouter, Depends, Path
+
 from app.routers.nse.equity.data_retrieval import (
     get_index_data,
     get_nifty_index_stocks,
@@ -9,7 +11,6 @@ from app.routers.nse.equity.data_retrieval import (
 from app.schemas.stock_model import StockPriceInfo
 from app.utils.urls import NIFTY_INDEX_BASE
 from app.utils.validators import validate_and_format_stock_symbol, validate_index_symbol
-from fastapi import APIRouter, Depends, Path
 
 router = APIRouter(prefix="/nse/equity", tags=["equity"])
 

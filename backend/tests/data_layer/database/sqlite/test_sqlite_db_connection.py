@@ -4,6 +4,8 @@ Test the database connection and interaction with the SQLite database.
 
 from pathlib import Path
 
+from sqlmodel import inspect, select
+
 from app.data_layer.database.db_connections.sqlite import (
     create_db_and_tables,
     get_session,
@@ -11,7 +13,6 @@ from app.data_layer.database.db_connections.sqlite import (
 )
 from app.data_layer.database.models.smartapi_model import SmartAPIToken
 from app.utils.urls import SQLITE_DB_URL
-from sqlmodel import inspect, select
 
 table_names = {"smartapitoken", "socketstockpriceinfo"}
 

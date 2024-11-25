@@ -1,9 +1,10 @@
 # pylint: disable=missing-function-docstring
+from fastapi import FastAPI
+
 from app.routers.nse.derivatives import derivatives
 from app.routers.nse.equity import equity
 from app.routers.smartapi.smartapi import smartapi
 from app.utils.startup_utils import create_smartapi_tokens_db
-from fastapi import FastAPI
 
 app = FastAPI()
 

@@ -2,11 +2,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from app.data_layer.data_saver.data_saver import DataSaver
-from app.utils.common.logger import get_logger
 from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable
 from omegaconf import DictConfig
+
+from app.data_layer.data_saver.data_saver import DataSaver
+from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name)
 

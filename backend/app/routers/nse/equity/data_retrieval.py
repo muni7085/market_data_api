@@ -1,5 +1,7 @@
 from typing import Any
 
+from fastapi import HTTPException
+
 from app.routers.nse.equity.data_processor import (
     filter_nifty_stocks,
     filter_single_index,
@@ -8,7 +10,6 @@ from app.routers.nse.equity.data_processor import (
 from app.schemas.stock_model import StockPriceInfo
 from app.utils.fetch_data import fetch_data
 from app.utils.urls import ALL_INDICES, STOCK_URL
-from fastapi import HTTPException
 
 
 def get_nifty_index_stocks(url: str, max_tries: int = 1000) -> list[StockPriceInfo]:

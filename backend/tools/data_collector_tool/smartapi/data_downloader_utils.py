@@ -4,6 +4,7 @@ from pathlib import Path
 
 import httpx
 import pandas as pd
+
 from app.utils.common.types.reques_types import CandlestickInterval
 from app.utils.file_utils import create_dir, load_json_data, write_to_json_file
 from tools.data_collector_tool.smartapi.constants import HISTORICAL_STOCK_DATA_URL

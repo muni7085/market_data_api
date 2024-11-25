@@ -36,6 +36,8 @@ jobs:
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
           ./backend/scripts/setup
+      - name: Change to backend directory
+        run: cd backend
       - name: black check
         run: black --diff --check $(git ls-files '*.py')
       - name: isort check

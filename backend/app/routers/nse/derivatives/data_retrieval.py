@@ -1,8 +1,9 @@
+from fastapi import HTTPException
+
 from app.routers.nse.derivatives.data_processor import filter_option_chain
 from app.schemas.option_model import ExpiryOptionData
 from app.utils.fetch_data import fetch_data
 from app.utils.urls import INDEX_OPTION_CHAIN_URL, STOCK_OPTION_CHAIN_URL
-from fastapi import HTTPException
 
 
 def get_option_chain(

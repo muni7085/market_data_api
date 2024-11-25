@@ -1,9 +1,10 @@
 import time
 from typing import Any
 
+from fastapi.testclient import TestClient
+
 from app.routers.smartapi.smartapi.smartapi import router
 from app.schemas.stock_model import HistoricalStockDataBundle
-from fastapi.testclient import TestClient
 from tests.utils.common.exception_validators import validate_exception
 
 client = TestClient(router)

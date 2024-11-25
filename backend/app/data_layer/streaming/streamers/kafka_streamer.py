@@ -1,10 +1,11 @@
 from pathlib import Path
 from typing import Optional
 
-from app.data_layer.streaming.streamer import Streamer
-from app.utils.common.logger import get_logger
 from kafka import KafkaProducer
 from omegaconf import DictConfig
+
+from app.data_layer.streaming.streamer import Streamer
+from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name)
 

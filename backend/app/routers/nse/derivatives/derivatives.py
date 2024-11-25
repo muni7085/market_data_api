@@ -1,12 +1,13 @@
 from typing import Annotated
 
+from fastapi import APIRouter, HTTPException, Path, Query
+
 from app.routers.nse.derivatives.data_retrieval import get_option_chain
 from app.schemas.option_model import ExpiryOptionData
 from app.utils.validators import (
     validate_and_reformat_date,
     validate_derivative_symbol_with_type,
 )
-from fastapi import APIRouter, HTTPException, Path, Query
 
 router = APIRouter(prefix="/nse/derivatives", tags=["derivatives"])
 

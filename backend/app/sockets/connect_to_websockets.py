@@ -7,11 +7,12 @@ from pathlib import Path
 from typing import cast
 
 import hydra
+from omegaconf import DictConfig
+
 from app.sockets.connections import WebsocketConnection
 from app.utils.common import init_from_cfg
 from app.utils.common.logger import get_logger
 from app.utils.startup_utils import create_smartapi_tokens_db
-from omegaconf import DictConfig
 
 logger = get_logger(Path(__file__).name)
 

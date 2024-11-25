@@ -5,14 +5,15 @@ from tempfile import TemporaryDirectory
 from typing import cast
 
 import pytest
+from kafka.errors import NoBrokersAvailable
+from omegaconf import DictConfig, OmegaConf
+from pytest_mock import MockerFixture, MockType
+
 from app.data_layer.data_saver import DataSaver, SqliteDataSaver
 from app.data_layer.database.crud.sqlite.websocket_crud import get_all_stock_price_info
 from app.data_layer.database.db_connections.sqlite import get_session
 from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
 from app.utils.common import init_from_cfg
-from kafka.errors import NoBrokersAvailable
-from omegaconf import DictConfig, OmegaConf
-from pytest_mock import MockerFixture, MockType
 
 Message = namedtuple("Message", ["value"])
 

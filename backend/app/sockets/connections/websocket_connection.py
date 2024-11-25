@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Optional
 
-from app.sockets.twisted_socket import MarketDataTwistedSocket
 from omegaconf import DictConfig
 from registrable import Registrable
+
+from app.sockets.twisted_socket import MarketDataTwistedSocket
 
 
 class WebsocketConnection(ABC, Registrable):

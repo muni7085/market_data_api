@@ -2,11 +2,12 @@
 import time
 from pathlib import Path
 
-from app.sockets.websocket_client_protocol import MarketDataWebSocketClientProtocol
-from app.utils.common.logger import get_logger
 from autobahn.twisted.websocket import WebSocketClientFactory
 from twisted.internet.protocol import ReconnectingClientFactory
 from twisted.internet.tcp import Connector
+
+from app.sockets.websocket_client_protocol import MarketDataWebSocketClientProtocol
+from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name, log_level="DEBUG")
 

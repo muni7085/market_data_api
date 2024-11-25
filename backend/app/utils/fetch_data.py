@@ -3,10 +3,11 @@ from pathlib import Path
 from typing import Any
 
 import httpx
+from fastapi import HTTPException
+
 from app.utils.common.logger import get_logger
 from app.utils.headers import REQUEST_HEADERS
 from app.utils.urls import NSE_BASE_URL
-from fastapi import HTTPException
 
 logger = get_logger(Path(__file__).name)
 
