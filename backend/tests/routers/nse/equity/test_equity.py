@@ -1,8 +1,7 @@
 # pylint: disable=missing-function-docstring
+from app.routers.nse.equity.equity import router
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
-
-from app.routers.nse.equity.equity import router
 
 # from app.schemas.stock_model import StockPriceInfo
 

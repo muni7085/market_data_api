@@ -5,7 +5,6 @@ This module contains tests for the smartapi_crud.py module in the sqlite/crud di
 from pathlib import Path
 
 import pytest
-
 from app.data_layer.database.crud.sqlite.smartapi_crud import (
     get_smartapi_tokens_by_all_conditions,
     get_smartapi_tokens_by_any_condition,

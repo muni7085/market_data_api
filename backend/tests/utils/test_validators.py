@@ -1,8 +1,6 @@
 from datetime import datetime
 
 import pytest
-from fastapi import HTTPException
-
 from app.utils.validators import (
     get_date_format,
     validate_and_format_stock_symbol,
@@ -10,6 +8,7 @@ from app.utils.validators import (
     validate_derivative_symbol_with_type,
     validate_index_symbol,
 )
+from fastapi import HTTPException
 
 
 def test_validate_and_format_stock_symbol():

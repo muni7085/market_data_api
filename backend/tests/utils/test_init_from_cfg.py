@@ -1,13 +1,12 @@
 from typing import Any
 
 import pytest
+from app.utils.common import init_from_cfg, pop_name
 from hydra.errors import InstantiationException
 from omegaconf import DictConfig, OmegaConf
 from omegaconf.errors import ConfigAttributeError
 from registrable import Registrable
 from registrable.exceptions import RegistrationError
-
-from app.utils.common import init_from_cfg, pop_name
 
 
 ############################# FIXTURES #############################

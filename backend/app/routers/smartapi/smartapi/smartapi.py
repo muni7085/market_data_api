@@ -1,8 +1,6 @@
 import json
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Query
-
 from app.schemas.stock_model import HistoricalStockDataBundle, SmartAPIStockPriceInfo
 from app.utils.common.exceptions import UnkownException
 from app.utils.common.types.financial_types import Exchange
@@ -14,6 +12,7 @@ from app.utils.smartapi.data_processor import (
 )
 from app.utils.smartapi.urls import CANDLE_DATA_URL, LAST_TRADED_PRICE_URL
 from app.utils.smartapi.validator import validate_dates, validate_symbol_and_get_token
+from fastapi import APIRouter, Path, Query
 
 router = APIRouter(prefix="/smart-api/equity", tags=["equity"])
 

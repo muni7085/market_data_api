@@ -2,11 +2,10 @@ import http.client
 from http.client import HTTPConnection
 
 import pyotp
-from SmartApi import SmartConnect
-
 from app.utils.common.types.reques_types import RequestType
 from app.utils.credentials.credentails_manager import DataProvider, get_credentials
 from app.utils.credentials.credentials import Credentials
+from SmartApi import SmartConnect
 
 
 class Singleton(type):

@@ -2,8 +2,6 @@ from itertools import islice
 from pathlib import Path
 from typing import Optional
 
-from omegaconf import DictConfig
-
 from app.data_layer.database.crud.sqlite.smartapi_crud import (
     get_smartapi_tokens_by_all_conditions,
 )
@@ -16,6 +14,7 @@ from app.utils.common.logger import get_logger
 from app.utils.common.types.financial_types import Exchange
 from app.utils.smartapi.smartsocket_types import ExchangeType
 from app.utils.smartapi.validator import validate_symbol_and_get_token
+from omegaconf import DictConfig
 
 logger = get_logger(Path(__file__).name)
 

@@ -5,14 +5,13 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Callable, Optional
 
+from app.sockets.websocket_client_factory import MarketDataWebSocketClientFactory
+from app.sockets.websocket_client_protocol import MarketDataWebSocketClientProtocol
+from app.utils.common.logger import get_logger
 from autobahn.twisted.websocket import connectWS
 from autobahn.websocket.types import ConnectionResponse
 from twisted.internet import reactor, ssl
 from twisted.python import log as twisted_log
-
-from app.sockets.websocket_client_factory import MarketDataWebSocketClientFactory
-from app.sockets.websocket_client_protocol import MarketDataWebSocketClientProtocol
-from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name, log_level="DEBUG")
 

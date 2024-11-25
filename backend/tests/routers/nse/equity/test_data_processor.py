@@ -1,6 +1,5 @@
 # pylint: disable=too-many-arguments
 import pytest
-
 from app.routers.nse.equity.data_processor import (
     filter_nifty_stocks,
     filter_single_index,

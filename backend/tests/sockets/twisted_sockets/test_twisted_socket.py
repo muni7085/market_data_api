@@ -2,9 +2,8 @@
 from unittest.mock import MagicMock
 
 import pytest
-from pytest_mock import MockerFixture, MockType
-
 from app.sockets.twisted_socket import MarketDataTwistedSocket
+from pytest_mock import MockerFixture, MockType
 
 ############################ FIXTURES ############################
 

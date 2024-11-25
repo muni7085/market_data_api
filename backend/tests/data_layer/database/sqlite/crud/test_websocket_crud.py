@@ -1,7 +1,6 @@
 from unittest.mock import MagicMock
 
 import pytest
-
 from app.data_layer.database.crud.sqlite.websocket_crud import (
     insert_data,
     insert_or_ignore,

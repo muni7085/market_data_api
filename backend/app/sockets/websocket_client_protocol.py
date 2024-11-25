@@ -2,10 +2,9 @@
 import time
 from pathlib import Path
 
+from app.utils.common.logger import get_logger
 from autobahn.twisted.websocket import WebSocketClientProtocol
 from autobahn.websocket.types import ConnectionResponse
-
-from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name, log_level="DEBUG")
 

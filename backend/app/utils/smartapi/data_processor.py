@@ -4,7 +4,6 @@ from typing import Any
 
 import numpy as np
 import pandas as pd
-
 from app.data_layer.database.models.smartapi_model import SmartAPIToken
 from app.schemas.stock_model import (
     HistoricalStockDataBundle,

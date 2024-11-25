@@ -7,13 +7,12 @@ from copy import deepcopy
 from typing import Any, cast
 
 import pytest
-from omegaconf import OmegaConf
-from pytest_mock import MockerFixture, MockType
-
 from app.data_layer.database.models.smartapi_model import SmartAPIToken
 from app.sockets.connections import SmartSocketConnection
 from app.utils.common.exceptions import SymbolNotFoundException
 from app.utils.common.types.financial_types import Exchange
+from omegaconf import OmegaConf
+from pytest_mock import MockerFixture, MockType
 
 
 #################### Fixtures ####################

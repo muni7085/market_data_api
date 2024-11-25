@@ -3,11 +3,10 @@
 from typing import Any
 
 import pytest
-from fastapi import HTTPException
-from fastapi.testclient import TestClient
-
 from app.routers.nse.derivatives.derivatives import router
 from app.utils.date_utils import get_date  # , get_expiry_dates
+from fastapi import HTTPException
+from fastapi.testclient import TestClient
 
 client = TestClient(router)
 

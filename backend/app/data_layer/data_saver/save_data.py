@@ -2,11 +2,10 @@ from pathlib import Path
 from threading import Thread
 
 import hydra
-from omegaconf import DictConfig
-
 from app.data_layer.data_saver.data_saver import DataSaver
 from app.utils.common import init_from_cfg
 from app.utils.common.logger import get_logger
+from omegaconf import DictConfig
 
 logger = get_logger(Path(__file__).name)
 

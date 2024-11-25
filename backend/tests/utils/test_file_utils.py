@@ -3,7 +3,6 @@ import tempfile
 from pathlib import Path
 
 import pytest
-
 from app.utils.file_utils import get_symbols, load_json_data, resolve_path
 from app.utils.urls import NSE_F_AND_O_SYMBOLS
 

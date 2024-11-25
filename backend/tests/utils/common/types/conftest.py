@@ -1,5 +1,4 @@
 import pytest
-
 from app.utils.common.types.reques_types import CandlestickInterval
 
 

@@ -2,10 +2,9 @@ import re
 from datetime import datetime
 from typing import Annotated
 
-from fastapi import HTTPException, Path
-
 from app.utils.file_utils import get_symbols
 from app.utils.urls import NSE_F_AND_O_SYMBOLS, NSE_INDEX_SYMBOLS, NSE_STOCK_SYMBOLS
+from fastapi import HTTPException, Path
 
 
 def validate_and_format_stock_symbol(stock_symbol: str) -> str:
