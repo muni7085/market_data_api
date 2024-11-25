@@ -35,7 +35,7 @@ jobs:
       - name: Install poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
-          ./backend/scripts/setup
+          ./scripts/setup
       - name: Format check
         run: ./scripts/format.sh --check
       - name: Lint check
@@ -46,6 +46,7 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
+        working-directory: backend
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -74,8 +75,8 @@ jobs:
       - name: Install poetry and dependencies
         run: |
           curl -sSL https://install.python-poetry.org | python3 - --version ${{ env.POETRY_VERSION }} -y
-          ./backend/scripts/setup
+          ./scripts/setup
   
       - name: testing
-        run: pytest ./backend -vvv
+        run: pytest . -vvv
     
