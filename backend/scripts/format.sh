@@ -1,8 +1,10 @@
 #!/bin/bash
 
+set -euo pipefail
+
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
-cd $SCRIPT_DIR
-cd ..
+cd "$SCRIPT_DIR" || exit 1
+cd .. || exit 1
 
 format_files() {
     git ls-files "*.py" | xargs black "$@"
