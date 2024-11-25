@@ -9,6 +9,7 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(Path(__file__).name)
+BACKEND_ROOT_PATH = Path(__file__).resolve().parents[1]
 
 
 def setup_env_vars():
@@ -24,21 +25,19 @@ def setup_env_vars():
     activate_dir.mkdir(parents=True, exist_ok=True)
     deactivate_dir.mkdir(parents=True, exist_ok=True)
 
-    # Define the paths you want to add to PYTHONPATH
-    project_root = Path(os.getcwd()).parent / "app"
 
     # Create activation script
     with open(activate_dir / "project_env_vars.sh", "w") as f:
         f.write("#!/bin/bash\n")
-        f.write(f"export ROOT_PATH={project_root}\n")
+        f.write(f"export ROOT_PATH={BACKEND_ROOT_PATH}\n")
 
     # Create deactivation script
     with open(deactivate_dir / "project_env_vars.sh", "w") as f:
         f.write("#!/bin/bash\n")
         f.write("unset ROOT_PATH\n")
 
-    with open(project_root.parent / ".env", "w") as f:
-        f.write("ROOT_PATH=" + str(project_root) + "\n")
+    with open(BACKEND_ROOT_PATH.parent / ".env", "w") as f:
+        f.write("ROOT_PATH=" + str(BACKEND_ROOT_PATH) + "\n")
 
     logger.info(
         "Environment variables set. Reactivate your conda environment to apply changes."
@@ -49,6 +48,7 @@ def install_dependencies():
     """Installs dependencies using Poetry."""
     try:
         logger.info("Installing dependencies with Poetry...")
+        os.chdir(BACKEND_ROOT_PATH)
         subprocess.run(["poetry", "install"], check=True)
         logger.info("Dependencies installed successfully.")
     except subprocess.CalledProcessError:

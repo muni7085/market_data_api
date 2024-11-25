@@ -82,5 +82,5 @@ jobs:
           ./backend/scripts/setup
   
       - name: testing
-        run: pytest . -vvv
+        run: pytest ./backend -vvv
     
