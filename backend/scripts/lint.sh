@@ -1,12 +1,16 @@
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
 cd $SCRIPT_DIR
 cd ..
-echo "Current script parent path: $(pwd)"
 
+run_mypy_check() {
+    echo "Running mypy check..."
+    git ls-files "*.py" | xargs mypy
+}
 
-echo "Running mypy check..."
-mypy $(git ls-files "*.py")
+run_pylint_check() {
+    echo "Running pylint check..."
+    git ls-files "*.py" | xargs pylint
+}
 
-echo $(pwd)
-echo "Running pylint check..."
-pylint $(git ls-files "*.py")
+run_mypy_check
+run_pylint_check
