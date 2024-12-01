@@ -14,7 +14,7 @@ from app.data_layer.database.db_connections.sqlite import (
     create_db_and_tables,
     get_session,
 )
-from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
+from app.data_layer.database.models.websocket_model import InstrumentPrice
 from app.utils.common.logger import get_logger
 from app.utils.smartapi.smartsocket_types import ExchangeType
 
@@ -72,7 +72,7 @@ class SqliteDataSaver(DataSaver):
             present in the database. The presence of the data is checked based
             on the primary key of the SocketStockPriceInfo object.
         """
-        socket_stock_price_info = SocketStockPriceInfo(
+        socket_stock_price_info = InstrumentPrice(
             token=data["token"],
             retrieval_timestamp=data["retrieval_timestamp"],
             last_traded_timestamp=data["last_traded_timestamp"],

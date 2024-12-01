@@ -9,7 +9,7 @@ from sqlalchemy.dialects.sqlite import insert
 from sqlmodel import Session, select
 
 from app.data_layer.database.db_connections.sqlite import get_session
-from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
+from app.data_layer.database.models.websocket_model import InstrumentPrice
 from app.utils.common.logger import get_logger
 
 logger = get_logger(Path(__file__).name)
@@ -51,7 +51,7 @@ def upsert(
     session: ``Generator[Session, None, None]``
         The SQLModel session object to use for the database operations
     """
-    upsert_stmt = insert(SocketStockPriceInfo).values(stock_price_info)
+    upsert_stmt = insert(InstrumentPrice).values(stock_price_info)
 
     # Create a dictionary of columns to update if the data already exists
     columns = {
@@ -80,7 +80,7 @@ def insert_or_ignore(
     session: ``Generator[Session, None, None]``
         The SQLModel session object to use for the database operations
     """
-    insert_stmt = insert(SocketStockPriceInfo).values(stock_price_info)
+    insert_stmt = insert(InstrumentPrice).values(stock_price_info)
     insert_stmt = insert_stmt.on_conflict_do_nothing()
 
     with next(session) as db_session:
@@ -90,9 +90,9 @@ def insert_or_ignore(
 
 def insert_data(
     data: (
-        SocketStockPriceInfo
+        InstrumentPrice
         | dict[str, str | None]
-        | list[SocketStockPriceInfo | dict[str, str | None]]
+        | list[InstrumentPrice | dict[str, str | None]]
         | None
     ),
     update_existing: bool = False,
@@ -118,7 +118,7 @@ def insert_data(
         logger.warning("Provided data is empty. Skipping insertion.")
         return
 
-    if isinstance(data, (SocketStockPriceInfo, dict)):
+    if isinstance(data, (InstrumentPrice, dict)):
         data = [data]
 
     if not session:
@@ -128,7 +128,7 @@ def insert_data(
     data_to_insert = cast(
         list[dict[str, str | None]],
         [
-            item.to_dict() if isinstance(item, SocketStockPriceInfo) else item
+            item.to_dict() if isinstance(item, InstrumentPrice) else item
             for item in data
         ],
     )
@@ -141,7 +141,7 @@ def insert_data(
 
 def get_all_stock_price_info(
     session: Generator[Session, None, None]
-) -> list[SocketStockPriceInfo]:
+) -> list[InstrumentPrice]:
     """
     Retrieve all the data from the SocketStockPriceInfo table in the SQLite database.
 
@@ -156,5 +156,5 @@ def get_all_stock_price_info(
         The list of all the SocketStockPriceInfo objects present in the table
     """
     with next(session) as db_session:
-        stmt = select(SocketStockPriceInfo)
+        stmt = select(InstrumentPrice)
         return db_session.exec(stmt).all()  # type: ignore

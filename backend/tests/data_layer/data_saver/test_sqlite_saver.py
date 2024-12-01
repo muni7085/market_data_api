@@ -12,7 +12,7 @@ from pytest_mock import MockerFixture, MockType
 from app.data_layer.data_saver import DataSaver, SqliteDataSaver
 from app.data_layer.database.crud.sqlite.websocket_crud import get_all_stock_price_info
 from app.data_layer.database.db_connections.sqlite import get_session
-from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
+from app.data_layer.database.models.websocket_model import InstrumentPrice
 from app.utils.common import init_from_cfg
 
 Message = namedtuple("Message", ["value"])
@@ -158,7 +158,7 @@ def test_retrieve_and_save(
     session = get_session(sqlite_saver.engine)
     stock_price_info = get_all_stock_price_info(session)
     inserted_data = [info.to_dict() for info in stock_price_info]
-    expected_data = [SocketStockPriceInfo(**data).to_dict() for data in kafka_data]
+    expected_data = [InstrumentPrice(**data).to_dict() for data in kafka_data]
     for data in expected_data:
         data["exchange"] = "NSE_CM"
 
