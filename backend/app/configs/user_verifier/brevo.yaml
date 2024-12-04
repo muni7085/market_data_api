@@ -1,0 +1,4 @@
+name: brevo
+sender_name: MarketData
+sender_email: stock.market.data.india@gmail.com
+brevo_api_key_name: BREVO_API_KEY

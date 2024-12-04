@@ -12,6 +12,7 @@ import os
 from dotenv import load_dotenv
 from app import ROOT_DIR
 
+load_dotenv(ROOT_DIR.parent / ".env")
 app = FastAPI()
 
 app.include_router(derivatives.router)
@@ -21,7 +22,6 @@ app.include_router(authentication.router)
 
 @app.on_event("startup")
 async def startup_event():
-    load_dotenv(ROOT_DIR.parent / ".env")
     create_smartapi_tokens_db()
     postgresql.create_db_and_tables()
 
