@@ -42,6 +42,7 @@ class InstrumentPrice(SQLModel, table=True):  # type: ignore
         The total sell quantity for the day
         Eg: "500"
     """
+
     retrieval_timestamp: str = Field(primary_key=True)
     last_traded_timestamp: str
     symbol: str = Field(primary_key=True)
@@ -67,6 +68,3 @@ class InstrumentPrice(SQLModel, table=True):  # type: ignore
             "total_buy_quantity": self.total_buy_quantity,
             "total_sell_quantity": self.total_sell_quantity,
         }
-
-
-

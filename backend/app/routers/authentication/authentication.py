@@ -1,24 +1,26 @@
-from fastapi import APIRouter, Depends, Response
-from app.schemas.user_model import UserSignup, UserSignIn
-from .authenticate import (
-    signup_user,
-    signin_user,
-    get_current_user,
-    generate_verification_code,
-    update_user_verification_status,
-)
 from datetime import datetime, timedelta, timezone
+
+import hydra
+from fastapi import APIRouter, Depends, Response
+
+from app import ROOT_DIR
 from app.data_layer.database.crud.postgresql.user_crud import (
     create_or_update_user_verification,
+    get_user_by_attr,
     get_user_verification,
-    get_user_by_field,
 )
 from app.data_layer.database.models.user_model import UserVerification
 from app.notification.provider import NotificationProvider
+from app.schemas.user_model import UserSignIn, UserSignup
 from app.utils.common import init_from_cfg
-import hydra
-from app import ROOT_DIR
 
+from .authenticate import (
+    generate_verification_code,
+    get_current_user,
+    signin_user,
+    signup_user,
+    update_user_verification_status,
+)
 
 with hydra.initialize_config_dir(config_dir=f"{ROOT_DIR}/configs", version_base=None):
     notification_provider_cfg = hydra.compose(config_name="user_verification")
@@ -81,7 +83,7 @@ async def send_verification_code(
         response.status_code = 400
         return {"message": "Invalid verification medium. Use 'email' or 'phone'"}
 
-    user = get_user_by_field("verification_medium", email_or_phone)
+    user = get_user_by_attr("verification_medium", email_or_phone)
 
     if user is None:
         response.status_code = 404

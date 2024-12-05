@@ -1,16 +1,17 @@
 # pylint: disable=missing-function-docstring
-from fastapi import FastAPI
-import uvicorn
+import os
 
+import uvicorn
+from dotenv import load_dotenv
+from fastapi import FastAPI
+
+from app import ROOT_DIR
+from app.data_layer.database.db_connections import postgresql
+from app.routers.authentication import authentication
 from app.routers.nse.derivatives import derivatives
 from app.routers.nse.equity import equity
 from app.routers.smartapi.smartapi import smartapi
 from app.utils.startup_utils import create_smartapi_tokens_db
-from app.data_layer.database.db_connections import postgresql
-from app.routers.authentication import authentication
-import os
-from dotenv import load_dotenv
-from app import ROOT_DIR
 
 load_dotenv(ROOT_DIR.parent / ".env")
 app = FastAPI()
@@ -20,11 +21,11 @@ app.include_router(equity.router)
 app.include_router(smartapi.router)
 app.include_router(authentication.router)
 
+
 @app.on_event("startup")
 async def startup_event():
     create_smartapi_tokens_db()
     postgresql.create_db_and_tables()
-
 
 
 @app.get("/", response_model=str)

@@ -1,29 +1,28 @@
-from app.schemas.user_model import UserSignup
-from app.data_layer.database.models.user_model import User
-from app.data_layer.database.crud.postgresql.user_crud import (
-    create_user,
-    check_field_existence,
-    get_user_by_field,
-    get_user,
-    update_user,
-)
-import re
-from fastapi import HTTPException
-from datetime import datetime
-import bcrypt
 import random
-
-import jwt
+import re
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+
+import bcrypt
+import jwt
 from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+
+from app.data_layer.database.crud.postgresql.user_crud import (
+    create_user,
+    get_user,
+    get_user_by_attr,
+    is_attr_data_in_db,
+    update_user,
+)
+from app.data_layer.database.models.user_model import User
+from app.schemas.user_model import UserSignup
 from app.utils.constants import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
     JWT_REFRESH_SECRET,
     JWT_SECRET,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
     REFRESH_TOKEN_EXPIRE_DAYS,
 )
-from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/authentication/signin")
 
@@ -227,7 +226,7 @@ def validate_user_exists(user: UserSignup) -> bool:
         "phone_number": user.phone_number,
         "user_id": user.user_id,
     }
-    response = check_field_existence(User, fields_to_check)
+    response = is_attr_data_in_db(User, fields_to_check)
 
     return response
 
@@ -400,7 +399,7 @@ def signin_user(email, password):
         A message indicating if the login was successful or an error message
     """
 
-    user = get_user_by_field("email", email)
+    user = get_user_by_attr("email", email)
     if not user:
         return {"message": "Invalid email or password", "status_code": 401}
 
@@ -433,7 +432,7 @@ def update_user_verification_status(user_email: str, status: bool = True):
     status: ``bool``
         The verification status of the user
     """
-    user = get_user_by_field("email", user_email)
+    user = get_user_by_attr("email", user_email)
     if not user:
         return {"message": "User not found", "status_code": 401}
 
