@@ -148,7 +148,7 @@ async def verify_email(email: str, verification_code: str, response: Response):
 
 @router.get("/protected-endpoint")
 def protected_route(current_user: dict = Depends(get_current_user)):
-    """ 
+    """
     Dummy protected route to test the authentication.
     """
     return {"message": "This is a protected route", "user": current_user}
