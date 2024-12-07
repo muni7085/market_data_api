@@ -3,6 +3,7 @@ BrevoEmailProvider is used to send email notifications using the Brevo API.
 """
 
 import os
+from pathlib import Path
 
 import brevo_python
 from brevo_python.rest import ApiException
@@ -10,6 +11,9 @@ from omegaconf import DictConfig
 
 from app.notification.email.email_provider import EmailProvider
 from app.notification.provider import NotificationProvider
+from app.utils.common.logger import get_logger
+
+logger = get_logger(Path(__file__).name)
 
 
 @NotificationProvider.register("brevo")
@@ -62,13 +66,12 @@ class BrevoEmailProvider(EmailProvider):
         )
 
         try:
-            api_response = api_instance.send_transac_email(send_smtp_email)
-            return api_response
+            api_instance.send_transac_email(send_smtp_email)
 
         except ApiException as e:
-            print(
-                "Exception when calling TransactionalEmailsApi->send_transac_email: %s\n"
-                % e
+            logger.error(
+                "Exception when calling TransactionalEmailsApi->send_transac_email: %s\n",
+                e,
             )
 
     @classmethod

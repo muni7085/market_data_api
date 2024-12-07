@@ -140,9 +140,7 @@ def test_init(
 
 
 # Test: 2
-def test_retrieve_and_save(
-    sqlite_saver: SqliteDataSaver, mock_logger: MockType, kafka_data: list[dict]
-):
+def test_retrieve_and_save(sqlite_saver: SqliteDataSaver, kafka_data: list[dict]):
     """
     Test the `retrieve_and_save` method of the SqliteDataSaver.
     """
@@ -159,17 +157,5 @@ def test_retrieve_and_save(
     stock_price_info = get_all_stock_price_info(session)
     inserted_data = [info.to_dict() for info in stock_price_info]
     expected_data = [InstrumentPrice(**data).to_dict() for data in kafka_data]
-    for data in expected_data:
-        data["exchange"] = "NSE_CM"
 
     assert inserted_data == expected_data
-
-    # Test: 2.2 ( Test saving data to the sqlite database with invalid exchange type )
-    kafka_data[0]["exchange"] = -1
-    encoded_data = [
-        Message(value=json.dumps(data).encode("utf-8")) for data in kafka_data
-    ]
-
-    sqlite_saver.consumer.__iter__.return_value = encoded_data
-    sqlite_saver.retrieve_and_save()
-    mock_logger.error.assert_called_once_with("Exchange type %s is not supported", -1)

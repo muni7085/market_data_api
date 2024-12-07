@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlmodel import TIMESTAMP, Column, Field, SQLModel, text
 
 
-class User(SQLModel, table=True):
+class User(SQLModel, table=True):  # type: ignore
     """
     User model to store user details in the database
 
@@ -38,7 +38,7 @@ class User(SQLModel, table=True):
     is_verified: bool = False
 
 
-class UserVerification(SQLModel, table=True):
+class UserVerification(SQLModel, table=True):  # type: ignore
     """
     UserVerification model to store user verification details in the database.
 

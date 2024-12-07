@@ -13,7 +13,7 @@ logger = get_logger(Path(__file__).name)
 #### User CRUD operations ####
 def is_attr_data_in_db(
     model: Type[SQLModel], att_values: Dict[str, str], session: Session | None = None
-) -> str | None:
+) -> dict | None:
     """
     Checks if any of the specified fields have values that already exist in the database.
 
@@ -34,15 +34,20 @@ def is_attr_data_in_db(
     Returns:
     -------
     ``str | None``
-        A message indicating if any of the field values already exist in the database
+        A message indicating that the field already exists if found, otherwise None
     """
     session = session or next(get_session())
 
-    for field_name, value in att_values.items():
-        statement = select(model).where(getattr(model, field_name) == value)
+    existing_attr: dict | None = None
+
+    for attr_name, attr_value in att_values.items():
+        statement = select(model).where(getattr(model, attr_name) == attr_value)
 
         if session.exec(statement).first():
-            return f"{field_name.replace('_', ' ').capitalize()} already exists"
+            existing_attr = {"message": f"{attr_name} already exists"}
+            break
+
+    return existing_attr
 
 
 def get_user_by_attr(attr_name: str, attr_value: str) -> User | None:
@@ -92,7 +97,7 @@ def create_user(user: User) -> bool:
 
         return True
     except Exception as e:
-        logger.error(f"Error creating user: {e}")
+        logger.error("Error creating user: %s", e)
 
         return False
 
@@ -151,7 +156,7 @@ def update_user(user_id: str, user_data: dict) -> User | None:
             session.commit()
             session.refresh(user)
 
-            return user
+        return user
 
 
 def delete_user(user_id: str) -> bool:

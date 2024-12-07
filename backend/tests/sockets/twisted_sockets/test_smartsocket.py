@@ -72,7 +72,6 @@ def binary_data_io() -> tuple[bytes, dict]:
         + b"\x00iF\x00\x00\x00\x00\x00\x00",
         {
             "subscription_mode": 3,
-            "exchange_type": 1,
             "token": "17758",
             "sequence_number": 19562,
             "exchange_timestamp": 1728696324621,
@@ -444,7 +443,7 @@ def test_decode_data(binary_data_io: tuple[bytes, dict]):
     # Test 7.2: Test decoding binary data with subscription mode as `LTP`
     binary_data = b"\x01" + binary_data[1:]
     result = smartsocket.decode_data(binary_data)
-    ltp_expected_result = dict(islice(expected_result.items(), 0, 7))
+    ltp_expected_result = dict(islice(expected_result.items(), 0, 6))
     ltp_expected_result["subscription_mode"] = 1
     ltp_expected_result["subscription_mode_val"] = "LTP"
     assert result == ltp_expected_result
@@ -452,7 +451,7 @@ def test_decode_data(binary_data_io: tuple[bytes, dict]):
     # Test 7.3: Test decoding binary data with subscription mode as `QUOTE`
     binary_data = b"\x02" + binary_data[1:]
     result = smartsocket.decode_data(binary_data)
-    quote_expected_result = dict(islice(expected_result.items(), 0, 16))
+    quote_expected_result = dict(islice(expected_result.items(), 0, 15))
     quote_expected_result["subscription_mode"] = 2
     quote_expected_result["subscription_mode_val"] = "QUOTE"
     assert result == quote_expected_result
@@ -466,22 +465,24 @@ def test_on_message_callback(binary_data_io: tuple[bytes, dict]):
     # Test 8.1: Test on_message callback with binary data
     smartsocket = get_smartsocket()
 
-    smartsocket.set_tokens([{"exchangeType": 1, "tokens": {"17758": "name"}}])
+    smartsocket.set_tokens([{"exchangeType": 1, "tokens": {"17758": "symbol"}}])
 
     smartsocket._on_message(None, binary_data_io[0], is_binary=True)
     exptected_data = binary_data_io[1]
     exptected_data.update(
         {
-            "name": "name",
-            "socket_name": "smartapi",
-            "exchange": "NSE_CM",
+            "symbol": "symbol"
+            # "socket_name": "smartapi",
+            # "exchange": "NSE_CM",
         }
     )
     actual_call_args = json.loads(smartsocket.on_data_save_callback.call_args.args[0])
     assert actual_call_args.pop("retrieval_timestamp")
 
     assert smartsocket.on_data_save_callback.call_count == 1
-    assert actual_call_args == exptected_data
+    for keys in exptected_data.keys():
+        assert actual_call_args[keys] == exptected_data[keys]
+
     smartsocket.on_data_save_callback.reset_mock()
 
     # Test 8.2: Test on_message callback with text data

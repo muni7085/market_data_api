@@ -2,6 +2,10 @@ from pydantic import BaseModel
 
 
 class UserSignup(BaseModel):
+    """
+    UserSignup schema for user registration
+    """
+
     user_id: str
     username: str
     email: str
@@ -13,5 +17,9 @@ class UserSignup(BaseModel):
 
 
 class UserSignIn(BaseModel):
+    """
+    UserSignIn schema for user authentication
+    """
+
     email: str
     password: str

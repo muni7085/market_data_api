@@ -60,7 +60,7 @@ class InstrumentPrice(SQLModel, table=True):  # type: ignore
         return {
             "retrieval_timestamp": self.retrieval_timestamp,
             "last_traded_timestamp": self.last_traded_timestamp,
-            "symbol": self.name,
+            "symbol": self.symbol,
             "last_traded_price": self.last_traded_price,
             "last_traded_quantity": self.last_traded_quantity,
             "average_traded_price": self.average_traded_price,

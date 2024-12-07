@@ -333,8 +333,6 @@ class SmartSocket(MarketDataTwistedSocket):
             "subscription_mode": self._unpack_data(binary_data, 0, 1, byte_format="B")[
                 0
             ],
-            "exchange_type": self._unpack_data(binary_data, 1, 2, byte_format="B")[0],
-            # "token": SmartWebSocketV2._parse_token_value(binary_data[2:27]),
             "token": binary_data[2:27].decode("utf-8").replace("\x00", ""),
             "sequence_number": self._unpack_data(binary_data, 27, 35, byte_format="q")[
                 0
@@ -425,10 +423,8 @@ class SmartSocket(MarketDataTwistedSocket):
         else:
             data = json.loads(payload)
 
-        data["name"] = self.token_map[data["token"]][0]
-        data["socket_name"] = "smartapi"
+        data["symbol"] = self.token_map[data["token"]][0]
         data["retrieval_timestamp"] = str(time.time())
-        data["exchange"] = self.token_map[data["token"]][1].name
 
         if self.debug:
             logger.debug("Received data: %s", data)

@@ -39,9 +39,9 @@ class UserSignupError(HTTPException):
         The error message to be displayed to the user
     """
 
-    def __int__(self, message: str):
-        self.message = message
-        super().__init__(self.message)
+    def __init__(self, message: str):
+
+        super().__init__(status.HTTP_400_BAD_REQUEST, message)
 
 
 def validate_email(email: str) -> bool:
@@ -85,7 +85,7 @@ def validate_phone_number(phone_number: str) -> bool:
     phone_number_regex = r"^\d{10}$"
 
     if re.match(phone_number_regex, phone_number) is None:
-        raise UserSignupError(400, "Invalid phone number format")
+        raise UserSignupError("Invalid phone number format")
 
     return True
 
@@ -132,8 +132,8 @@ def validate_password(password: str) -> bool:
     ):
 
         raise UserSignupError(
-            400,
-            "Password must be at least 8 characters long and include an uppercase letter, lowercase letter, digit, and special character",
+            "Password must be at least 8 characters long and include an uppercase letter, "
+            "lowercase letter, digit, and special character",
         )
     return True
 
@@ -154,9 +154,8 @@ def verify_password(password: str, hash_password: str) -> bool:
     ``bool``
         True if the password matches the hashed password
     """
-
     if not bcrypt.checkpw(password.encode("utf-8"), hash_password.encode("utf-8")):
-        raise UserSignupError(400, "Passwords do not match")
+        raise UserSignupError("Passwords do not match")
 
     return True
 
@@ -176,7 +175,7 @@ def validate_gender(gender: str) -> bool:
         True if the given gender in the correct format
     """
     if gender.lower() not in ["m", "f", "o"]:
-        raise UserSignupError(400, "Gender must be 'M' or 'F'")
+        raise UserSignupError("Gender must be 'M' or 'F'")
 
     return True
 
@@ -199,13 +198,13 @@ def validate_date_of_birth(date_of_birth: str) -> bool:
     try:
         datetime.strptime(date_of_birth, "%d/%m/%Y")
         return True
-    except ValueError:
+    except ValueError as exc:
         raise UserSignupError(
-            400, "Invalid date format for date of birth. Expected format: dd/mm/yyyy"
-        )
+            "Invalid date format for date of birth. Expected format: dd/mm/yyyy",
+        ) from exc
 
 
-def validate_user_exists(user: UserSignup) -> bool:
+def validate_user_exists(user: UserSignup) -> dict | None:
     """
     Checks if the user already exists in the database. It checks the email, phone number,
     and user_id fields to see if the user already exists.
@@ -217,8 +216,8 @@ def validate_user_exists(user: UserSignup) -> bool:
 
     Returns:
     --------
-    ``bool``
-        True if the user already exists in the database
+    ``str | None``
+        An error message if the user already exists, otherwise None
     """
 
     fields_to_check = {
@@ -227,6 +226,9 @@ def validate_user_exists(user: UserSignup) -> bool:
         "user_id": user.user_id,
     }
     response = is_attr_data_in_db(User, fields_to_check)
+
+    if response:
+        response = {"message": response, "status_code": 400}
 
     return response
 
@@ -243,7 +245,7 @@ def validate_user_data(user: UserSignup) -> None:
     validate_email(user.email)
     validate_phone_number(user.phone_number)
     validate_password(user.password)
-    verify_password(get_hash_password(user.password), user.confirm_password)
+    verify_password(user.confirm_password, get_hash_password(user.password))
     validate_gender(user.gender)
     validate_date_of_birth(user.date_of_birth)
 
@@ -317,7 +319,7 @@ def decode_token(token: str, secret: str) -> Optional[dict]:
         return None
 
 
-def refresh_access_token(refresh_token: str) -> dict:
+def access_token_from_refresh_token(refresh_token: str) -> dict:
     """
     Create the access token using the refresh token. If the refresh token is invalid
     or expired, it returns an error message. Otherwise, it generates a new access token
@@ -334,8 +336,9 @@ def refresh_access_token(refresh_token: str) -> dict:
         A dictionary containing the new access token and the refresh token
     """
     decoded_data = decode_token(refresh_token, JWT_REFRESH_SECRET)
+
     if not decoded_data:
-        return {"message": "Invalid or expired refresh token"}, 401
+        return {"message": "Invalid or expired refresh token", "status_code": 401}
 
     # Generate a new access token
     access_token = create_access_token(
@@ -365,16 +368,18 @@ def signup_user(user: UserSignup):
     """
     if reason := validate_user_exists(user):
         return reason
-    else:
-        validate_user_data(user)
 
-        user_model = User(
-            **user.dict(exclude={"password"}), password=get_hash_password(user.password)
-        )
-        user = create_user(user_model)
-        return {
-            "message": "User created successfully. Please verify your email to activate your account"
-        }
+    validate_user_data(user)
+
+    user_model = User(
+        **user.dict(exclude={"password"}), password=get_hash_password(user.password)
+    )
+    create_user(user_model)
+
+    return {
+        "message": "User created successfully. Please verify your email to activate your account",
+        "status_code": 200,
+    }
 
 
 def signin_user(email, password):
@@ -403,7 +408,7 @@ def signin_user(email, password):
     if not user:
         return {"message": "Invalid email or password", "status_code": 401}
 
-    if not verify_password(user.password, password):
+    if not verify_password(password, user.password):
         return {"message": "Invalid email or password", "status_code": 401}
 
     if not user.is_verified:
@@ -477,6 +482,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     """
     try:
         decoded_data = decode_token(token, JWT_SECRET)
+
         if not decoded_data:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -485,16 +491,18 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
 
         exp_time = decoded_data["exp"]
         current_time = datetime.now(timezone.utc).timestamp()
+
         if current_time > exp_time:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token has expired",
             )
         user = get_user(decoded_data["user_id"])
-        return user
+
     except Exception as e:
-        print(e)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token",
-        )
+            detail="Invalid access token",
+        ) from e
+
+    return user

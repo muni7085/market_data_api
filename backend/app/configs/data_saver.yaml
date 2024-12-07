@@ -5,8 +5,8 @@ defaults:
   - data_saver@jsonl_saver: jsonl_saver
 
 data_saver:
-  - csv_saver: ${csv_saver}
-  - jsonl_saver: ${jsonl_saver}
+  # - csv_saver: ${csv_saver}
+  # - jsonl_saver: ${jsonl_saver}
   - sqlite_saver: ${sqlite_saver}
 
 hydra:  

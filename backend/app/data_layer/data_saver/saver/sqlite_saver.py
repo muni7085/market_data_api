@@ -16,7 +16,6 @@ from app.data_layer.database.db_connections.sqlite import (
 )
 from app.data_layer.database.models.websocket_model import InstrumentPrice
 from app.utils.common.logger import get_logger
-from app.utils.smartapi.smartsocket_types import ExchangeType
 
 logger = get_logger(Path(__file__).name)
 
@@ -53,6 +52,7 @@ class SqliteDataSaver(DataSaver):
 
         current_date = datetime.now().strftime("%Y_%m_%d")
         self.sqlite_db = f"sqlite:///{sqlite_db}_{current_date}.sqlite3"
+        print(self.sqlite_db)
 
         self.engine = create_engine(self.sqlite_db)
         create_db_and_tables(self.engine)
@@ -73,14 +73,10 @@ class SqliteDataSaver(DataSaver):
             on the primary key of the SocketStockPriceInfo object.
         """
         socket_stock_price_info = InstrumentPrice(
-            token=data["token"],
             retrieval_timestamp=data["retrieval_timestamp"],
             last_traded_timestamp=data["last_traded_timestamp"],
-            socket_name=data["socket_name"],
-            exchange_timestamp=data["exchange_timestamp"],
-            name=data["name"],
+            symbol=data["symbol"],
             last_traded_price=data["last_traded_price"],
-            exchange=data["exchange"],
             last_traded_quantity=data.get("last_traded_quantity"),
             average_traded_price=data.get("average_traded_price"),
             volume_trade_for_the_day=data.get("volume_trade_for_the_day"),
@@ -102,16 +98,7 @@ class SqliteDataSaver(DataSaver):
         """
         decoded_data = data.decode("utf-8")
         data_to_insert = json.loads(decoded_data)
-
-        try:
-            data_to_insert["exchange"] = ExchangeType.get_exchange(
-                data_to_insert["exchange"]
-            ).name
-            self.save_stock_data(data_to_insert)
-        except ValueError:
-            logger.error(
-                "Exchange type %s is not supported", data_to_insert["exchange"]
-            )
+        self.save_stock_data(data_to_insert)
 
     def retrieve_and_save(self):
         """

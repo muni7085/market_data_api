@@ -1,5 +1,4 @@
 # pylint: disable=missing-function-docstring
-import os
 
 import uvicorn
 from dotenv import load_dotenv

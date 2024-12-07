@@ -44,7 +44,7 @@ async def signup(user: UserSignup, response: Response):
         The user details to be registered in the system
     """
     status = signup_user(user)
-    response.status_code = status.pop("status_code") or 200
+    response.status_code = status.pop("status_code", 200)
 
     return status
 
@@ -60,7 +60,7 @@ async def signin(user: UserSignIn, response: Response):
         The user details to be authenticated in the system
     """
     status = signin_user(user.email, user.password)
-    response.status_code = status.pop("status_code") or 200
+    response.status_code = status.pop("status_code", 200)
 
     return status
 
@@ -83,7 +83,7 @@ async def send_verification_code(
         response.status_code = 400
         return {"message": "Invalid verification medium. Use 'email' or 'phone'"}
 
-    user = get_user_by_attr("verification_medium", email_or_phone)
+    user = get_user_by_attr(verification_medium, email_or_phone)
 
     if user is None:
         response.status_code = 404
@@ -127,6 +127,10 @@ async def verify_email(email: str, verification_code: str, response: Response):
     """
     email_verification = get_user_verification(email)
 
+    if email_verification is None:
+        response.status_code = 404
+        return {"message": "User does not exist with this email"}
+
     if email_verification.verification_code == verification_code:
         if email_verification.expiration_time < int(
             datetime.now(timezone.utc).timestamp()
@@ -137,11 +141,14 @@ async def verify_email(email: str, verification_code: str, response: Response):
         update_user_verification_status(email)
         response.status_code = 200
         return {"message": "Email verified successfully"}
-    else:
-        response.status_code = 400
-        return {"message": "Invalid verification code"}
+
+    response.status_code = 400
+    return {"message": "Invalid verification code"}
 
 
 @router.get("/protected-endpoint")
 def protected_route(current_user: dict = Depends(get_current_user)):
+    """ 
+    Dummy protected route to test the authentication.
+    """
     return {"message": "This is a protected route", "user": current_user}
