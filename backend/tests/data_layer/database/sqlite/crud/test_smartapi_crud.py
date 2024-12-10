@@ -57,7 +57,7 @@ def test_get_smartapi_tokens_by_any_and_all_condition():
             assert "BSE" == item.exchange
 
         result = get_smartapi_tokens_by_all_conditions(symbol="INFY", exchange="NSE")
-        assert token1.to_dict() == result[1].to_dict()
+        assert token1.to_dict() == result[0].to_dict()
 
         result = get_smartapi_tokens_by_all_conditions(symbol="SBI", exchange="BSE")
         for item in result:

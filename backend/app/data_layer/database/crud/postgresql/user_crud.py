@@ -159,13 +159,13 @@ def update_user(user_id: int, user_data: dict) -> User | None:
         return user
 
 
-def delete_user(user_id: str) -> bool:
+def delete_user(user_id: int) -> bool:
     """
     Delete a user from the database using the `user_id` if the user is present.
 
     Parameters:
     ----------
-    user_id: ``str``
+    user_id: ``int``
         The `user_id` of the user to delete
 
     Returns:
