@@ -52,7 +52,7 @@ def sample_stock_price_info() -> dict[str, str | None]:
 @pytest.fixture
 def sample_socket_stock_price_info() -> InstrumentPrice:
     """
-    Sample SocketStockPriceInfo object
+    Sample InstrumentPrice object
     """
     return InstrumentPrice(
         token="256265",
@@ -162,7 +162,7 @@ def test_insert_data_with_object_conversion(
     mock_session: MagicMock, sample_socket_stock_price_info: InstrumentPrice
 ) -> None:
     """
-    Test insert_data with a SocketStockPriceInfo object
+    Test insert_data with a InstrumentPrice object
     """
     insert_data(sample_socket_stock_price_info, update_existing=False)
 

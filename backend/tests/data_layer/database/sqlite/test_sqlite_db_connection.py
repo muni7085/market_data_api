@@ -14,7 +14,7 @@ from app.data_layer.database.db_connections.sqlite import (
 from app.data_layer.database.models.smartapi_model import SmartAPIToken
 from app.utils.urls import SQLITE_DB_URL
 
-table_names = {"smartapitoken", "instrumentprice", "user", "userverification"}
+table_names = {"smartapitoken", "instrumentprice"}
 
 
 def test_database_init_and_interaction():

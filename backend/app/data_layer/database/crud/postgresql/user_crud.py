@@ -102,13 +102,13 @@ def create_user(user: User) -> bool:
         return False
 
 
-def get_user(user_id: str):
+def get_user(user_id: int):
     """
     Retrieve a user from the database using the user_id.
 
     Parameters:
     ----------
-    user_id: ``str``
+    user_id: ``int``
         The `user_id` of the user to retrieve
 
     Returns:
@@ -123,7 +123,7 @@ def get_user(user_id: str):
         return result
 
 
-def update_user(user_id: str, user_data: dict) -> User | None:
+def update_user(user_id: int, user_data: dict) -> User | None:
     """
     Update the fields of a user in the database using the `user_id` if the user
     present in the database. The `user_data` dictionary should contain the fields
@@ -131,7 +131,7 @@ def update_user(user_id: str, user_data: dict) -> User | None:
 
     Parameters:
     ----------
-    user_id: ``str``
+    user_id: ``int``
         The `user_id` of the user to update
     user_data: ``dict``
         A dictionary containing the fields to update and their new values

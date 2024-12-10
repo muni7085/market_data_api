@@ -12,7 +12,11 @@ from app.routers.nse.equity import equity
 from app.routers.smartapi.smartapi import smartapi
 from app.utils.startup_utils import create_smartapi_tokens_db
 
-load_dotenv(ROOT_DIR.parent / ".env")
+env_path = ROOT_DIR.parent / ".env"
+
+if not load_dotenv(env_path):
+    raise RuntimeError(f"Failed to load environment variables from {env_path}")
+
 app = FastAPI()
 
 app.include_router(derivatives.router)

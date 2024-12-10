@@ -1,5 +1,5 @@
 """
-This module contains the CRUD operations for the SocketStockPriceInfo table in the SQLite database.
+This module contains the CRUD operations for the InstrumentPrice table in the SQLite database.
 """
 
 from pathlib import Path
@@ -47,7 +47,7 @@ def upsert(
     Parameters
     ----------
     stock_price_info: ``dict[str, str|None]| list[dict[str, str|None]]``
-        The SocketStockPriceInfo objects to upsert into the table
+        The InstrumentPrice objects to upsert into the table
     session: ``Generator[Session, None, None]``
         The SQLModel session object to use for the database operations
     """
@@ -76,7 +76,7 @@ def insert_or_ignore(
     Parameters
     ----------
     stock_price_info: ``dict[str, str|None]| list[dict[str, str|None]]``
-        The SocketStockPriceInfo objects to insert into the table
+        The InstrumentPrice objects to insert into the table
     session: ``Generator[Session, None, None]``
         The SQLModel session object to use for the database operations
     """
@@ -99,14 +99,14 @@ def insert_data(
     session: Generator[Session, None, None] | None = None,
 ):
     """
-    Insert the provided data into the SocketStockPriceInfo table in the SQLite database. It
+    Insert the provided data into the InstrumentPrice table in the SQLite database. It
     will handle both single and multiple data objects. If the data already exists in the table,
     it will either update the existing data or ignore the new data based on the value of the
     `update_existing` parameter
 
     Parameters
     ----------
-    data: ``SocketStockPriceInfo | dict[str, str|None] | List[SocketStockPriceInfo | dict[str, str | None]] | None``
+    data: ``InstrumentPrice | dict[str, str|None] | List[InstrumentPrice | dict[str, str | None]] | None``
         The data to insert into the table
     update_existing: ``bool``, ( defaults = False )
         If True, the existing data in the table will be updated with the new data
@@ -124,7 +124,7 @@ def insert_data(
     if not session:
         session = get_session()
 
-    # Convert list of SocketStockPriceInfo to a list of dicts
+    # Convert list of InstrumentPrice to a list of dicts
     data_to_insert = cast(
         list[dict[str, str | None]],
         [
@@ -143,7 +143,7 @@ def get_all_stock_price_info(
     session: Generator[Session, None, None]
 ) -> list[InstrumentPrice]:
     """
-    Retrieve all the data from the SocketStockPriceInfo table in the SQLite database.
+    Retrieve all the data from the InstrumentPrice table in the SQLite database.
 
     Parameters
     ----------
@@ -152,8 +152,8 @@ def get_all_stock_price_info(
 
     Returns
     -------
-    ``List[SocketStockPriceInfo]``
-        The list of all the SocketStockPriceInfo objects present in the table
+    ``List[InstrumentPrice]``
+        The list of all the InstrumentPrice objects present in the table
     """
     with next(session) as db_session:
         stmt = select(InstrumentPrice)

@@ -1,5 +1,5 @@
 """
-This module contain the schema for the SocketStockPriceInfo table.
+This module contain the schema for the InstrumentPrice table.
 """
 
 from typing import Optional

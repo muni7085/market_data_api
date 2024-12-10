@@ -59,18 +59,18 @@ class SqliteDataSaver(DataSaver):
 
     def save_stock_data(self, data: dict[str, str | None]) -> None:
         """
-        Create a SocketStockPriceInfo object from the given data and save it
+        Create a InstrumentPrice object from the given data and save it
         to the sqlite database.
 
         Parameters
         ----------
         data: ``dict[str, str | None]``
             The data to be saved in the database. The data should contain all
-            the required fields to create a SocketStockPriceInfo object. While
+            the required fields to create a InstrumentPrice object. While
             saving the data, if the data is already present in the database, it
             will be ignored. Means, the data will be saved only if it is not
             present in the database. The presence of the data is checked based
-            on the primary key of the SocketStockPriceInfo object.
+            on the primary key of the InstrumentPrice object.
         """
         socket_stock_price_info = InstrumentPrice(
             retrieval_timestamp=data["retrieval_timestamp"],

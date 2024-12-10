@@ -7,6 +7,7 @@ import bcrypt
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from snowflake import SnowflakeGenerator
 
 from app.data_layer.database.crud.postgresql.user_crud import (
     create_user,
@@ -15,7 +16,7 @@ from app.data_layer.database.crud.postgresql.user_crud import (
     is_attr_data_in_db,
     update_user,
 )
-from app.data_layer.database.models.user_model import User
+from app.data_layer.database.models.user_model import Gender, User
 from app.schemas.user_model import UserSignup
 from app.utils.constants import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -24,7 +25,22 @@ from app.utils.constants import (
     REFRESH_TOKEN_EXPIRE_DAYS,
 )
 
+MACHINE_ID = 1
+snowflake_generator = SnowflakeGenerator(MACHINE_ID)
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/authentication/signin")
+
+
+def get_snowflake_id() -> int:
+    """
+    Generate a unique snowflake ID using the snowflake algorithm.
+
+    Returns:
+    --------
+    ``int``
+        The unique snowflake ID
+    """
+    return next(snowflake_generator)
 
 
 class UserSignupError(HTTPException):
@@ -174,13 +190,11 @@ def validate_gender(gender: str) -> bool:
     ``bool``
         True if the given gender in the correct format
     """
-    if gender.lower() not in ["m", "f", "o"]:
-        raise UserSignupError("Gender must be 'M' or 'F'")
-
+    Gender.get_gender_enum(gender, raise_exception=UserSignupError)
     return True
 
 
-def validate_date_of_birth(date_of_birth: str) -> bool:
+def validate_date_of_birth(date_of_birth: str) -> datetime:
     """
     Validates the date of birth format. The date of birth must be in the format
     'dd/mm/yyyy' and a valid date.
@@ -192,12 +206,12 @@ def validate_date_of_birth(date_of_birth: str) -> bool:
 
     Returns:
     --------
-    ``bool``
+    ``datetime``
         True if the date of birth is valid
     """
     try:
-        datetime.strptime(date_of_birth, "%d/%m/%Y")
-        return True
+        return datetime.strptime(date_of_birth, "%d/%m/%Y")
+
     except ValueError as exc:
         raise UserSignupError(
             "Invalid date format for date of birth. Expected format: dd/mm/yyyy",
@@ -223,7 +237,6 @@ def validate_user_exists(user: UserSignup) -> dict | None:
     fields_to_check = {
         "email": user.email,
         "phone_number": user.phone_number,
-        "user_id": user.user_id,
     }
     response = is_attr_data_in_db(User, fields_to_check)
 
@@ -372,13 +385,22 @@ def signup_user(user: UserSignup):
     validate_user_data(user)
 
     user_model = User(
-        **user.dict(exclude={"password"}), password=get_hash_password(user.password)
+        **user.dict(exclude={"password", "date_of_birth"}),
+        password=get_hash_password(user.password),
+        user_id=get_snowflake_id(),
+        date_of_birth=validate_date_of_birth(user.date_of_birth),
     )
+
     create_user(user_model)
 
+    if not get_user_by_attr("email", user.email):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="User not created successfully. Please try again later",
+        )
+
     return {
-        "message": "User created successfully. Please verify your email to activate your account",
-        "status_code": 200,
+        "message": "User created successfully. Please verify your email to activate your account"
     }
 
 
@@ -406,13 +428,22 @@ def signin_user(email, password):
 
     user = get_user_by_attr("email", email)
     if not user:
-        return {"message": "Invalid email or password", "status_code": 401}
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
 
     if not verify_password(password, user.password):
-        return {"message": "Invalid email or password", "status_code": 401}
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+        )
 
     if not user.is_verified:
-        return {"message": "User is not verified", "status_code": 401}
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is not verified",
+        )
 
     access_token = create_access_token({"user_id": user.user_id, "email": user.email})
     refresh_token = create_refresh_token({"user_id": user.user_id, "email": user.email})
@@ -421,11 +452,10 @@ def signin_user(email, password):
         "message": "Login successful",
         "access_token": access_token,
         "refresh_token": refresh_token,
-        "status_code": 200,
     }
 
 
-def update_user_verification_status(user_email: str, status: bool = True):
+def update_user_verification_status(user_email: str, is_verified: bool = True):
     """
     Update the user verification status in the database. If the user does not exist,
     it returns an error message.
@@ -434,17 +464,20 @@ def update_user_verification_status(user_email: str, status: bool = True):
     -----------
     user_email: ``str``
         The email address of the user
-    status: ``bool``
+    is_verified: ``bool``
         The verification status of the user
     """
     user = get_user_by_attr("email", user_email)
     if not user:
-        return {"message": "User not found", "status_code": 401}
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+        )
 
-    user.is_verified = status
+    user.is_verified = is_verified
     update_user(user.user_id, user.model_dump())
 
-    return {"message": "User verified successfully", "status_code": 200}
+    return {"message": "User verified successfully"}
 
 
 def generate_verification_code(length: int = 6) -> str:

@@ -6,7 +6,6 @@ class UserSignup(BaseModel):
     UserSignup schema for user registration
     """
 
-    user_id: str
     username: str
     email: str
     password: str
@@ -23,3 +22,12 @@ class UserSignIn(BaseModel):
 
     email: str
     password: str
+
+
+class UserVerificationRequest(BaseModel):
+    """
+    UserVerification schema for user verification
+    """
+
+    verification_code: str
+    email_or_phone: str
