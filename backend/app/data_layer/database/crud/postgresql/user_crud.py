@@ -37,15 +37,18 @@ def is_attr_data_in_db(
         A message indicating that the field already exists if found, otherwise None
     """
     session = session or next(get_session())
-
     existing_attr: dict | None = None
 
-    for attr_name, attr_value in att_values.items():
-        statement = select(model).where(getattr(model, attr_name) == attr_value)
+    try:
+        for attr_name, attr_value in att_values.items():
+            statement = select(model).where(getattr(model, attr_name) == attr_value)
 
-        if session.exec(statement).first():
-            existing_attr = {"message": f"{attr_name} already exists"}
-            break
+            if session.exec(statement).first():
+                existing_attr = {"message": f"{attr_name} already exists"}
+                break
+
+    except Exception as e:
+        logger.error("Error checking if attribute data exists: %s", e)
 
     return existing_attr
 
