@@ -39,16 +39,12 @@ def is_attr_data_in_db(
     session = session or next(get_session())
     existing_attr: dict | None = None
 
-    try:
-        for attr_name, attr_value in att_values.items():
-            statement = select(model).where(getattr(model, attr_name) == attr_value)
+    for attr_name, attr_value in att_values.items():
+        statement = select(model).where(getattr(model, attr_name) == attr_value)
 
-            if session.exec(statement).first():
-                existing_attr = {"message": f"{attr_name} already exists"}
-                break
-
-    except Exception as e:
-        logger.error("Error checking if attribute data exists: %s", e)
+        if session.exec(statement).first():
+            existing_attr = {"message": f"{attr_name} already exists"}
+            break
 
     return existing_attr
 
@@ -148,18 +144,18 @@ def update_user(user_id: int, user_data: dict) -> User | None:
     >>> Example:
         update_user("1234", {"first_name": "John", "last_name": "Doe"})
     """
+    user = get_user(user_id)
+
+    if user:
+        for key, value in user_data.items():
+            setattr(user, key, value)
+
     with next(get_session()) as session:
-        user = get_user(user_id)
+        session.add(user)
+        session.commit()
+        session.refresh(user)
 
-        if user:
-            for key, value in user_data.items():
-                setattr(user, key, value)
-
-            session.add(user)
-            session.commit()
-            session.refresh(user)
-
-        return user
+    return user
 
 
 def delete_user(user_id: int) -> bool:

@@ -1,21 +1,15 @@
 # pylint: disable=missing-function-docstring
 
 import uvicorn
-from dotenv import load_dotenv
+
 from fastapi import FastAPI
 
-from app import ROOT_DIR
 from app.data_layer.database.db_connections import postgresql
 from app.routers.authentication import authentication
 from app.routers.nse.derivatives import derivatives
 from app.routers.nse.equity import equity
 from app.routers.smartapi.smartapi import smartapi
 from app.utils.startup_utils import create_smartapi_tokens_db
-
-env_path = ROOT_DIR.parent / ".env"
-
-if not load_dotenv(env_path):
-    raise RuntimeError(f"Failed to load environment variables from {env_path}")
 
 app = FastAPI()
 

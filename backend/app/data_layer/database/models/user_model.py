@@ -115,7 +115,7 @@ class UserVerification(SQLModel, table=True):  # type: ignore
     recipient: str = Field(primary_key=True)
     verification_medium: str
     verification_code: str = Field(max_length=6, min_length=6)
-    expiration_time: int = Field(ge=300, le=1600)
+    expiration_time: int
     verification_datetime: datetime | None = Field(
         sa_column=Column(
             TIMESTAMP(timezone=True),

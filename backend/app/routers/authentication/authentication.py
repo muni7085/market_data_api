@@ -66,7 +66,7 @@ async def signin(user: UserSignIn) -> dict:
     return signin_user(user.email, user.password)
 
 
-# Removed rate limiting dependency
+@router.post("/send-verification-code", status_code=status.HTTP_200_OK)
 async def send_verification_code(email_or_phone: str, verification_medium: str) -> dict:
     """
     Send a verification code to the user's email or phone number.
@@ -111,6 +111,7 @@ async def send_verification_code(email_or_phone: str, verification_medium: str) 
     expiration_time = int(
         (datetime.now(timezone.utc) + timedelta(minutes=10)).timestamp()
     )
+
     create_or_update_user_verification(
         UserVerification(
             recipient=email_or_phone,
@@ -122,7 +123,9 @@ async def send_verification_code(email_or_phone: str, verification_medium: str) 
 
     # Send the notification
     notification_provider.send_notification(
-        code=verification_code, recipient=email_or_phone, recipient_name=user.username
+        code=verification_code,
+        recipient_email=email_or_phone,
+        recipient_name=user.username,
     )
 
     return {
