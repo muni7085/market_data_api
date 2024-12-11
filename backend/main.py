@@ -1,7 +1,6 @@
 # pylint: disable=missing-function-docstring
 
 import uvicorn
-
 from fastapi import FastAPI
 
 from app.data_layer.database.db_connections import postgresql
