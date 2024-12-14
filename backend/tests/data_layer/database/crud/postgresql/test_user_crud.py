@@ -63,7 +63,6 @@ def test_user():
 def test_create_user(session, test_user):
     """
     Test creating a new user.
-
     Ensures `create_user` adds a user to the database.
     """
     result = create_user(test_user, session)
@@ -80,7 +79,6 @@ def test_create_user(session, test_user):
 def test_get_user(session, test_user):
     """
     Test retrieving a user by user_id.
-
     Confirms that `get_user` fetches the correct user.
     """
     user = get_user(test_user.user_id, session)
@@ -91,7 +89,6 @@ def test_get_user(session, test_user):
 def test_is_attr_data_in_db(session):
     """
     Test if attribute data exists in the database.
-
     Verifies that `is_attr_data_in_db` detects existing attributes.
     """
     result = is_attr_data_in_db(User, {"email": "testuser@example.com"}, session)
