@@ -7,7 +7,7 @@ from app.data_layer.database.crud.sqlite.websocket_crud import (
     insert_or_ignore,
     upsert,
 )
-from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
+from app.data_layer.database.models.websocket_model import InstrumentPrice
 
 #################### FIXTURES ####################
 
@@ -50,11 +50,11 @@ def sample_stock_price_info() -> dict[str, str | None]:
 
 
 @pytest.fixture
-def sample_socket_stock_price_info() -> SocketStockPriceInfo:
+def sample_socket_stock_price_info() -> InstrumentPrice:
     """
-    Sample SocketStockPriceInfo object
+    Sample InstrumentPrice object
     """
-    return SocketStockPriceInfo(
+    return InstrumentPrice(
         token="256265",
         retrieval_timestamp="2021-09-30 10:00:00",
         last_traded_timestamp="2021-09-30 09:59:59",
@@ -159,10 +159,10 @@ def test_insert_data_list_dicts_upsert(
 
 # Test: 6
 def test_insert_data_with_object_conversion(
-    mock_session: MagicMock, sample_socket_stock_price_info: SocketStockPriceInfo
+    mock_session: MagicMock, sample_socket_stock_price_info: InstrumentPrice
 ) -> None:
     """
-    Test insert_data with a SocketStockPriceInfo object
+    Test insert_data with a InstrumentPrice object
     """
     insert_data(sample_socket_stock_price_info, update_existing=False)
 

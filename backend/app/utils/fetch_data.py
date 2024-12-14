@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import Any
 
@@ -62,3 +63,30 @@ def fetch_data(url: str, max_tries: int = 10) -> Any:
             status_code=503,
             detail={"Error": "Service Unavailable"},
         )
+
+
+def get_required_env_var(name: str) -> str:
+    """
+    Get the required environment variable from the system.
+
+    Parameters:
+    -----------
+    name: ``str``
+        Name of the environment variable to fetch
+
+    Raises:
+    -------
+    ``ValueError``
+        If the required environment variable is not found
+
+    Returns:
+    --------
+    ``str``
+        Value of the environment variable
+    """
+    value = os.environ.get(name)
+
+    if not value:
+        raise ValueError(f"Missing required environment variable: {name}")
+
+    return value

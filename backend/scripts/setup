@@ -25,7 +25,6 @@ def setup_env_vars():
     activate_dir.mkdir(parents=True, exist_ok=True)
     deactivate_dir.mkdir(parents=True, exist_ok=True)
 
-
     # Create activation script
     with open(activate_dir / "project_env_vars.sh", "w") as f:
         f.write("#!/bin/bash\n")
@@ -36,8 +35,18 @@ def setup_env_vars():
         f.write("#!/bin/bash\n")
         f.write("unset ROOT_PATH\n")
 
-    with open(BACKEND_ROOT_PATH.parent / ".env", "w") as f:
-        f.write("ROOT_PATH=" + str(BACKEND_ROOT_PATH) + "\n")
+    env_path = BACKEND_ROOT_PATH / ".env"
+    env_data = [f"ROOT_PATH={BACKEND_ROOT_PATH}\n"]
+    if env_path.exists():
+        with open(env_path, "r") as f:
+            prev_data = f.readlines()
+        for line in prev_data:
+            if not line.startswith("ROOT_PATH="):
+                env_data.append(line)
+
+    with open(env_path, "w") as f:
+        for env in env_data:
+            f.write(env)
 
     logger.info(
         "Environment variables set. Reactivate your conda environment to apply changes."

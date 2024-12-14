@@ -32,10 +32,9 @@ def kafka_data() -> list[dict]:
             "last_traded_timestamp": 1729504796,
             "open_interest": 0,
             "open_interest_change_percentage": 0,
-            "name": "DBOL",
+            "symbol": "DBOL",
             "socket_name": "smartapi",
             "retrieval_timestamp": 1729532024.309936,
-            "exchange": "NSE_CM",
         },
         {
             "subscription_mode": 3,
@@ -57,9 +56,8 @@ def kafka_data() -> list[dict]:
             "last_traded_timestamp": 1729505946,
             "open_interest": 0,
             "open_interest_change_percentage": 0,
-            "name": "GEECEE",
+            "symbol": "GEECEE",
             "socket_name": "smartapi",
             "retrieval_timestamp": 1729532024.31136,
-            "exchange": 1,
         },
     ]

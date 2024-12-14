@@ -4,4 +4,4 @@ defaults:
 
 name: jsonl_saver
 source: $kafka
-jsonl_file_path: ${oc.env:ROOT_PATH}/data_layer/database/db/jsonl_saver.csv
+jsonl_file_path: ${oc.env:ROOT_PATH}/app/data_layer/database/db/jsonl_saver.jsonl

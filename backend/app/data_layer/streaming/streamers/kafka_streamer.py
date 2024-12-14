@@ -39,6 +39,7 @@ class KafkaStreamer(Streamer):
             The data to be sent to the Kafka server as a string
         """
         try:
+            print(f"Sending data to Kafka: {data}")
             bytes_data = data.encode("utf-8")
             self.kafka_producer.send(self.kafka_topic, bytes_data)
             self.kafka_producer.flush()

@@ -12,7 +12,7 @@ from pytest_mock import MockerFixture, MockType
 from app.data_layer.data_saver import DataSaver, SqliteDataSaver
 from app.data_layer.database.crud.sqlite.websocket_crud import get_all_stock_price_info
 from app.data_layer.database.db_connections.sqlite import get_session
-from app.data_layer.database.models.websocket_model import SocketStockPriceInfo
+from app.data_layer.database.models.websocket_model import InstrumentPrice
 from app.utils.common import init_from_cfg
 
 Message = namedtuple("Message", ["value"])
@@ -140,9 +140,7 @@ def test_init(
 
 
 # Test: 2
-def test_retrieve_and_save(
-    sqlite_saver: SqliteDataSaver, mock_logger: MockType, kafka_data: list[dict]
-):
+def test_retrieve_and_save(sqlite_saver: SqliteDataSaver, kafka_data: list[dict]):
     """
     Test the `retrieve_and_save` method of the SqliteDataSaver.
     """
@@ -158,18 +156,6 @@ def test_retrieve_and_save(
     session = get_session(sqlite_saver.engine)
     stock_price_info = get_all_stock_price_info(session)
     inserted_data = [info.to_dict() for info in stock_price_info]
-    expected_data = [SocketStockPriceInfo(**data).to_dict() for data in kafka_data]
-    for data in expected_data:
-        data["exchange"] = "NSE_CM"
+    expected_data = [InstrumentPrice(**data).to_dict() for data in kafka_data]
 
     assert inserted_data == expected_data
-
-    # Test: 2.2 ( Test saving data to the sqlite database with invalid exchange type )
-    kafka_data[0]["exchange"] = -1
-    encoded_data = [
-        Message(value=json.dumps(data).encode("utf-8")) for data in kafka_data
-    ]
-
-    sqlite_saver.consumer.__iter__.return_value = encoded_data
-    sqlite_saver.retrieve_and_save()
-    mock_logger.error.assert_called_once_with("Exchange type %s is not supported", -1)
